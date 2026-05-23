@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CreditCardAPR adaptive icon foreground.
+    Rendered on top of amber (#F59E0B) background.
+    White card silhouette + amber stripe + amber % symbol.
+    Safe zone: 18–90dp.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- White credit card body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,32 Q22,26 28,26 L80,26 Q86,26 86,32 L86,76 Q86,82 80,82 L28,82 Q22,82 22,76 Z"/>
+
+    <!-- Amber stripe across card (simulates magnetic strip / chip area) -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M22,42 L86,42 L86,52 L22,52 Z"/>
+
+    <!-- % top-left circle  (center 38,62  r=7) -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M31,62 A7,7 0 0,1 45,62 A7,7 0 0,1 31,62 Z"/>
+
+    <!-- % diagonal slash -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M34,78 L38,82 L76,56 L72,52 Z"/>
+
+    <!-- % bottom-right circle  (center 70,72  r=7) -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M63,72 A7,7 0 0,1 77,72 A7,7 0 0,1 63,72 Z"/>
+
+</vector>

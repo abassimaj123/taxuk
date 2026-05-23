@@ -1,0 +1,52 @@
+name: CI — Lint, Format, Test
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  validate:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Dart analyze
+        run: |
+          output=$(flutter analyze --no-pub 2>&1) || true
+          echo "$output"
+          errors=$(echo "$output" | grep -cE "^  error [•-]" || true)
+          if [ "${errors:-0}" -gt 0 ]; then
+            echo "FAIL: $errors real error(s) found"
+            exit 1
+          fi
+          echo "OK: 0 real errors"
+
+      - name: Format check
+        run: dart format --set-exit-if-changed lib/ test/
+
+      - name: Run tests
+        run: |
+          flutter test --no-pub --coverage
+          if [ -f coverage/lcov.info ]; then
+            total_lines=$(grep -c "^DA:" coverage/lcov.info || echo 0)
+            covered=$(grep -c "^DA:.*,[^0]" coverage/lcov.info || echo 0)
+            if [ $total_lines -gt 0 ]; then
+              pct=$((covered * 100 / total_lines))
+              echo "## 📊 Test Coverage: ${pct}% (${covered}/${total_lines} lines)" >> $GITHUB_STEP_SUMMARY
+              echo "Coverage: ${pct}%"
+            fi
+          fi
+

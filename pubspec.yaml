@@ -1,0 +1,63 @@
+name: taxuk
+description: UK VAT and income tax calculator
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  calcwise_core:
+    git:
+      url: https://github.com/abassimaj123/calcwise_core.git
+      ref: main
+  intl: ^0.20.0
+  share_plus: ^10.1.4
+  fl_chart: ^0.68.0
+  flutter_local_notifications: ^18.0.1
+  google_mobile_ads: ^5.1.0
+  shared_preferences: ^2.2.3
+  in_app_purchase: ^3.2.0
+  in_app_review: ^2.0.9
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  pdf: ^3.11.1
+  printing: ^5.13.1
+  collection: ^1.18.0
+  firebase_core: ^3.6.0
+  firebase_analytics: ^11.3.3
+  firebase_crashlytics: ^4.1.3
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  calcwise_lint:
+    git:
+      url: https://github.com/abassimaj123/calcwise_core.git
+      path: calcwise_lint
+      ref: main
+  custom_lint: ">=0.6.0 <0.8.0"
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/branding/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png"
+  min_sdk_android: 21
+  web:
+    generate: false
+  windows:
+    generate: false

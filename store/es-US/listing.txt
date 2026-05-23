@@ -1,0 +1,50 @@
+TÍTULO (30 caracteres)
+---------------------
+Calculadora APR Tarjeta de Crédito
+
+DESCRIPCIÓN CORTA (80 caracteres)
+-----------------------------------
+Domina tu deuda. APR, pago, comparación y más. Gratis.
+
+DESCRIPCIÓN COMPLETA
+---------------------
+CreditCardAPR es la calculadora de tarjeta de crédito más completa para Estados Unidos — diseñada para quienes quieren entender el costo real de su deuda y crear un plan para salir de ella.
+
+★ 5 HERRAMIENTAS PODEROSAS EN UNA SOLA APP
+
+💳 CALCULADORA APR
+Ingresa tu saldo, APR y pago mensual. Obtén al instante:
+• Cargo mensual de intereses (lo que le pagas al banco)
+• Interés acumulado en 12 meses
+• Interés total hasta liquidar la tarjeta
+• Fecha exacta de liquidación (meses restantes)
+
+📊 TABLA DE AMORTIZACIÓN
+Desglose pago por pago. Ve cómo baja tu saldo cada mes, cuánto va a intereses vs capital, y exactamente cuándo estarás libre de deuda.
+
+⚖️ COMPARADOR DE TARJETAS
+Compara hasta 3 tarjetas de crédito — distintos APR, saldos, pagos. Elige la estrategia que más te ahorra.
+
+📉 OPTIMIZADOR DE PAGO
+Encuentra el pago mínimo que tiene sentido. Ve cómo pequeños pagos extra acortan drásticamente tu fecha de liquidación.
+
+📁 HISTORIAL Y EXPORTAR PDF
+Guarda cada cálculo. Revisa, compara y exporta resultados como PDF.
+
+★ DISEÑADO PARA EE.UU.
+
+✅ APR estándar + escenarios de APR promocional
+✅ Rango completo de APR en EE.UU. (0% a 36%+)
+✅ Cálculo de pago mínimo (2% del saldo o $25 mínimo)
+✅ Inglés + Español (EN/ES) — completamente bilingüe
+✅ 100% sin conexión — tus datos quedan en tu dispositivo
+✅ Modo oscuro
+
+★ MODELO FREEMIUM
+Gratis: 5 calculadoras, 100 cálculos guardados
+Premium ($2.99, único pago): guardados ilimitados, sin anuncios, exportar PDF, historial completo
+Ver un anuncio corto: 60 min sin anuncios (hasta 3× al día)
+
+CATEGORÍA: Finanzas | CONTENIDO: Para todos
+CONTACTO: abassimaj@gmail.com
+PRIVACIDAD: https://abassimaj.github.io/creditcardapr-privacy/

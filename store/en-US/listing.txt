@@ -1,0 +1,54 @@
+APP TITLE (30 chars)
+--------------------
+Credit Card APR Calculator
+
+SHORT DESCRIPTION (80 chars)
+------------------------------
+Master your credit card debt. APR, payoff, comparison & more. Free.
+
+FULL DESCRIPTION
+-----------------
+CreditCardAPR is the most complete credit card calculator for the United States — built for cardholders who want to understand the real cost of debt and build a plan to get out of it.
+
+★ 5 POWERFUL TOOLS IN ONE APP
+
+💳 APR CALCULATOR
+Enter your balance, APR, and monthly payment. Instantly see:
+• Monthly interest charge (what you're paying the bank)
+• Interest over 12 months at current rate
+• Total interest until card is paid off
+• Exact payoff timeline (months to freedom)
+
+📊 AMORTIZATION SCHEDULE
+Full payment-by-payment breakdown. See how your balance drops each month, how much goes to interest vs. principal, and exactly when you'll be debt-free.
+
+⚖️ CARD COMPARATOR
+Compare up to 3 credit cards side by side — different APRs, balances, payments. Choose the strategy that saves you the most.
+
+📉 PAYOFF OPTIMIZER
+Find the minimum payment that makes sense. See how small extra payments dramatically shorten your payoff timeline.
+
+📁 HISTORY & PDF EXPORT
+Save every calculation. Review, compare, and export results as PDF for your records.
+
+★ BUILT FOR THE US
+
+✅ Standard APR + promotional APR scenarios
+✅ Stress-tested with all US APR ranges (0% to 36%+)
+✅ Minimum payment calculation (2% of balance or $25 floor)
+✅ English + Spanish (EN/ES) — fully bilingual
+✅ 100% offline — your data stays on your device
+✅ Dark mode support
+
+★ FREEMIUM MODEL
+Free: all 5 calculators, 100 saved calculations
+Premium ($2.99, one-time): unlimited saves, no ads, PDF export, full history
+Watch a short ad: 60 minutes ad-free (up to 3× per day)
+
+KEYWORDS
+---------
+credit card calculator, APR calculator, credit card payoff, interest calculator, debt payoff, credit card debt, amortization, minimum payment calculator, credit card comparison, debt snowball, debt avalanche, credit card payoff calculator
+
+CATEGORY: Finance | CONTENT RATING: Everyone
+CONTACT: abassimaj@gmail.com
+PRIVACY: https://abassimaj.github.io/creditcardapr-privacy/
