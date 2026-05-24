@@ -15,6 +15,8 @@ import 'core/theme/app_theme.dart';
 import 'screens/splash_screen.dart';
 import 'screens/vat_screen.dart';
 import 'screens/income_tax_screen.dart';
+import 'screens/dividend_screen.dart';
+import 'screens/student_loan_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
@@ -237,6 +239,8 @@ class _MainShellState extends State<MainShell> {
         children: const [
           VatScreen(),
           IncomeTaxScreen(),
+          DividendScreen(),
+          StudentLoanScreen(),
           HistoryScreen(),
         ],
       ),
@@ -273,6 +277,16 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.account_balance_outlined),
               selectedIcon: Icon(Icons.account_balance_rounded),
               label: 'Income Tax',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bar_chart_outlined),
+              selectedIcon: Icon(Icons.bar_chart_rounded),
+              label: 'Dividends',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.school_outlined),
+              selectedIcon: Icon(Icons.school_rounded),
+              label: 'Student Loan',
             ),
             NavigationDestination(
               icon: Icon(Icons.history_rounded),

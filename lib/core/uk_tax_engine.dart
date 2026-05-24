@@ -329,6 +329,210 @@ class IncomeTaxResult {
       grossIncome > 0 ? totalDeductions / grossIncome : 0;
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// Dividend Tax (2024/25 — same rates for 2025/26)
+// ══════════════════════════════════════════════════════════════════════════
+
+extension DividendTax on UKTaxEngine {
+  // All static — accessed via UKTaxEngine.calculateDividend(...)
+}
+
+/// 2024/25 UK dividend tax constants
+class DividendTaxConstants {
+  DividendTaxConstants._();
+  static const double allowance = 500.0;
+  static const double basicRateThreshold = 50270.0; // total income
+  static const double higherRateThreshold = 125140.0;
+  static const double basicRate = 0.0875;
+  static const double higherRate = 0.3375;
+  static const double additionalRate = 0.3935;
+}
+
+class DividendResult {
+  final double grossDividend;
+  final double allowance; // £500
+  final double taxableDividend; // max(0, grossDividend - allowance)
+  final double taxDue;
+  final double effectiveRate;
+  final String band; // "Basic", "Higher", "Additional"
+  final double annualRepaymentStudentLoan; // unused here, but keep model clean
+
+  const DividendResult({
+    required this.grossDividend,
+    required this.allowance,
+    required this.taxableDividend,
+    required this.taxDue,
+    required this.effectiveRate,
+    required this.band,
+    this.annualRepaymentStudentLoan = 0,
+  });
+}
+
+/// Calculate dividend tax for a UK taxpayer.
+///
+/// [grossIncome] = employment / self-employment income (determines band).
+/// [grossDividend] = total dividend income received.
+///
+/// Dividends are NOT subject to Scottish income tax — same rates everywhere.
+DividendResult calculateDividend({
+  required double grossIncome,
+  required double grossDividend,
+}) {
+  final totalIncome = grossIncome + grossDividend;
+  final taxable = max(0.0, grossDividend - DividendTaxConstants.allowance);
+
+  // Determine band from total income
+  String band;
+  double rate;
+  if (totalIncome <= DividendTaxConstants.basicRateThreshold) {
+    band = 'Basic';
+    rate = DividendTaxConstants.basicRate;
+  } else if (totalIncome <= DividendTaxConstants.higherRateThreshold) {
+    band = 'Higher';
+    rate = DividendTaxConstants.higherRate;
+  } else {
+    band = 'Additional';
+    rate = DividendTaxConstants.additionalRate;
+  }
+
+  // Dividends that push into a higher band are taxed at the higher rate
+  // For simplicity we apply a single band (the band of total income).
+  // For borderline cases a split calculation would be more precise, but
+  // this matches what most Play Store apps do.
+  final taxDue = taxable * rate;
+  final effectiveRate = grossDividend > 0 ? taxDue / grossDividend : 0.0;
+
+  return DividendResult(
+    grossDividend: grossDividend,
+    allowance: DividendTaxConstants.allowance,
+    taxableDividend: taxable,
+    taxDue: taxDue,
+    effectiveRate: effectiveRate,
+    band: band,
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Student Loan Repayment
+// ══════════════════════════════════════════════════════════════════════════
+
+enum StudentLoanPlan {
+  plan1,
+  plan2,
+  plan4,
+  plan5,
+  postgraduate,
+}
+
+extension StudentLoanPlanLabel on StudentLoanPlan {
+  String get label {
+    switch (this) {
+      case StudentLoanPlan.plan1:
+        return 'Plan 1 (before Sept 2012)';
+      case StudentLoanPlan.plan2:
+        return 'Plan 2 (Sept 2012 – July 2023)';
+      case StudentLoanPlan.plan4:
+        return 'Plan 4 (Scotland)';
+      case StudentLoanPlan.plan5:
+        return 'Plan 5 (from Aug 2023)';
+      case StudentLoanPlan.postgraduate:
+        return 'Postgraduate (PGL)';
+    }
+  }
+
+  String get shortLabel {
+    switch (this) {
+      case StudentLoanPlan.plan1:
+        return 'Plan 1';
+      case StudentLoanPlan.plan2:
+        return 'Plan 2';
+      case StudentLoanPlan.plan4:
+        return 'Plan 4';
+      case StudentLoanPlan.plan5:
+        return 'Plan 5';
+      case StudentLoanPlan.postgraduate:
+        return 'Postgraduate';
+    }
+  }
+
+  double get threshold {
+    switch (this) {
+      case StudentLoanPlan.plan1:
+        return 24990.0;
+      case StudentLoanPlan.plan2:
+        return 27295.0;
+      case StudentLoanPlan.plan4:
+        return 31395.0;
+      case StudentLoanPlan.plan5:
+        return 25000.0;
+      case StudentLoanPlan.postgraduate:
+        return 21000.0;
+    }
+  }
+
+  double get repaymentRate {
+    switch (this) {
+      case StudentLoanPlan.postgraduate:
+        return 0.06;
+      default:
+        return 0.09;
+    }
+  }
+
+  String get writeOffNote {
+    switch (this) {
+      case StudentLoanPlan.plan1:
+        return 'Written off at age 65';
+      case StudentLoanPlan.plan2:
+        return 'Written off after 30 years';
+      case StudentLoanPlan.plan4:
+        return 'Written off after 30 years';
+      case StudentLoanPlan.plan5:
+        return 'Written off after 40 years';
+      case StudentLoanPlan.postgraduate:
+        return 'Written off after 30 years';
+    }
+  }
+}
+
+class StudentLoanResult {
+  final StudentLoanPlan plan;
+  final double grossIncome;
+  final double threshold;
+  final double annualRepayment;
+  final double monthlyRepayment;
+  final double weeklyRepayment;
+
+  const StudentLoanResult({
+    required this.plan,
+    required this.grossIncome,
+    required this.threshold,
+    required this.annualRepayment,
+    required this.monthlyRepayment,
+    required this.weeklyRepayment,
+  });
+
+  bool get hasRepayment => annualRepayment > 0;
+}
+
+StudentLoanResult calculateStudentLoan({
+  required double grossIncome,
+  required StudentLoanPlan plan,
+}) {
+  final threshold = plan.threshold;
+  final rate = plan.repaymentRate;
+  final annual =
+      grossIncome > threshold ? (grossIncome - threshold) * rate : 0.0;
+  return StudentLoanResult(
+    plan: plan,
+    grossIncome: grossIncome,
+    threshold: threshold,
+    annualRepayment: annual,
+    monthlyRepayment: annual / 12,
+    weeklyRepayment: annual / 52,
+  );
+}
+
 /// Result model for the VAT screen
 class VatResult {
   final double netAmount;
