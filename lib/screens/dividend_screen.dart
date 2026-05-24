@@ -36,6 +36,9 @@ class _DividendScreenState extends State<DividendScreen> {
     _salaryCtrl = TextEditingController(
       text: initial != null ? initial.round().toString() : '35000',
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _calculate();
+    });
   }
 
   @override

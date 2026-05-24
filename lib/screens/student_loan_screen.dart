@@ -37,6 +37,9 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> {
     _grossCtrl = TextEditingController(
       text: initial != null ? initial.round().toString() : '35000',
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _calculate();
+    });
   }
 
   @override

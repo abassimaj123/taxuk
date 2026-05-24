@@ -27,6 +27,14 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
   IncomeTaxResult? _result;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _calculate();
+    });
+  }
+
+  @override
   void dispose() {
     _grossCtrl.dispose();
     super.dispose();
