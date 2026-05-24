@@ -193,13 +193,11 @@ class _VatScreenState extends State<VatScreen> {
                       _rateOption = opt;
                       if (_result != null) _calculate();
                     }),
-                    selectedColor:
-                        AppTheme.primary.withValues(alpha: 0.15),
+                    selectedColor: AppTheme.primary.withValues(alpha: 0.15),
                     checkmarkColor: AppTheme.primary,
                     labelStyle: TextStyle(
                       color: sel ? AppTheme.primary : ct.textSecondary,
-                      fontWeight:
-                          sel ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
                     ),
                     side: BorderSide(
                       color: sel
@@ -254,8 +252,7 @@ class _VatScreenState extends State<VatScreen> {
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 ],
                 decoration: InputDecoration(
-                  labelText:
-                      _fromGross ? 'Gross Amount (£)' : 'Net Amount (£)',
+                  labelText: _fromGross ? 'Gross Amount (£)' : 'Net Amount (£)',
                   prefixText: '£',
                   filled: true,
                 ),
@@ -290,10 +287,7 @@ class _VatScreenState extends State<VatScreen> {
                         value: _fmtGbp.format(r.vatAmount),
                         secondary: 'At ${r.rateLabel}',
                         stats: [
-                          (
-                            label: 'Net',
-                            value: _fmtGbp.format(r.netAmount)
-                          ),
+                          (label: 'Net', value: _fmtGbp.format(r.netAmount)),
                           (
                             label: 'Gross',
                             value: _fmtGbp.format(r.grossAmount)
@@ -433,8 +427,7 @@ class _ToggleOption extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 13,
-              fontWeight:
-                  selected ? FontWeight.w600 : FontWeight.w400,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               color: selected ? AppTheme.primary : ct.textSecondary,
             ),
           ),
@@ -465,22 +458,16 @@ class _ResultRow extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: highlight
-                    ? AppTheme.primary
-                    : ct.textSecondary,
-                fontWeight:
-                    highlight ? FontWeight.w600 : FontWeight.w400,
+                color: highlight ? AppTheme.primary : ct.textSecondary,
+                fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
             Text(
               value,
               style: TextStyle(
                 fontSize: 14,
-                color: highlight
-                    ? AppTheme.primary
-                    : ct.textPrimary,
-                fontWeight:
-                    highlight ? FontWeight.w700 : FontWeight.w600,
+                color: highlight ? AppTheme.primary : ct.textPrimary,
+                fontWeight: highlight ? FontWeight.w700 : FontWeight.w600,
               ),
             ),
           ],

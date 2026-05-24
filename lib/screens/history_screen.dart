@@ -64,8 +64,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text('Cancel',
-                  style: TextStyle(color: ct.textSecondary)),
+              child: Text('Cancel', style: TextStyle(color: ct.textSecondary)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
@@ -94,7 +93,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ? CalcwiseEmptyState(
                   icon: Icons.history_rounded,
                   title: AppStringsEN.historyEmpty,
-                  body: 'Your saved VAT and income tax calculations will appear here.',
+                  body:
+                      'Your saved VAT and income tax calculations will appear here.',
                   actionLabel: 'Calculate now',
                   onAction: () {},
                 )
@@ -117,13 +117,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color:
-                                AppTheme.primary.withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppRadius.md),
+                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(
-                              color: AppTheme.primary
-                                  .withValues(alpha: 0.3),
+                              color: AppTheme.primary.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(children: [
@@ -140,8 +137,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () =>
-                                  IAPService.instance.buy(),
+                              onPressed: () => IAPService.instance.buy(),
                               child: const Text(
                                 'Upgrade',
                                 style: TextStyle(
@@ -169,8 +165,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             fmtGbp: _fmtGbp,
                             fmtDate: _fmtDate,
                             ct: ct,
-                            onDelete: () =>
-                                _delete(entry['id'] as int),
+                            onDelete: () => _delete(entry['id'] as int),
                           );
                         },
                       ),
@@ -246,8 +241,7 @@ class _HistoryTile extends StatelessWidget {
       final vat = (results['vat'] as num?)?.toDouble() ?? 0;
       final rateLabel = inputs['rate_label'] as String? ?? '';
       title = 'VAT — $rateLabel';
-      subtitle =
-          'Net: ${fmtGbp.format(net)} · VAT: ${fmtGbp.format(vat)}';
+      subtitle = 'Net: ${fmtGbp.format(net)} · VAT: ${fmtGbp.format(vat)}';
       icon = Icons.percent_rounded;
     }
 
@@ -261,8 +255,8 @@ class _HistoryTile extends StatelessWidget {
           color: AppTheme.errorRed.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        child: const Icon(Icons.delete_outline_rounded,
-            color: AppTheme.errorRed),
+        child:
+            const Icon(Icons.delete_outline_rounded, color: AppTheme.errorRed),
       ),
       onDismissed: (_) => onDelete(),
       child: Container(
@@ -295,8 +289,7 @@ class _HistoryTile extends StatelessWidget {
             children: [
               Text(
                 subtitle,
-                style:
-                    TextStyle(fontSize: 12, color: ct.textSecondary),
+                style: TextStyle(fontSize: 12, color: ct.textSecondary),
               ),
               Text(
                 dateStr,

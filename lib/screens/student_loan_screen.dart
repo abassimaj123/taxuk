@@ -250,8 +250,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> {
                     ),
                     CalcwiseStaggerItem(
                       index: 2,
-                      child: _SummaryCard(
-                          result: r, fmtGbp: _fmtGbp, ct: ct),
+                      child: _SummaryCard(result: r, fmtGbp: _fmtGbp, ct: ct),
                     ),
                     CalcwiseStaggerItem(
                       index: 3,
@@ -363,8 +362,8 @@ class _SummaryCard extends StatelessWidget {
           Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
           Text(
             result.plan.writeOffNote,
-            style: TextStyle(
-                fontSize: 12, color: ct.textSecondary, height: 1.4),
+            style:
+                TextStyle(fontSize: 12, color: ct.textSecondary, height: 1.4),
           ),
         ],
       );

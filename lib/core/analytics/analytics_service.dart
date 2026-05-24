@@ -46,18 +46,18 @@ class AnalyticsService extends CalcwiseAnalytics {
   Future<void> logScreenView(String screenName) =>
       log('screen_view', {'screen_name': screenName});
   Future<void> logOnboardingComplete() => log('onboarding_complete');
-  Future<void> logOnboardingSkipped()  => log('onboarding_skipped');
-  Future<void> logFirstCalculate()     => log('first_calculate');
+  Future<void> logOnboardingSkipped() => log('onboarding_skipped');
+  Future<void> logFirstCalculate() => log('first_calculate');
   Future<void> logDarkModeToggled(bool enabled) =>
       log('dark_mode_toggled', {'enabled': '$enabled'});
-  Future<void> logShareTapped()   => log('share_tapped');
+  Future<void> logShareTapped() => log('share_tapped');
   Future<void> logExportStarted() => log('export_started');
   Future<void> logUpgradeButtonTapped(String source) =>
       log('upgrade_tapped', {'source': source});
   Future<void> logPaywallSoftShown() => log('paywall_soft_shown');
   Future<void> logPaywallHardShown() => log('paywall_hard_shown');
   Future<void> logPaywallBuyTapped() => log('paywall_buy_tapped');
-  Future<void> logPurchaseSuccess()  => log('iap_purchase_success');
+  Future<void> logPurchaseSuccess() => log('iap_purchase_success');
   Future<void> logPurchaseError(String r) =>
       log('iap_purchase_error', {'reason': r});
   Future<void> logRewardedVideoWatched() => log('rewarded_video_watched');

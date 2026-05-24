@@ -40,8 +40,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
     if (gross < 0) return;
 
     final pa = UKTaxEngine.effectivePersonalAllowance(gross);
-    final tax =
-        UKTaxEngine.incomeTax(gross, isScotland: _isScotland);
+    final tax = UKTaxEngine.incomeTax(gross, isScotland: _isScotland);
     final ni = UKTaxEngine.nationalInsurance(gross);
     final net = UKTaxEngine.netIncome(gross, isScotland: _isScotland);
     final effRate =
@@ -84,8 +83,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
       await PaywallSoft.show(
         context,
         featureTitle: AppStringsEN.historyLimit,
-        featureSubtitle:
-            'Upgrade to save unlimited calculations.',
+        featureSubtitle: 'Upgrade to save unlimited calculations.',
       );
       return;
     }
@@ -156,8 +154,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
               Container(
                 decoration: BoxDecoration(
                   color: ct.surface,
-                  borderRadius:
-                      BorderRadius.circular(AppRadius.md),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: ct.cardBorder),
                 ),
                 child: SwitchListTile(
@@ -304,7 +301,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                     ),
                     CalcwiseStaggerItem(
                       index: 4,
-                      child: _MonthlyWeeklyCard(result: r, fmtGbp: _fmtGbp, ct: ct),
+                      child: _MonthlyWeeklyCard(
+                          result: r, fmtGbp: _fmtGbp, ct: ct),
                     ),
                     CalcwiseStaggerItem(
                       index: 5,
@@ -433,9 +431,7 @@ class _BandBreakdown extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: b.amount > 0
-                          ? AppTheme.primary
-                          : ct.textSecondary,
+                      color: b.amount > 0 ? AppTheme.primary : ct.textSecondary,
                     ),
                   ),
                 ],

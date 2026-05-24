@@ -12,7 +12,8 @@ class UKTaxEngine {
   // ── Income Tax band limits (taxable income above PA) ──────────────────────
   // England / Wales / NI
   static const double ukBasicLimit = 37700.0; // 0–37700 = 20%
-  static const double ukHigherLimit = 112570.0; // 37700–112570 = 40% (above PA+37700=50270)
+  static const double ukHigherLimit =
+      112570.0; // 37700–112570 = 40% (above PA+37700=50270)
 
   // PA taper: £1 lost per £2 above £100k gross
   static const double paTaperStart = 100000.0;
@@ -50,9 +51,7 @@ class UKTaxEngine {
   static double incomeTax(double grossIncome, {bool isScotland = false}) {
     final pa = effectivePersonalAllowance(grossIncome);
     final taxable = max(0.0, grossIncome - pa);
-    return isScotland
-        ? _calculateScottish(taxable)
-        : _calculateUK(taxable);
+    return isScotland ? _calculateScottish(taxable) : _calculateUK(taxable);
   }
 
   /// England/Wales/NI bands (applied to taxable income = gross - PA)
@@ -89,25 +88,29 @@ class UKTaxEngine {
 
     // Basic: 2,306–13,991 @ 20%
     if (taxable > scotStarterLimit) {
-      final basic = min(taxable - scotStarterLimit, scotBasicLimit - scotStarterLimit);
+      final basic =
+          min(taxable - scotStarterLimit, scotBasicLimit - scotStarterLimit);
       tax += basic * 0.20;
     }
 
     // Intermediate: 13,991–31,092 @ 21%
     if (taxable > scotBasicLimit) {
-      final intermediate = min(taxable - scotBasicLimit, scotIntermediateLimit - scotBasicLimit);
+      final intermediate =
+          min(taxable - scotBasicLimit, scotIntermediateLimit - scotBasicLimit);
       tax += intermediate * 0.21;
     }
 
     // Higher: 31,092–62,430 @ 42%
     if (taxable > scotIntermediateLimit) {
-      final higher = min(taxable - scotIntermediateLimit, scotHigherLimit - scotIntermediateLimit);
+      final higher = min(taxable - scotIntermediateLimit,
+          scotHigherLimit - scotIntermediateLimit);
       tax += higher * 0.42;
     }
 
     // Advanced: 62,430–112,570 @ 45%
     if (taxable > scotHigherLimit) {
-      final advanced = min(taxable - scotHigherLimit, scotAdvancedLimit - scotHigherLimit);
+      final advanced =
+          min(taxable - scotHigherLimit, scotAdvancedLimit - scotHigherLimit);
       tax += advanced * 0.45;
     }
 
@@ -139,9 +142,9 @@ class UKTaxEngine {
   // ══════════════════════════════════════════════════════════════════════════
 
   static double netIncome(double gross, {bool isScotland = false}) {
-    return gross
-        - incomeTax(gross, isScotland: isScotland)
-        - nationalInsurance(gross);
+    return gross -
+        incomeTax(gross, isScotland: isScotland) -
+        nationalInsurance(gross);
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -211,11 +214,36 @@ class UKTaxEngine {
     if (taxable <= 0) return;
     final bands = [
       (name: 'Starter Rate', rate: 0.19, from: 0.0, to: scotStarterLimit),
-      (name: 'Basic Rate', rate: 0.20, from: scotStarterLimit, to: scotBasicLimit),
-      (name: 'Intermediate Rate', rate: 0.21, from: scotBasicLimit, to: scotIntermediateLimit),
-      (name: 'Higher Rate', rate: 0.42, from: scotIntermediateLimit, to: scotHigherLimit),
-      (name: 'Advanced Rate', rate: 0.45, from: scotHigherLimit, to: scotAdvancedLimit),
-      (name: 'Top Rate', rate: 0.48, from: scotAdvancedLimit, to: double.infinity),
+      (
+        name: 'Basic Rate',
+        rate: 0.20,
+        from: scotStarterLimit,
+        to: scotBasicLimit
+      ),
+      (
+        name: 'Intermediate Rate',
+        rate: 0.21,
+        from: scotBasicLimit,
+        to: scotIntermediateLimit
+      ),
+      (
+        name: 'Higher Rate',
+        rate: 0.42,
+        from: scotIntermediateLimit,
+        to: scotHigherLimit
+      ),
+      (
+        name: 'Advanced Rate',
+        rate: 0.45,
+        from: scotHigherLimit,
+        to: scotAdvancedLimit
+      ),
+      (
+        name: 'Top Rate',
+        rate: 0.48,
+        from: scotAdvancedLimit,
+        to: double.infinity
+      ),
     ];
     for (final b in bands) {
       if (taxable <= b.from) break;
@@ -235,7 +263,8 @@ class UKTaxEngine {
   // Effective & marginal rates
   // ══════════════════════════════════════════════════════════════════════════
 
-  static double effectiveTaxRate(double grossIncome, {bool isScotland = false}) {
+  static double effectiveTaxRate(double grossIncome,
+      {bool isScotland = false}) {
     if (grossIncome <= 0) return 0;
     return incomeTax(grossIncome, isScotland: isScotland) / grossIncome;
   }

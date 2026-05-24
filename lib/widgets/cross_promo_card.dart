@@ -96,8 +96,7 @@ class _CrossPromoCardState extends State<CrossPromoCard> {
                       fontWeight: FontWeight.bold)),
             ),
             const SizedBox(width: 6),
-            const Text(
-                'Also from us',
+            const Text('Also from us',
                 style: TextStyle(fontSize: 10, color: Color(0xFF64748B))),
           ]),
           const SizedBox(height: AppSpacing.xxs),

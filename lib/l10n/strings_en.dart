@@ -49,7 +49,6 @@ class AppStringsEN {
   static const taxBands = 'Tax Band Breakdown';
   static const niBreakdown = 'National Insurance';
   static const personalAllowance = 'Personal Allowance';
-  static const disclaimer =
-      'This app is for informational purposes only. '
+  static const disclaimer = 'This app is for informational purposes only. '
       'Consult a financial professional or HMRC for official guidance.';
 }

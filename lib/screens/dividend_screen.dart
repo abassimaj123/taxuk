@@ -321,8 +321,8 @@ class _DividendSummaryCard extends StatelessWidget {
         title: 'Summary',
         children: [
           _Row('Gross Dividend', fmtGbp.format(result.grossDividend), ct),
-          _Row('Dividend Allowance', '- ${fmtGbp.format(result.allowance)}',
-              ct),
+          _Row(
+              'Dividend Allowance', '- ${fmtGbp.format(result.allowance)}', ct),
           _Divider(ct),
           _Row('Taxable Dividend', fmtGbp.format(result.taxableDividend), ct,
               bold: true),
@@ -405,7 +405,8 @@ class _DividendRatesCard extends StatelessWidget {
           Text(
             'Dividend allowance: £500 (2024/25). '
             'Dividends are not subject to Scottish income tax — same rates apply throughout the UK.',
-            style: TextStyle(fontSize: 11, color: ct.textSecondary, height: 1.5),
+            style:
+                TextStyle(fontSize: 11, color: ct.textSecondary, height: 1.5),
           ),
         ],
       );

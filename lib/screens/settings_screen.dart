@@ -42,8 +42,8 @@ class SettingsScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppRadius.mdPlus),
-              border: Border.all(
-                  color: AppTheme.primary.withValues(alpha: 0.3)),
+              border:
+                  Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
             ),
             child: const Icon(Icons.settings_rounded,
                 color: AppTheme.primary, size: 18),
@@ -68,8 +68,8 @@ class SettingsScreen extends StatelessWidget {
             builder: (context, isPremium, _) {
               if (isPremium) {
                 return ListTile(
-                  leading:
-                      const Icon(Icons.verified_rounded, color: AppTheme.accent),
+                  leading: const Icon(Icons.verified_rounded,
+                      color: AppTheme.accent),
                   title: Text(AppStringsEN.premiumActive,
                       style: TextStyle(color: ct.textPrimary)),
                   subtitle: Text(AppStringsEN.premiumDesc,
@@ -78,8 +78,8 @@ class SettingsScreen extends StatelessWidget {
               }
               return Column(mainAxisSize: MainAxisSize.min, children: [
                 ListTile(
-                  leading: const Icon(Icons.star_outline,
-                      color: AppTheme.primary),
+                  leading:
+                      const Icon(Icons.star_outline, color: AppTheme.primary),
                   title: Text(AppStringsEN.getPremium,
                       style: TextStyle(color: ct.textPrimary)),
                   subtitle: Text(AppStringsEN.premiumDesc,
@@ -89,8 +89,7 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => IAPService.instance.buy(),
                 ),
                 ListTile(
-                  leading:
-                      const Icon(Icons.restore, color: AppTheme.primary),
+                  leading: const Icon(Icons.restore, color: AppTheme.primary),
                   title: Text(AppStringsEN.restorePurchase,
                       style: TextStyle(color: ct.textPrimary)),
                   onTap: () => IAPService.instance.restore(),
@@ -114,8 +113,8 @@ class SettingsScreen extends StatelessWidget {
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeModeService.notifier,
             builder: (context, mode, _) => ListTile(
-              leading:
-                  const Icon(Icons.brightness_6_rounded, color: AppTheme.primary),
+              leading: const Icon(Icons.brightness_6_rounded,
+                  color: AppTheme.primary),
               title: Text('Theme', style: TextStyle(color: ct.textPrimary)),
               subtitle: Text(
                 mode == ThemeMode.dark
@@ -132,18 +131,18 @@ class SettingsScreen extends StatelessWidget {
                 items: [
                   DropdownMenuItem(
                     value: ThemeMode.system,
-                    child: Text('Auto',
-                        style: TextStyle(color: ct.textPrimary)),
+                    child:
+                        Text('Auto', style: TextStyle(color: ct.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.light,
-                    child: Text('Light',
-                        style: TextStyle(color: ct.textPrimary)),
+                    child:
+                        Text('Light', style: TextStyle(color: ct.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.dark,
-                    child: Text('Dark',
-                        style: TextStyle(color: ct.textPrimary)),
+                    child:
+                        Text('Dark', style: TextStyle(color: ct.textPrimary)),
                   ),
                 ],
                 onChanged: (v) {
@@ -158,8 +157,8 @@ class SettingsScreen extends StatelessWidget {
           // ── Legal ────────────────────────────────────────────────────────
           _SectionHeader('Legal'),
           ListTile(
-            leading: const Icon(Icons.info_outline_rounded,
-                color: AppTheme.primary),
+            leading:
+                const Icon(Icons.info_outline_rounded, color: AppTheme.primary),
             title: Text('About', style: TextStyle(color: ct.textPrimary)),
             subtitle: Text(
               AppStringsEN.disclaimer,
@@ -167,8 +166,8 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined,
-                color: AppTheme.primary),
+            leading:
+                const Icon(Icons.privacy_tip_outlined, color: AppTheme.primary),
             title: Text(AppStringsEN.privacyPolicy,
                 style: TextStyle(color: ct.textPrimary)),
             trailing: Icon(Icons.open_in_new_rounded,
@@ -176,14 +175,14 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _launch('https://calqwise.com/privacy'),
           ),
           ListTile(
-            leading: const Icon(Icons.mail_outline_rounded,
-                color: AppTheme.primary),
+            leading:
+                const Icon(Icons.mail_outline_rounded, color: AppTheme.primary),
             title: Text(AppStringsEN.contactSupport,
                 style: TextStyle(color: ct.textPrimary)),
             trailing: Icon(Icons.open_in_new_rounded,
                 color: ct.textSecondary, size: 16),
-            onTap: () => _launch(
-                'mailto:support@calqwise.com?subject=TaxUK%20Support'),
+            onTap: () =>
+                _launch('mailto:support@calqwise.com?subject=TaxUK%20Support'),
           ),
           const SizedBox(height: AppSpacing.xxxl),
         ],

@@ -24,8 +24,7 @@ class OnboardingScreen extends StatelessWidget {
           OnboardingPage(
             icon: Icons.account_balance_rounded,
             title: 'Income Tax\n& NI 2025/26',
-            subtitle:
-                'Enter your salary and see your exact take-home pay, '
+            subtitle: 'Enter your salary and see your exact take-home pay, '
                 'including Scottish rates and National Insurance.',
             pills: [
               'England / Wales / NI',
@@ -37,8 +36,7 @@ class OnboardingScreen extends StatelessWidget {
           OnboardingPage(
             icon: Icons.history_rounded,
             title: 'Save & Share\nYour Results',
-            subtitle:
-                'Keep a history of your calculations and share or export '
+            subtitle: 'Keep a history of your calculations and share or export '
                 'results as a PDF.',
             pills: ['History', 'Share', 'PDF Export'],
           ),

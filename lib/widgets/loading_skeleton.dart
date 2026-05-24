@@ -34,7 +34,8 @@ class SkeletonCard extends StatelessWidget {
 class _ShimmerBox extends StatefulWidget {
   final double width, height;
   final CalcwiseTheme ct;
-  const _ShimmerBox({required this.width, required this.height, required this.ct});
+  const _ShimmerBox(
+      {required this.width, required this.height, required this.ct});
 
   @override
   State<_ShimmerBox> createState() => _ShimmerBoxState();
