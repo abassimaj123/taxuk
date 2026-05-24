@@ -14,7 +14,7 @@ dependencies:
       url: https://github.com/abassimaj123/calcwise_core.git
       ref: main
   intl: ^0.20.0
-  share_plus: ^10.1.4
+  share_plus: ^13.1.0
   fl_chart: ^0.68.0
   flutter_local_notifications: ^18.0.1
   google_mobile_ads: ^5.1.0
