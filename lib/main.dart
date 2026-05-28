@@ -17,12 +17,16 @@ import 'screens/vat_screen.dart';
 import 'screens/income_tax_screen.dart';
 import 'screens/dividend_screen.dart';
 import 'screens/student_loan_screen.dart';
+import 'screens/cgt_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
 import 'widgets/paywall_hard.dart';
 
-final paywallSession = PaywallSessionService(appKey: 'taxuk');
+final paywallSession = PaywallSessionService(
+  appKey: 'taxuk',
+  hasFullAccess: () => freemiumService.hasFullAccess,
+);
 
 final adService = CalcwiseAdService(
   config: CalcwiseAdConfig(
@@ -237,10 +241,11 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _index,
         children: const [
-          VatScreen(),
           IncomeTaxScreen(),
+          VatScreen(),
           DividendScreen(),
           StudentLoanScreen(),
+          CGTScreen(),
           HistoryScreen(),
         ],
       ),
@@ -258,6 +263,7 @@ class _MainShellState extends State<MainShell> {
             setState(() => _index = i);
             final trigger = await paywallSession.recordAction();
             if (!mounted) return;
+            if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
             if (trigger == PaywallTrigger.hard) {
               PaywallHard.show(context);
             } else if (trigger == PaywallTrigger.soft) {
@@ -269,14 +275,14 @@ class _MainShellState extends State<MainShell> {
           },
           destinations: const [
             NavigationDestination(
-              icon: Icon(Icons.percent_rounded),
-              selectedIcon: Icon(Icons.percent),
-              label: 'VAT',
-            ),
-            NavigationDestination(
               icon: Icon(Icons.account_balance_outlined),
               selectedIcon: Icon(Icons.account_balance_rounded),
               label: 'Income Tax',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.percent_rounded),
+              selectedIcon: Icon(Icons.percent),
+              label: 'VAT',
             ),
             NavigationDestination(
               icon: Icon(Icons.bar_chart_outlined),
@@ -287,6 +293,11 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.school_outlined),
               selectedIcon: Icon(Icons.school_rounded),
               label: 'Student Loan',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.trending_up_rounded),
+              selectedIcon: Icon(Icons.trending_up),
+              label: 'CGT',
             ),
             NavigationDestination(
               icon: Icon(Icons.history_rounded),
