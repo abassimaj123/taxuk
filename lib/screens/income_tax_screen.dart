@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:calcwise_core/calcwise_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
 import '../main.dart';
 import '../widgets/paywall_soft.dart';
+import 'salary_comparison_screen.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
   const IncomeTaxScreen({super.key});
@@ -18,13 +20,21 @@ class IncomeTaxScreen extends StatefulWidget {
   State<IncomeTaxScreen> createState() => _IncomeTaxScreenState();
 }
 
-class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
+class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalcMixin {
+  // ── Controllers ─────────────────────────────────────────────────────────────
   final _grossCtrl = TextEditingController(text: '35000');
+  final _pensionCtrl = TextEditingController(text: '0');
+  final _targetNetCtrl = TextEditingController(text: '25000');
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
   final _fmtPct = NumberFormat.percentPattern('en_GB');
 
+  // ── State ────────────────────────────────────────────────────────────────────
   bool _isScotland = false;
+  bool _isSelfEmployed = false;
+  bool _hasMarriageAllowance = false;
+  bool _isReverse = false; // forward (gross→net) vs reverse (net→gross)
   IncomeTaxResult? _result;
+  double? _reverseGross; // result in reverse mode
 
   @override
   void initState() {
@@ -37,40 +47,62 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
   @override
   void dispose() {
     _grossCtrl.dispose();
+    _pensionCtrl.dispose();
+    _targetNetCtrl.dispose();
     super.dispose();
   }
 
+  // ── Calculation ──────────────────────────────────────────────────────────────
+
   void _calculate() {
-    final gross = double.tryParse(
-          _grossCtrl.text.replaceAll(',', '.').trim(),
-        ) ??
-        0;
+    if (_isReverse) {
+      _calculateReverse();
+    } else {
+      _calculateForward();
+    }
+  }
+
+  void _calculateForward() {
+    final gross =
+        double.tryParse(_grossCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    final pensionPct =
+        double.tryParse(_pensionCtrl.text.replaceAll(',', '.').trim()) ?? 0;
     if (gross < 0) return;
 
-    final pa = UKTaxEngine.effectivePersonalAllowance(gross);
-    final tax = UKTaxEngine.incomeTax(gross, isScotland: _isScotland);
-    final ni = UKTaxEngine.nationalInsurance(gross);
-    final net = UKTaxEngine.netIncome(gross, isScotland: _isScotland);
-    final effRate =
-        UKTaxEngine.effectiveTaxRate(gross, isScotland: _isScotland);
+    final pension = gross * (pensionPct.clamp(0, 100) / 100);
+    final effectiveGross = grossAfterPension(gross, pension);
+    final pa = UKTaxEngine.effectivePersonalAllowance(effectiveGross);
+    final tax = UKTaxEngine.incomeTax(effectiveGross, isScotland: _isScotland);
+    final ni = _isSelfEmployed
+        ? calculateSelfEmployedNI(effectiveGross)
+        : UKTaxEngine.nationalInsurance(effectiveGross);
+    final maCredit = _hasMarriageAllowance ? marriageAllowanceCredit : 0.0;
+    final taxAfterMA = max(0.0, tax - maCredit);
+    final net = effectiveGross - taxAfterMA - ni;
+    final effRate = effectiveGross > 0 ? taxAfterMA / effectiveGross : 0.0;
     final margRate =
-        UKTaxEngine.marginalTaxRate(gross, isScotland: _isScotland);
+        UKTaxEngine.marginalTaxRate(effectiveGross, isScotland: _isScotland);
     final bands = UKTaxEngine.taxBandBreakdown(
-      gross,
+      effectiveGross,
       isScotland: _isScotland,
     );
 
     setState(() {
+      _reverseGross = null;
       _result = IncomeTaxResult(
         grossIncome: gross,
         personalAllowance: pa,
-        incomeTax: tax,
+        incomeTax: taxAfterMA,
         nationalInsurance: ni,
         netIncome: net,
         effectiveTaxRate: effRate,
         marginalTaxRate: margRate,
         bandBreakdown: bands,
         isScotland: _isScotland,
+        pensionContribution: pension,
+        isSelfEmployed: _isSelfEmployed,
+        hasMarriageAllowance: _hasMarriageAllowance,
+        marriageAllowanceCreditApplied: maCredit,
       );
     });
 
@@ -80,6 +112,36 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
     );
     adService.onAction();
   }
+
+  void _calculateReverse() {
+    final targetNet =
+        double.tryParse(_targetNetCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    final pensionPct =
+        double.tryParse(_pensionCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    if (targetNet <= 0) return;
+
+    // We solve for gross such that pension is a % of gross — iterative approach
+    // Since pension = gross * pct, pension reduces gross by a fixed %, so we
+    // can compute requiredEffective first, then gross = effective / (1 - pct/100)
+    final pctFraction = pensionPct.clamp(0, 99) / 100;
+    final requiredEffective = reverseCalculateGross(
+      targetNet: targetNet,
+      isScotland: _isScotland,
+      pensionContrib: 0, // we compute pension from effective gross
+      selfEmployed: _isSelfEmployed,
+    );
+    // gross = effectiveGross / (1 - pensionPct/100)
+    final gross = pctFraction < 1 ? requiredEffective / (1 - pctFraction) : requiredEffective;
+
+    setState(() {
+      _reverseGross = gross;
+      _result = null;
+    });
+
+    adService.onAction();
+  }
+
+  // ── Save ─────────────────────────────────────────────────────────────────────
 
   Future<void> _save() async {
     final r = _result;
@@ -100,6 +162,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
         'type': 'income_tax',
         'gross': r.grossIncome,
         'is_scotland': r.isScotland,
+        'is_self_employed': r.isSelfEmployed,
+        'pension': r.pensionContribution,
       },
       results: {
         'net': r.netIncome,
@@ -118,16 +182,25 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
   void _reset() {
     _grossCtrl.text = '35000';
+    _pensionCtrl.text = '0';
+    _targetNetCtrl.text = '25000';
     setState(() {
       _isScotland = false;
+      _isSelfEmployed = false;
+      _hasMarriageAllowance = false;
+      _isReverse = false;
       _result = null;
+      _reverseGross = null;
     });
   }
+
+  // ── Build ─────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final ct = CalcwiseTheme.of(context);
     final r = _result;
+
     return Column(
       children: [
         Expanded(
@@ -139,71 +212,198 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
               AppSpacing.xxxl,
             ),
             children: [
-              // ── Gross salary input ─────────────────────────────────────
-              TextField(
-                controller: _grossCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: false,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Gross Annual Salary',
-                  prefixText: '£',
-                  hintText: '35000',
-                  filled: true,
-                ),
-                onSubmitted: (_) => _calculate(),
+              // ── Mode toggle (Forward / Reverse) ─────────────────────────
+              _ModeToggle(
+                isReverse: _isReverse,
+                ct: ct,
+                onChanged: (v) => setState(() {
+                  _isReverse = v;
+                  _result = null;
+                  _reverseGross = null;
+                }),
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Scotland toggle ────────────────────────────────────────
+              // ── Main input ───────────────────────────────────────────────
+              if (!_isReverse)
+                TextField(
+                  controller: _grossCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: false,
+                  ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Gross Annual Salary',
+                    prefixText: '£',
+                    hintText: '35000',
+                    filled: true,
+                  ),
+                  onChanged: (_) => scheduleCalc(_calculate),
+                  onSubmitted: (_) => _calculate(),
+                )
+              else
+                TextField(
+                  controller: _targetNetCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: false,
+                  ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Target Take-Home (net)',
+                    prefixText: '£',
+                    hintText: '25000',
+                    helperText: 'We\'ll calculate the gross salary you need',
+                    filled: true,
+                  ),
+                  onChanged: (_) => scheduleCalc(_calculate),
+                  onSubmitted: (_) => _calculate(),
+                ),
+              const SizedBox(height: AppSpacing.md),
+
+              // ── Pension input ────────────────────────────────────────────
+              TextField(
+                controller: _pensionCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Pension Contribution (salary sacrifice)',
+                  suffixText: '%',
+                  hintText: '0',
+                  helperText: 'Reduces taxable income and NI',
+                  filled: true,
+                ),
+                onChanged: (_) => scheduleCalc(_calculate),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // ── Toggles ──────────────────────────────────────────────────
               Container(
                 decoration: BoxDecoration(
                   color: ct.surface,
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: ct.cardBorder),
                 ),
-                child: SwitchListTile(
-                  title: Text(
-                    'Scottish Income Tax Rates',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: ct.textPrimary,
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      title: Text(
+                        'Scottish Income Tax Rates',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: ct.textPrimary,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _isScotland
+                            ? 'Scotland: 6 bands (19%–48%)'
+                            : 'England / Wales / NI: 3 bands (20%–45%)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: ct.textSecondary,
+                        ),
+                      ),
+                      value: _isScotland,
+                      activeColor: AppTheme.primary,
+                      onChanged: (v) {
+                        setState(() => _isScotland = v);
+                        analyticsService.logScotlandToggled(v);
+                        if (_result != null || _reverseGross != null) {
+                          _calculate();
+                        }
+                      },
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
                     ),
-                  ),
-                  subtitle: Text(
-                    _isScotland
-                        ? 'Scotland: 6 bands (19%–48%)'
-                        : 'England / Wales / NI: 3 bands (20%–45%)',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: ct.textSecondary,
+                    Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: ct.cardBorder,
+                        indent: AppSpacing.md),
+                    SwitchListTile(
+                      title: Text(
+                        'Self-Employed (Class 2 + 4 NI)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: ct.textPrimary,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _isSelfEmployed
+                            ? 'NI: £3.45/wk (Class 2) + 6%/2% on profits (Class 4)'
+                            : 'PAYE: Class 1 NI (8% / 2%)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: ct.textSecondary,
+                        ),
+                      ),
+                      value: _isSelfEmployed,
+                      activeColor: AppTheme.primary,
+                      onChanged: (v) {
+                        setState(() => _isSelfEmployed = v);
+                        if (_result != null || _reverseGross != null) {
+                          _calculate();
+                        }
+                      },
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
                     ),
-                  ),
-                  value: _isScotland,
-                  activeColor: AppTheme.primary,
-                  onChanged: (v) {
-                    setState(() => _isScotland = v);
-                    analyticsService.logScotlandToggled(v);
-                    if (_result != null) _calculate();
-                  },
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
+                    Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: ct.cardBorder,
+                        indent: AppSpacing.md),
+                    SwitchListTile(
+                      title: Text(
+                        'Marriage Allowance (recipient)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: ct.textPrimary,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _hasMarriageAllowance
+                            ? '+£252/year tax credit from partner\'s unused allowance'
+                            : 'Partner transfers 10% of Personal Allowance to you',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: ct.textSecondary,
+                        ),
+                      ),
+                      value: _hasMarriageAllowance,
+                      activeColor: AppTheme.primary,
+                      onChanged: (v) {
+                        setState(() => _hasMarriageAllowance = v);
+                        if (_result != null) _calculate();
+                      },
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
 
-              // ── Action buttons ─────────────────────────────────────────
+              // ── Action buttons ───────────────────────────────────────────
               Row(children: [
                 Expanded(
                   child: FilledButton(
                     onPressed: _calculate,
-                    child: const Text('Calculate'),
+                    child: Text(_isReverse
+                        ? 'Find Required Gross'
+                        : 'Calculate'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -213,8 +413,50 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                 ),
               ]),
 
-              // ── Results ────────────────────────────────────────────────
-              if (r != null) ...[
+              // ── Reverse result ───────────────────────────────────────────
+              if (_isReverse && _reverseGross != null) ...[
+                const SizedBox(height: AppSpacing.xl),
+                CalcwisePageEntrance(
+                  child: Column(children: [
+                    CalcwiseStaggerItem(
+                      index: 0,
+                      child: CalcwiseHeroCard(
+                        label: 'REQUIRED GROSS SALARY',
+                        value: _fmtGbp.format(_reverseGross),
+                        secondary: _isScotland
+                            ? 'Scotland · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}'
+                            : 'England/Wales/NI · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
+                        stats: [
+                          (
+                            label: 'Target Net',
+                            value: _fmtGbp.format(
+                              double.tryParse(_targetNetCtrl.text) ?? 0,
+                            ),
+                          ),
+                          if (_reverseGross! > 0)
+                            (
+                              label: 'Est. Monthly',
+                              value: _fmtGbp.format(_reverseGross! / 12),
+                            ),
+                        ],
+                      ),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 1,
+                      child: _ReverseInsightCard(
+                        gross: _reverseGross!,
+                        targetNet:
+                            double.tryParse(_targetNetCtrl.text) ?? 0,
+                        fmtGbp: _fmtGbp,
+                        ct: ct,
+                      ),
+                    ),
+                  ]),
+                ),
+              ],
+
+              // ── Forward results ──────────────────────────────────────────
+              if (!_isReverse && r != null) ...[
                 const SizedBox(height: AppSpacing.xl),
                 CalcwisePageEntrance(
                   child: Column(children: [
@@ -229,64 +471,26 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                         stats: [
                           (
                             label: 'Income Tax',
-                            value: _fmtGbp.format(r.incomeTax)
+                            value: _fmtGbp.format(r.incomeTax),
                           ),
                           (
-                            label: 'NI',
-                            value: _fmtGbp.format(r.nationalInsurance)
+                            label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI',
+                            value: _fmtGbp.format(r.nationalInsurance),
                           ),
                           (
                             label: 'Effective Rate',
-                            value: _fmtPct.format(r.effectiveOverallRate)
+                            value: _fmtPct.format(r.effectiveOverallRate),
                           ),
                         ],
                       ),
                     ),
                     CalcwiseStaggerItem(
                       index: 1,
-                      child: SectionCard(
-                        title: 'Summary',
-                        children: [
-                          _Row(
-                            'Gross Income',
-                            _fmtGbp.format(r.grossIncome),
-                            ct,
-                          ),
-                          _Row(
-                            'Personal Allowance',
-                            _fmtGbp.format(r.personalAllowance),
-                            ct,
-                          ),
-                          _Row(
-                            'Income Tax',
-                            _fmtGbp.format(r.incomeTax),
-                            ct,
-                            highlight: true,
-                          ),
-                          _Row(
-                            'National Insurance',
-                            _fmtGbp.format(r.nationalInsurance),
-                            ct,
-                            highlight: true,
-                          ),
-                          _Divider(ct),
-                          _Row(
-                            'Take-Home Pay',
-                            _fmtGbp.format(r.netIncome),
-                            ct,
-                            bold: true,
-                          ),
-                          _Row(
-                            'Effective Tax Rate',
-                            _fmtPct.format(r.effectiveTaxRate),
-                            ct,
-                          ),
-                          _Row(
-                            'Marginal Rate',
-                            '${(r.marginalTaxRate * 100).toStringAsFixed(0)}%',
-                            ct,
-                          ),
-                        ],
+                      child: _SummaryCard(
+                        result: r,
+                        fmtGbp: _fmtGbp,
+                        fmtPct: _fmtPct,
+                        ct: ct,
                       ),
                     ),
                     CalcwiseStaggerItem(
@@ -301,8 +505,9 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                     CalcwiseStaggerItem(
                       index: 3,
                       child: _NiBreakdown(
-                        gross: r.grossIncome,
+                        gross: r.effectiveGross,
                         ni: r.nationalInsurance,
+                        isSelfEmployed: r.isSelfEmployed,
                         fmtGbp: _fmtGbp,
                         ct: ct,
                       ),
@@ -310,10 +515,17 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                     CalcwiseStaggerItem(
                       index: 4,
                       child: _MonthlyWeeklyCard(
-                          result: r, fmtGbp: _fmtGbp, ct: ct),
+                        result: r,
+                        fmtGbp: _fmtGbp,
+                        ct: ct,
+                      ),
                     ),
                     CalcwiseStaggerItem(
                       index: 5,
+                      child: _CompareButton(ct: ct),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 6,
                       child: _SaveButton(onSave: _save),
                     ),
                   ]),
@@ -330,42 +542,141 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
 
-class _Row extends StatelessWidget {
-  final String label;
-  final String value;
+class _ModeToggle extends StatelessWidget {
+  final bool isReverse;
   final CalcwiseTheme ct;
-  final bool highlight;
-  final bool bold;
+  final ValueChanged<bool> onChanged;
 
-  const _Row(
-    this.label,
-    this.value,
-    this.ct, {
-    this.highlight = false,
-    this.bold = false,
+  const _ModeToggle({
+    required this.isReverse,
+    required this.ct,
+    required this.onChanged,
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: highlight ? AppTheme.accent : ct.textSecondary,
-                fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+  Widget build(BuildContext context) => Row(
+        children: [
+          _ToggleOption(
+            label: 'Gross → Net',
+            icon: Icons.south_rounded,
+            selected: !isReverse,
+            ct: ct,
+            onTap: () => onChanged(false),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          _ToggleOption(
+            label: 'Net → Gross',
+            icon: Icons.north_rounded,
+            selected: isReverse,
+            ct: ct,
+            onTap: () => onChanged(true),
+          ),
+        ],
+      );
+}
+
+class _ToggleOption extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final CalcwiseTheme ct;
+  final VoidCallback onTap;
+
+  const _ToggleOption({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.ct,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: selected
+                  ? AppTheme.primary.withValues(alpha: 0.12)
+                  : ct.surface,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(
+                color: selected
+                    ? AppTheme.primary.withValues(alpha: 0.5)
+                    : ct.cardBorder,
               ),
             ),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                color: highlight ? AppTheme.accent : ct.textPrimary,
-                fontWeight:
-                    bold || highlight ? FontWeight.w700 : FontWeight.w600,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
+                  color: selected ? AppTheme.primary : ct.textSecondary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        selected ? FontWeight.w600 : FontWeight.w400,
+                    color: selected ? AppTheme.primary : ct.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+}
+
+class _ReverseInsightCard extends StatelessWidget {
+  final double gross;
+  final double targetNet;
+  final NumberFormat fmtGbp;
+  final CalcwiseTheme ct;
+
+  const _ReverseInsightCard({
+    required this.gross,
+    required this.targetNet,
+    required this.fmtGbp,
+    required this.ct,
+  });
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppTheme.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(
+            color: AppTheme.primary.withValues(alpha: 0.25),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.swap_vert_rounded,
+                color: AppTheme.primary, size: 20),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                'To take home ${fmtGbp.format(targetNet)} per year, '
+                'you need a gross salary of ${fmtGbp.format(gross)} '
+                '(${fmtGbp.format(gross / 12)}/month gross). '
+                'Deductions total ${fmtGbp.format(gross - targetNet)}.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: ct.textPrimary,
+                  height: 1.45,
+                ),
               ),
             ),
           ],
@@ -373,15 +684,83 @@ class _Row extends StatelessWidget {
       );
 }
 
-class _Divider extends StatelessWidget {
+class _SummaryCard extends StatelessWidget {
+  final IncomeTaxResult result;
+  final NumberFormat fmtGbp;
+  final NumberFormat fmtPct;
   final CalcwiseTheme ct;
-  const _Divider(this.ct);
+
+  const _SummaryCard({
+    required this.result,
+    required this.fmtGbp,
+    required this.fmtPct,
+    required this.ct,
+  });
 
   @override
-  Widget build(BuildContext context) => Divider(
-        color: ct.cardBorder,
-        height: AppSpacing.xl,
-        thickness: 1,
+  Widget build(BuildContext context) => SectionCard(
+        title: 'Summary',
+        children: [
+          _Row('Gross Income', fmtGbp.format(result.grossIncome), ct),
+          if (result.pensionContribution > 0)
+            _Row(
+              'Pension (salary sacrifice)',
+              '− ${fmtGbp.format(result.pensionContribution)}',
+              ct,
+            ),
+          _Row(
+            'Taxable Income',
+            fmtGbp.format(result.effectiveGross),
+            ct,
+          ),
+          _Row(
+            'Personal Allowance',
+            fmtGbp.format(result.personalAllowance),
+            ct,
+          ),
+          _Row(
+            'Income Tax',
+            fmtGbp.format(result.incomeTax),
+            ct,
+            highlight: true,
+          ),
+          if (result.hasMarriageAllowance && result.marriageAllowanceCreditApplied > 0)
+            _Row(
+              'Marriage Allowance Credit',
+              '− ${fmtGbp.format(result.marriageAllowanceCreditApplied)}',
+              ct,
+            ),
+          _Row(
+            result.isSelfEmployed
+                ? 'National Insurance (Class 2+4)'
+                : 'National Insurance (Class 1)',
+            fmtGbp.format(result.nationalInsurance),
+            ct,
+            highlight: true,
+          ),
+          _Divider(ct),
+          _Row(
+            'Take-Home Pay',
+            fmtGbp.format(result.netIncome),
+            ct,
+            bold: true,
+          ),
+          _Row(
+            'Effective Tax Rate',
+            fmtPct.format(result.effectiveTaxRate),
+            ct,
+          ),
+          _Row(
+            'Effective Overall Rate',
+            fmtPct.format(result.effectiveOverallRate),
+            ct,
+          ),
+          _Row(
+            'Marginal Rate',
+            '${(result.marginalTaxRate * 100).toStringAsFixed(0)}%',
+            ct,
+          ),
+        ],
       );
 }
 
@@ -402,7 +781,7 @@ class _BandBreakdown extends StatelessWidget {
   Widget build(BuildContext context) => SectionCard(
         title: 'Tax Band Breakdown',
         children: [
-          for (final b in bands) ...[
+          for (final b in bands)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
               child: Row(
@@ -425,7 +804,7 @@ class _BandBreakdown extends StatelessWidget {
                         Text(
                           '${(b.rate * 100).toStringAsFixed(0)}%  '
                           '${fmtGbp.format(b.rangeFrom)}–'
-                          '${b.rangeTo.isInfinite ? "∞" : fmtGbp.format(b.rangeTo)}',
+                          '${b.rangeTo.isInfinite ? '∞' : fmtGbp.format(b.rangeTo)}',
                           style: TextStyle(
                             fontSize: 11,
                             color: ct.textSecondary,
@@ -439,13 +818,13 @@ class _BandBreakdown extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: b.amount > 0 ? AppTheme.primary : ct.textSecondary,
+                      color:
+                          b.amount > 0 ? AppTheme.primary : ct.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-          ],
         ],
       );
 }
@@ -453,23 +832,49 @@ class _BandBreakdown extends StatelessWidget {
 class _NiBreakdown extends StatelessWidget {
   final double gross;
   final double ni;
+  final bool isSelfEmployed;
   final NumberFormat fmtGbp;
   final CalcwiseTheme ct;
 
   const _NiBreakdown({
     required this.gross,
     required this.ni,
+    required this.isSelfEmployed,
     required this.fmtGbp,
     required this.ct,
   });
 
   @override
   Widget build(BuildContext context) {
+    final title = isSelfEmployed
+        ? 'National Insurance (Self-Employed)'
+        : 'National Insurance (Class 1)';
+
+    if (isSelfEmployed) {
+      final class2 = gross > 12570 ? 3.45 * 52 : 0.0;
+      final class4band1 = gross > 12570
+          ? (min(gross, 50270) - 12570) * 0.06
+          : 0.0;
+      final class4band2 =
+          gross > 50270 ? (gross - 50270) * 0.02 : 0.0;
+      return SectionCard(
+        title: title,
+        children: [
+          if (class2 > 0)
+            _SubRow('Class 2 (£3.45/week)', class2, fmtGbp, ct),
+          if (class4band1 > 0)
+            _SubRow('Class 4 @ 6% (£12,570–£50,270)', class4band1, fmtGbp, ct),
+          if (class4band2 > 0)
+            _SubRow(
+                'Class 4 @ 2% (above £50,270)', class4band2, fmtGbp, ct),
+          Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
+          _SubRow('Total NI', ni, fmtGbp, ct, bold: true),
+        ],
+      );
+    }
+
     final band1 = gross > UKTaxEngine.niPrimaryThreshold
-        ? (gross.clamp(
-                  UKTaxEngine.niPrimaryThreshold,
-                  UKTaxEngine.niUpperEarningsLimit,
-                ) -
+        ? (min(gross, UKTaxEngine.niUpperEarningsLimit) -
                 UKTaxEngine.niPrimaryThreshold) *
             UKTaxEngine.niRate1
         : 0.0;
@@ -478,106 +883,25 @@ class _NiBreakdown extends StatelessWidget {
         : 0.0;
 
     return SectionCard(
-      title: 'National Insurance (Class 1)',
+      title: title,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Main rate (8%)',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: ct.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      '${fmtGbp.format(UKTaxEngine.niPrimaryThreshold)}–'
-                      '${fmtGbp.format(UKTaxEngine.niUpperEarningsLimit)}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: ct.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                fmtGbp.format(band1),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primary,
-                ),
-              ),
-            ],
+        if (band1 > 0)
+          _SubRow(
+            'Main rate 8% (£${UKTaxEngine.niPrimaryThreshold.toStringAsFixed(0)}–'
+            '£${UKTaxEngine.niUpperEarningsLimit.toStringAsFixed(0)})',
+            band1,
+            fmtGbp,
+            ct,
           ),
-        ),
         if (band2 > 0)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Upper rate (2%)',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: ct.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        'Above ${fmtGbp.format(UKTaxEngine.niUpperEarningsLimit)}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: ct.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  fmtGbp.format(band2),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primary,
-                  ),
-                ),
-              ],
-            ),
+          _SubRow(
+            'Upper rate 2% (above £${UKTaxEngine.niUpperEarningsLimit.toStringAsFixed(0)})',
+            band2,
+            fmtGbp,
+            ct,
           ),
         Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Total NI',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: ct.textPrimary,
-              ),
-            ),
-            Text(
-              fmtGbp.format(ni),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.primary,
-              ),
-            ),
-          ],
-        ),
+        _SubRow('Total NI', ni, fmtGbp, ct, bold: true),
       ],
     );
   }
@@ -599,14 +923,102 @@ class _MonthlyWeeklyCard extends StatelessWidget {
         title: 'Monthly & Weekly Breakdown',
         children: [
           _SubRow('Monthly gross', result.grossIncome / 12, fmtGbp, ct),
+          if (result.pensionContribution > 0)
+            _SubRow(
+              'Monthly pension',
+              result.pensionContribution / 12,
+              fmtGbp,
+              ct,
+            ),
           _SubRow('Monthly income tax', result.incomeTax / 12, fmtGbp, ct),
-          _SubRow('Monthly NI', result.nationalInsurance / 12, fmtGbp, ct),
+          _SubRow(
+              'Monthly NI', result.nationalInsurance / 12, fmtGbp, ct),
           Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
           _SubRow('Monthly take-home', result.netIncome / 12, fmtGbp, ct,
               bold: true),
           _SubRow('Weekly take-home', result.netIncome / 52, fmtGbp, ct,
               bold: true),
         ],
+      );
+}
+
+class _CompareButton extends StatelessWidget {
+  final CalcwiseTheme ct;
+  const _CompareButton({required this.ct});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: OutlinedButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const SalaryComparisonScreen(),
+            ),
+          ),
+          icon: const Icon(Icons.compare_arrows_rounded, size: 18),
+          label: const Text('Compare Two Salaries →'),
+        ),
+      );
+}
+
+class _SaveButton extends StatelessWidget {
+  final VoidCallback onSave;
+  const _SaveButton({required this.onSave});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.xs),
+        child: OutlinedButton.icon(
+          onPressed: onSave,
+          icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
+          label: const Text('Save to History'),
+        ),
+      );
+}
+
+class _Row extends StatelessWidget {
+  final String label;
+  final String value;
+  final CalcwiseTheme ct;
+  final bool highlight;
+  final bool bold;
+
+  const _Row(
+    this.label,
+    this.value,
+    this.ct, {
+    this.highlight = false,
+    this.bold = false,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: highlight ? AppTheme.accent : ct.textSecondary,
+                  fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                color: highlight ? AppTheme.accent : ct.textPrimary,
+                fontWeight:
+                    bold || highlight ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       );
 }
 
@@ -617,7 +1029,8 @@ class _SubRow extends StatelessWidget {
   final CalcwiseTheme ct;
   final bool bold;
 
-  const _SubRow(this.label, this.value, this.fmt, this.ct, {this.bold = false});
+  const _SubRow(this.label, this.value, this.fmt, this.ct,
+      {this.bold = false});
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -625,12 +1038,14 @@ class _SubRow extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                color: ct.textSecondary,
-                fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: ct.textSecondary,
+                  fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+                ),
               ),
             ),
             Text(
@@ -646,17 +1061,14 @@ class _SubRow extends StatelessWidget {
       );
 }
 
-class _SaveButton extends StatelessWidget {
-  final VoidCallback onSave;
-  const _SaveButton({required this.onSave});
+class _Divider extends StatelessWidget {
+  final CalcwiseTheme ct;
+  const _Divider(this.ct);
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
-        child: OutlinedButton.icon(
-          onPressed: onSave,
-          icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
-          label: const Text('Save to History'),
-        ),
+  Widget build(BuildContext context) => Divider(
+        color: ct.cardBorder,
+        height: AppSpacing.xl,
+        thickness: 1,
       );
 }

@@ -21,7 +21,7 @@ class DividendScreen extends StatefulWidget {
   State<DividendScreen> createState() => _DividendScreenState();
 }
 
-class _DividendScreenState extends State<DividendScreen> {
+class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMixin {
   late final TextEditingController _salaryCtrl;
   final _dividendCtrl = TextEditingController(text: '5000');
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
@@ -142,6 +142,7 @@ class _DividendScreenState extends State<DividendScreen> {
                   hintText: '35000',
                   filled: true,
                 ),
+                onChanged: (_) => scheduleCalc(_calculate),
                 onSubmitted: (_) => _calculate(),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -158,6 +159,7 @@ class _DividendScreenState extends State<DividendScreen> {
                   hintText: '5000',
                   filled: true,
                 ),
+                onChanged: (_) => scheduleCalc(_calculate),
                 onSubmitted: (_) => _calculate(),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -200,7 +202,7 @@ class _DividendScreenState extends State<DividendScreen> {
                       child: CalcwiseHeroCard(
                         label: 'DIVIDEND TAX DUE',
                         value: _fmtGbp.format(r.taxDue),
-                        secondary: '2024/25 rates · ${r.band} Rate taxpayer',
+                        secondary: '2025/26 rates · ${r.band} Rate taxpayer',
                         stats: [
                           (
                             label: 'Taxable Dividend',
@@ -353,7 +355,7 @@ class _DividendRatesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionCard(
-        title: '2024/25 Dividend Tax Rates',
+        title: '2025/26 Dividend Tax Rates',
         children: [
           for (final entry in const [
             ('Basic Rate (up to £50,270)', '8.75%', 'Basic'),
@@ -406,7 +408,7 @@ class _DividendRatesCard extends StatelessWidget {
           ],
           Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
           Text(
-            'Dividend allowance: £500 (2024/25). '
+            'Dividend allowance: £500 (2025/26). '
             'Dividends are not subject to Scottish income tax — same rates apply throughout the UK.',
             style:
                 TextStyle(fontSize: 11, color: ct.textSecondary, height: 1.5),

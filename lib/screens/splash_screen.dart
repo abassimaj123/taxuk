@@ -24,12 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) => CalcwiseSplash(
         appName: 'Tax',
         appSuffix: 'UK',
-        tagline: 'VAT & Income Tax Calculator',
+        tagline: 'UK Tax Calculator 2025/26',
         chips: const [
-          'VAT 20%/5%/0%',
-          'Scottish Tax',
-          'NI 2025/26',
           'Income Tax',
+          'Scottish Rates',
+          'CGT & Dividends',
+          'Student Loan',
         ],
         badgeIcon: Icons.account_balance_rounded,
         backgroundColor: AppTheme.primary,

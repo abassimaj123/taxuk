@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.calcwise.taxuk"
+    namespace = "com.taxeuk.calculator"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.calcwise.taxuk"
+        applicationId = "com.taxeuk.calculator"
         minSdk = flutter.minSdkVersion
         targetSdk = 35
         versionCode = flutter.versionCode

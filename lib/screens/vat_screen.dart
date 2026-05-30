@@ -53,7 +53,7 @@ class VatScreen extends StatefulWidget {
   State<VatScreen> createState() => _VatScreenState();
 }
 
-class _VatScreenState extends State<VatScreen> {
+class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
   final _amountCtrl = TextEditingController(text: '100');
   final _customRateCtrl = TextEditingController(text: '20');
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
@@ -61,6 +61,14 @@ class _VatScreenState extends State<VatScreen> {
   _VatRateOption _rateOption = _VatRateOption.standard;
   bool _fromGross = false; // false = from net, true = from gross
   VatResult? _result;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _calculate();
+    });
+  }
 
   @override
   void dispose() {
@@ -223,9 +231,7 @@ class _VatScreenState extends State<VatScreen> {
                     suffixText: '%',
                     filled: true,
                   ),
-                  onChanged: (_) {
-                    if (_result != null) _calculate();
-                  },
+                  onChanged: (_) => scheduleCalc(_calculate),
                 ),
               ],
               const SizedBox(height: AppSpacing.xl),
@@ -256,6 +262,7 @@ class _VatScreenState extends State<VatScreen> {
                   prefixText: '£',
                   filled: true,
                 ),
+                onChanged: (_) => scheduleCalc(_calculate),
                 onSubmitted: (_) => _calculate(),
               ),
               const SizedBox(height: AppSpacing.xl),

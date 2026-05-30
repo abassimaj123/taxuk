@@ -340,6 +340,11 @@ class IncomeTaxResult {
   final double marginalTaxRate;
   final List<TaxBandRow> bandBreakdown;
   final bool isScotland;
+  // Extended fields
+  final double pensionContribution;
+  final bool isSelfEmployed;
+  final bool hasMarriageAllowance;
+  final double marriageAllowanceCreditApplied;
 
   const IncomeTaxResult({
     required this.grossIncome,
@@ -351,11 +356,16 @@ class IncomeTaxResult {
     required this.marginalTaxRate,
     required this.bandBreakdown,
     required this.isScotland,
+    this.pensionContribution = 0,
+    this.isSelfEmployed = false,
+    this.hasMarriageAllowance = false,
+    this.marriageAllowanceCreditApplied = 0,
   });
 
   double get totalDeductions => incomeTax + nationalInsurance;
   double get effectiveOverallRate =>
       grossIncome > 0 ? totalDeductions / grossIncome : 0;
+  double get effectiveGross => grossIncome - pensionContribution;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -559,6 +569,180 @@ StudentLoanResult calculateStudentLoan({
     annualRepayment: annual,
     monthlyRepayment: annual / 12,
     weeklyRepayment: annual / 52,
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Self-Employed National Insurance (Class 2 + Class 4) 2025/26
+// ══════════════════════════════════════════════════════════════════════════
+
+extension SelfEmployedNI on UKTaxEngine {
+  // Accessed as static helpers below
+}
+
+/// Self-employed NI: Class 2 (£3.45/week if profits > SPT) + Class 4 (6%/2%)
+double calculateSelfEmployedNI(double grossProfit) {
+  const double class2Weekly = 3.45;
+  const double spt = 12570.0; // Small Profits Threshold
+  const double lpl = 12570.0; // Lower Profits Limit
+  const double upl = 50270.0; // Upper Profits Limit
+  double ni = 0;
+  if (grossProfit > spt) ni += class2Weekly * 52;
+  if (grossProfit > lpl) {
+    ni += (min(grossProfit, upl) - lpl) * 0.06;
+  }
+  if (grossProfit > upl) {
+    ni += (grossProfit - upl) * 0.02;
+  }
+  return ni;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Pension salary sacrifice helper
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Gross income after pension salary sacrifice (reduces taxable + NI-able income)
+double grossAfterPension(double gross, double pensionContrib) =>
+    max(0.0, gross - pensionContrib);
+
+// ══════════════════════════════════════════════════════════════════════════
+// Marriage Allowance (2025/26)
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Marriage Allowance tax credit for recipient (£1,260 @ 20% = £252/year)
+const double marriageAllowanceCredit = 252.0;
+
+// ══════════════════════════════════════════════════════════════════════════
+// Reverse calculator — target net → required gross
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Binary search: find gross salary needed to achieve [targetNet] take-home.
+/// Accounts for pension salary sacrifice (reduces taxable income).
+/// Uses Class 1 NI (PAYE) or Class 2+4 (self-employed).
+double reverseCalculateGross({
+  required double targetNet,
+  bool isScotland = false,
+  double pensionContrib = 0,
+  bool selfEmployed = false,
+}) {
+  if (targetNet <= 0) return 0;
+
+  // net(gross) function
+  double netFor(double gross) {
+    final effective = grossAfterPension(gross, pensionContrib);
+    final tax = UKTaxEngine.incomeTax(effective, isScotland: isScotland);
+    final ni = selfEmployed
+        ? calculateSelfEmployedNI(effective)
+        : UKTaxEngine.nationalInsurance(effective);
+    return effective - tax - ni;
+  }
+
+  // Find upper bound
+  double lo = targetNet;
+  double hi = targetNet * 2.5;
+  for (int i = 0; i < 12; i++) {
+    if (netFor(hi) >= targetNet) break;
+    hi *= 2;
+  }
+
+  // Binary search (50 iterations → precision < £0.01)
+  for (int i = 0; i < 60; i++) {
+    final mid = (lo + hi) / 2;
+    if ((hi - lo) < 0.01) break;
+    if (netFor(mid) < targetNet) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return (lo + hi) / 2;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Capital Gains Tax (CGT) 2025/26
+// ══════════════════════════════════════════════════════════════════════════
+
+class CGTResult {
+  final double totalGain;
+  final double annualExemption; // £3,000
+  final double taxableGain;
+  final double gainInBasicBand;
+  final double gainInHigherBand;
+  final double taxInBasicBand;
+  final double taxInHigherBand;
+  final double totalTax;
+  final double effectiveRate; // on totalGain
+  final bool isResidentialProperty;
+
+  const CGTResult({
+    required this.totalGain,
+    required this.annualExemption,
+    required this.taxableGain,
+    required this.gainInBasicBand,
+    required this.gainInHigherBand,
+    required this.taxInBasicBand,
+    required this.taxInHigherBand,
+    required this.totalTax,
+    required this.effectiveRate,
+    required this.isResidentialProperty,
+  });
+
+  bool get hasGain => totalGain > 0;
+  bool get hasTax => totalTax > 0;
+  double get basicRate => isResidentialProperty ? 0.18 : 0.10;
+  double get higherRate => isResidentialProperty ? 0.24 : 0.20;
+}
+
+CGTResult calculateCGT({
+  required double gain,
+  required double grossIncome,
+  required bool isResidentialProperty,
+}) {
+  const double exemption = 3000.0;
+  const double basicBandLimit = 37700.0;
+  const double pa = 12570.0;
+
+  final taxableGain = max(0.0, gain - exemption);
+
+  if (taxableGain <= 0) {
+    return CGTResult(
+      totalGain: gain,
+      annualExemption: exemption,
+      taxableGain: 0,
+      gainInBasicBand: 0,
+      gainInHigherBand: 0,
+      taxInBasicBand: 0,
+      taxInHigherBand: 0,
+      totalTax: 0,
+      effectiveRate: 0,
+      isResidentialProperty: isResidentialProperty,
+    );
+  }
+
+  // Remaining basic rate band
+  final taxableIncome = max(0.0, grossIncome - pa);
+  final remainingBasic = max(0.0, basicBandLimit - taxableIncome);
+  final gainInBasic = min(taxableGain, remainingBasic);
+  final gainInHigher = taxableGain - gainInBasic;
+
+  final basicRate = isResidentialProperty ? 0.18 : 0.10;
+  final higherRate = isResidentialProperty ? 0.24 : 0.20;
+
+  final taxBasic = gainInBasic * basicRate;
+  final taxHigher = gainInHigher * higherRate;
+  final total = taxBasic + taxHigher;
+
+  return CGTResult(
+    totalGain: gain,
+    annualExemption: exemption,
+    taxableGain: taxableGain,
+    gainInBasicBand: gainInBasic,
+    gainInHigherBand: gainInHigher,
+    taxInBasicBand: taxBasic,
+    taxInHigherBand: taxHigher,
+    totalTax: total,
+    effectiveRate: gain > 0 ? total / gain : 0,
+    isResidentialProperty: isResidentialProperty,
   );
 }
 

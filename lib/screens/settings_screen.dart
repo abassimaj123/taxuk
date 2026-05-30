@@ -113,41 +113,34 @@ class SettingsScreen extends StatelessWidget {
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeModeService.notifier,
             builder: (context, mode, _) => ListTile(
-              leading: const Icon(Icons.brightness_6_rounded,
-                  color: AppTheme.primary),
+              leading: Icon(Icons.brightness_6_rounded, color: AppTheme.primary),
               title: Text('Theme', style: TextStyle(color: ct.textPrimary)),
-              subtitle: Text(
-                mode == ThemeMode.dark
-                    ? 'Dark'
-                    : mode == ThemeMode.light
-                        ? 'Light'
-                        : 'System default',
-                style: TextStyle(color: ct.textSecondary),
-              ),
-              trailing: DropdownButton<ThemeMode>(
-                value: mode,
-                underline: const SizedBox.shrink(),
-                dropdownColor: ct.surfaceHigh,
-                items: [
-                  DropdownMenuItem(
-                    value: ThemeMode.system,
-                    child:
-                        Text('Auto', style: TextStyle(color: ct.textPrimary)),
-                  ),
-                  DropdownMenuItem(
+              subtitle: SegmentedButton<ThemeMode>(
+                segments: const [
+                  ButtonSegment(
                     value: ThemeMode.light,
-                    child:
-                        Text('Light', style: TextStyle(color: ct.textPrimary)),
+                    icon: Icon(Icons.light_mode_rounded, size: 16),
+                    label: Text('Light'),
                   ),
-                  DropdownMenuItem(
+                  ButtonSegment(
+                    value: ThemeMode.system,
+                    icon: Icon(Icons.brightness_auto_rounded, size: 16),
+                    label: Text('Auto'),
+                  ),
+                  ButtonSegment(
                     value: ThemeMode.dark,
-                    child:
-                        Text('Dark', style: TextStyle(color: ct.textPrimary)),
+                    icon: Icon(Icons.dark_mode_rounded, size: 16),
+                    label: Text('Dark'),
                   ),
                 ],
-                onChanged: (v) {
-                  if (v != null) themeModeService.set(v);
+                selected: {mode},
+                onSelectionChanged: (Set<ThemeMode> selection) {
+                  if (selection.isNotEmpty) themeModeService.set(selection.first);
                 },
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: AppTheme.primary.withValues(alpha: 0.15),
+                  selectedForegroundColor: AppTheme.primary,
+                ),
               ),
             ),
           ),
@@ -182,7 +175,7 @@ class SettingsScreen extends StatelessWidget {
             trailing: Icon(Icons.open_in_new_rounded,
                 color: ct.textSecondary, size: 16),
             onTap: () =>
-                _launch('mailto:support@calqwise.com?subject=TaxUK%20Support'),
+                _launch('mailto:hello@calqwise.com?subject=TaxUK%20Support'),
           ),
           const SizedBox(height: AppSpacing.xxxl),
         ],

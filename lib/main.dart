@@ -28,6 +28,22 @@ final paywallSession = PaywallSessionService(
   hasFullAccess: () => freemiumService.hasFullAccess,
 );
 
+/// Requests the main shell to switch to a given bottom-nav tab index.
+/// Index 0 is the primary Income Tax calculator.
+class _MainTabNotifier extends ChangeNotifier {
+  int _value = 0;
+  int get value => _value;
+
+  /// Requests a tab switch. Always notifies, even if the target index
+  /// equals the last requested value, so the shell reacts reliably.
+  void requestTab(int index) {
+    _value = index;
+    notifyListeners();
+  }
+}
+
+final _MainTabNotifier mainTabNotifier = _MainTabNotifier();
+
 final adService = CalcwiseAdService(
   config: CalcwiseAdConfig(
     bannerAndroid: AdConfig.bannerAndroid,
@@ -134,6 +150,7 @@ class _MainShellState extends State<MainShell> {
     _wasPremium = freemiumService.hasFullAccess;
     freemiumService.isPremiumNotifier.addListener(_onPremiumChange);
     iapErrorNotifier.addListener(_onIapError);
+    mainTabNotifier.addListener(_onTabRequested);
     WidgetsBinding.instance.addPostFrameCallback(
         (_) async => await paywallSession.recordSession());
   }
@@ -142,7 +159,14 @@ class _MainShellState extends State<MainShell> {
   void dispose() {
     freemiumService.isPremiumNotifier.removeListener(_onPremiumChange);
     iapErrorNotifier.removeListener(_onIapError);
+    mainTabNotifier.removeListener(_onTabRequested);
     super.dispose();
+  }
+
+  void _onTabRequested() {
+    final i = mainTabNotifier.value;
+    if (!mounted || i == _index) return;
+    setState(() => _index = i);
   }
 
   void _onPremiumChange() {

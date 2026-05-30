@@ -21,7 +21,7 @@ class StudentLoanScreen extends StatefulWidget {
   State<StudentLoanScreen> createState() => _StudentLoanScreenState();
 }
 
-class _StudentLoanScreenState extends State<StudentLoanScreen> {
+class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAutoCalcMixin {
   late final TextEditingController _grossCtrl;
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
 
@@ -136,6 +136,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> {
                   hintText: '35000',
                   filled: true,
                 ),
+                onChanged: (_) => scheduleCalc(_calculate),
                 onSubmitted: (_) => _calculate(),
               ),
               const SizedBox(height: AppSpacing.lg),

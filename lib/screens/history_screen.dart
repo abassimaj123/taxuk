@@ -96,7 +96,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   body:
                       'Your saved VAT and income tax calculations will appear here.',
                   actionLabel: 'Calculate now',
-                  onAction: () {},
+                  onAction: () => mainTabNotifier.requestTab(0),
                 )
               : Column(
                   children: [
@@ -228,14 +228,43 @@ class _HistoryTile extends StatelessWidget {
     final IconData icon;
 
     if (type == 'income_tax') {
-      final gross = (results['net'] as num?)?.toDouble() ?? 0;
+      final takeHome = (results['net'] as num?)?.toDouble() ?? 0;
       final taxAmt = (results['income_tax'] as num?)?.toDouble() ?? 0;
       final isScotland = inputs['is_scotland'] as bool? ?? false;
       title = 'Income Tax — ${fmtGbp.format(inputs['gross'] ?? 0)} gross';
       subtitle =
-          'Take-home: ${fmtGbp.format(gross)} · Tax: ${fmtGbp.format(taxAmt)}'
+          'Take-home: ${fmtGbp.format(takeHome)} · Tax: ${fmtGbp.format(taxAmt)}'
           '${isScotland ? ' (Scotland)' : ''}';
       icon = Icons.account_balance_rounded;
+    } else if (type == 'dividend') {
+      final taxDue = (results['tax_due'] as num?)?.toDouble() ?? 0;
+      final band = results['band'] as String? ?? '';
+      title = 'Dividend — ${fmtGbp.format(inputs['gross_dividend'] ?? 0)}';
+      subtitle = 'Tax due: ${fmtGbp.format(taxDue)} · $band Rate';
+      icon = Icons.bar_chart_rounded;
+    } else if (type == 'student_loan') {
+      final monthly = (results['monthly_repayment'] as num?)?.toDouble() ?? 0;
+      final plan = inputs['plan'] as String? ?? '';
+      title = 'Student Loan — $plan';
+      subtitle =
+          'Monthly: ${fmtGbp.format(monthly)} · ${fmtGbp.format(inputs['gross_income'] ?? 0)} income';
+      icon = Icons.school_rounded;
+    } else if (type == 'cgt') {
+      final taxDue = (results['tax_due'] as num?)?.toDouble() ?? 0;
+      final gain = (inputs['gain'] as num?)?.toDouble() ?? 0;
+      final assetType = inputs['asset_type'] as String? ?? 'Other Assets';
+      title = 'CGT — ${fmtGbp.format(gain)} gain';
+      subtitle = 'Tax due: ${fmtGbp.format(taxDue)} · $assetType';
+      icon = Icons.trending_up_rounded;
+    } else if (type == 'salary_compare') {
+      final netA = (results['net_a'] as num?)?.toDouble() ?? 0;
+      final netB = (results['net_b'] as num?)?.toDouble() ?? 0;
+      final nameA = inputs['name_a'] as String? ?? 'Job A';
+      final nameB = inputs['name_b'] as String? ?? 'Job B';
+      title = 'Salary Compare — $nameA vs $nameB';
+      subtitle =
+          '${fmtGbp.format(netA / 12)}/mo vs ${fmtGbp.format(netB / 12)}/mo';
+      icon = Icons.compare_arrows_rounded;
     } else {
       final net = (results['net'] as num?)?.toDouble() ?? 0;
       final vat = (results['vat'] as num?)?.toDouble() ?? 0;
