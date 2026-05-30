@@ -29,7 +29,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
   final _fmtPct = NumberFormat.percentPattern('en_GB');
 
   // ── State ────────────────────────────────────────────────────────────────────
-  bool _isScotland = false;
+  IncomeTaxRegion _region = IncomeTaxRegion.england;
+  bool get _isScotland => _region.usesScottishRates;
   bool _isSelfEmployed = false;
   bool _hasMarriageAllowance = false;
   bool _isReverse = false; // forward (gross→net) vs reverse (net→gross)
@@ -185,7 +186,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
     _pensionCtrl.text = '0';
     _targetNetCtrl.text = '25000';
     setState(() {
-      _isScotland = false;
+      _region = IncomeTaxRegion.england;
       _isSelfEmployed = false;
       _hasMarriageAllowance = false;
       _isReverse = false;
@@ -280,6 +281,28 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
               ),
               const SizedBox(height: AppSpacing.lg),
 
+              // ── Region selector ──────────────────────────────────────────
+              _SectionLabel('Tax Region', ct),
+              const SizedBox(height: AppSpacing.sm),
+              _RegionSelector(
+                region: _region,
+                ct: ct,
+                onChanged: (r) {
+                  setState(() => _region = r);
+                  analyticsService.logRegionSelected(r.label);
+                  analyticsService.logScotlandToggled(r.usesScottishRates);
+                  if (_result != null || _reverseGross != null) {
+                    _calculate();
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                _region.ratesNote,
+                style: TextStyle(fontSize: 12, color: ct.textSecondary),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
               // ── Toggles ──────────────────────────────────────────────────
               Container(
                 decoration: BoxDecoration(
@@ -289,43 +312,6 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                 ),
                 child: Column(
                   children: [
-                    SwitchListTile(
-                      title: Text(
-                        'Scottish Income Tax Rates',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: ct.textPrimary,
-                        ),
-                      ),
-                      subtitle: Text(
-                        _isScotland
-                            ? 'Scotland: 6 bands (19%–48%)'
-                            : 'England / Wales / NI: 3 bands (20%–45%)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: ct.textSecondary,
-                        ),
-                      ),
-                      value: _isScotland,
-                      activeColor: AppTheme.primary,
-                      onChanged: (v) {
-                        setState(() => _isScotland = v);
-                        analyticsService.logScotlandToggled(v);
-                        if (_result != null || _reverseGross != null) {
-                          _calculate();
-                        }
-                      },
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                    ),
-                    Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: ct.cardBorder,
-                        indent: AppSpacing.md),
                     SwitchListTile(
                       title: Text(
                         'Self-Employed (Class 2 + 4 NI)',
@@ -423,9 +409,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       child: CalcwiseHeroCard(
                         label: 'REQUIRED GROSS SALARY',
                         value: _fmtGbp.format(_reverseGross),
-                        secondary: _isScotland
-                            ? 'Scotland · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}'
-                            : 'England/Wales/NI · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
+                        secondary:
+                            '${_region.label} · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
                         stats: [
                           (
                             label: 'Target Net',
@@ -465,9 +450,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       child: CalcwiseHeroCard(
                         label: 'ANNUAL TAKE-HOME',
                         value: _fmtGbp.format(r.netIncome),
-                        secondary: r.isScotland
-                            ? 'Scottish rates 2025/26'
-                            : 'England / Wales / NI rates 2025/26',
+                        secondary: '${_region.label} rates 2025/26',
                         stats: [
                           (
                             label: 'Income Tax',
@@ -541,6 +524,62 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  final CalcwiseTheme ct;
+  const _SectionLabel(this.text, this.ct);
+
+  @override
+  Widget build(BuildContext context) => Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
+          color: ct.textSecondary,
+        ),
+      );
+}
+
+class _RegionSelector extends StatelessWidget {
+  final IncomeTaxRegion region;
+  final CalcwiseTheme ct;
+  final ValueChanged<IncomeTaxRegion> onChanged;
+
+  const _RegionSelector({
+    required this.region,
+    required this.ct,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: IncomeTaxRegion.values.map((r) {
+          final sel = region == r;
+          return ChoiceChip(
+            label: Text(r.shortLabel),
+            selected: sel,
+            onSelected: (_) => onChanged(r),
+            selectedColor: AppTheme.primary.withValues(alpha: 0.15),
+            labelStyle: TextStyle(
+              fontSize: 13,
+              color: sel ? AppTheme.primary : ct.textSecondary,
+              fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
+            ),
+            side: BorderSide(
+              color: sel
+                  ? AppTheme.primary.withValues(alpha: 0.5)
+                  : ct.cardBorder,
+            ),
+            backgroundColor: ct.surface,
+            showCheckmark: false,
+          );
+        }).toList(),
+      );
+}
 
 class _ModeToggle extends StatelessWidget {
   final bool isReverse;

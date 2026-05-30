@@ -34,6 +34,20 @@ class AnalyticsService extends CalcwiseAnalytics {
   Future<void> logScotlandToggled(bool isScotland) =>
       log('scotland_toggled', {'enabled': '$isScotland'});
 
+  Future<void> logRegionSelected(String region) =>
+      log('region_selected', {'region': region});
+
+  // ── Tax Code Checker ──────────────────────────────────────────────────────
+
+  Future<void> logTaxCodeChecked({
+    required String code,
+    required bool isValid,
+  }) =>
+      log('tax_code_checked', {
+        'code': code.toUpperCase().trim(),
+        'valid': '$isValid',
+      });
+
   // ── Universal events ──────────────────────────────────────────────────────
 
   Future<void> logSave() => log('calculation_saved');

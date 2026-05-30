@@ -18,6 +18,7 @@ import 'screens/income_tax_screen.dart';
 import 'screens/dividend_screen.dart';
 import 'screens/student_loan_screen.dart';
 import 'screens/cgt_screen.dart';
+import 'screens/tax_code_checker_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
@@ -270,6 +271,7 @@ class _MainShellState extends State<MainShell> {
           DividendScreen(),
           StudentLoanScreen(),
           CGTScreen(),
+          TaxCodeCheckerScreen(),
           HistoryScreen(),
         ],
       ),
@@ -322,6 +324,11 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.trending_up_rounded),
               selectedIcon: Icon(Icons.trending_up),
               label: 'CGT',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.qr_code_2_outlined),
+              selectedIcon: Icon(Icons.qr_code_2_rounded),
+              label: 'Tax Code',
             ),
             NavigationDestination(
               icon: Icon(Icons.history_rounded),

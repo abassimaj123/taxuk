@@ -1,5 +1,60 @@
 import 'dart:math';
 
+/// UK income-tax region. Only Scotland has its own rates/bands for 2025/26.
+///
+/// Wales has the Welsh Rate of Income Tax (WRIT): the UK rates are reduced by
+/// 10p in each band and the Welsh Government adds back 10p, so the effective
+/// Welsh rates are currently IDENTICAL to England — only the label differs.
+/// Northern Ireland uses the same rates as England. We keep them as separate
+/// values so the UI can show the correct label and the calculation stays
+/// future-proof if Wales/NI ever diverge.
+enum IncomeTaxRegion { england, scotland, wales, northernIreland }
+
+extension IncomeTaxRegionInfo on IncomeTaxRegion {
+  /// Whether Scottish rates/bands apply.
+  bool get usesScottishRates => this == IncomeTaxRegion.scotland;
+
+  String get label {
+    switch (this) {
+      case IncomeTaxRegion.england:
+        return 'England';
+      case IncomeTaxRegion.scotland:
+        return 'Scotland';
+      case IncomeTaxRegion.wales:
+        return 'Wales';
+      case IncomeTaxRegion.northernIreland:
+        return 'Northern Ireland';
+    }
+  }
+
+  String get shortLabel {
+    switch (this) {
+      case IncomeTaxRegion.england:
+        return 'England';
+      case IncomeTaxRegion.scotland:
+        return 'Scotland';
+      case IncomeTaxRegion.wales:
+        return 'Wales';
+      case IncomeTaxRegion.northernIreland:
+        return 'N. Ireland';
+    }
+  }
+
+  /// One-line description of the rates that apply.
+  String get ratesNote {
+    switch (this) {
+      case IncomeTaxRegion.scotland:
+        return 'Scotland: 6 bands (19%–48%)';
+      case IncomeTaxRegion.wales:
+        return 'Wales (WRIT): same as England — 3 bands (20%–45%)';
+      case IncomeTaxRegion.northernIreland:
+        return 'Northern Ireland: same as England — 3 bands (20%–45%)';
+      case IncomeTaxRegion.england:
+        return 'England: 3 bands (20%–45%)';
+    }
+  }
+}
+
 /// UK Tax Engine — 2025/26 rates
 /// Covers Income Tax (England/Wales/NI + Scotland), National Insurance (Class 1),
 /// and VAT (Standard 20%, Reduced 5%, Zero 0%, Custom).
