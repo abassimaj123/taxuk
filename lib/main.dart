@@ -13,14 +13,10 @@ import 'core/analytics/analytics_service.dart';
 import 'core/services/crashlytics_service.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/splash_screen.dart';
-import 'screens/vat_screen.dart';
 import 'screens/income_tax_screen.dart';
-import 'screens/dividend_screen.dart';
-import 'screens/rental_income_screen.dart';
-import 'screens/student_loan_screen.dart';
-import 'screens/cgt_screen.dart';
-import 'screens/tax_code_checker_screen.dart';
-import 'screens/savings_interest_screen.dart';
+import 'screens/investments_shell_screen.dart';
+import 'screens/tools_hub_screen.dart';
+import 'screens/salary_comparison_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
@@ -269,13 +265,9 @@ class _MainShellState extends State<MainShell> {
         index: _index,
         children: const [
           IncomeTaxScreen(),
-          VatScreen(),
-          DividendScreen(),
-          SavingsInterestScreen(),
-          RentalIncomeScreen(),
-          StudentLoanScreen(),
-          CGTScreen(),
-          TaxCodeCheckerScreen(),
+          InvestmentsShellScreen(),
+          ToolsHubScreen(),
+          SalaryComparisonScreen(),
           HistoryScreen(),
         ],
       ),
@@ -310,43 +302,23 @@ class _MainShellState extends State<MainShell> {
               label: 'Income Tax',
             ),
             NavigationDestination(
-              icon: Icon(Icons.percent_rounded),
-              selectedIcon: Icon(Icons.percent),
-              label: 'VAT',
-            ),
-            NavigationDestination(
               icon: Icon(Icons.bar_chart_outlined),
               selectedIcon: Icon(Icons.bar_chart_rounded),
-              label: 'Dividends',
+              label: 'Investments',
             ),
             NavigationDestination(
-              icon: Icon(Icons.savings_outlined),
-              selectedIcon: Icon(Icons.savings_rounded),
-              label: 'Savings',
+              icon: Icon(Icons.grid_view_outlined),
+              selectedIcon: Icon(Icons.grid_view_rounded),
+              label: 'Tools',
             ),
             NavigationDestination(
-              icon: Icon(Icons.home_work_outlined),
-              selectedIcon: Icon(Icons.home_work_rounded),
-              label: 'Rental',
+              icon: Icon(Icons.compare_arrows_outlined),
+              selectedIcon: Icon(Icons.compare_arrows_rounded),
+              label: 'Compare',
             ),
             NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              selectedIcon: Icon(Icons.school_rounded),
-              label: 'Student Loan',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.trending_up_rounded),
-              selectedIcon: Icon(Icons.trending_up),
-              label: 'CGT',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.qr_code_2_outlined),
-              selectedIcon: Icon(Icons.qr_code_2_rounded),
-              label: 'Tax Code',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.history_rounded),
-              selectedIcon: Icon(Icons.history),
+              icon: Icon(Icons.history_outlined),
+              selectedIcon: Icon(Icons.history_rounded),
               label: 'History',
             ),
           ],
