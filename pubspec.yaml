@@ -13,6 +13,7 @@ dependencies:
     git:
       url: https://github.com/abassimaj123/calcwise_core.git
       ref: main
+    version: 1.0.13
   intl: ^0.20.0
   share_plus: ^10.1.4
   fl_chart: ^0.68.0
