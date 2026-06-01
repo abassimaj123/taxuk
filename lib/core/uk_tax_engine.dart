@@ -400,6 +400,9 @@ class IncomeTaxResult {
   final bool isSelfEmployed;
   final bool hasMarriageAllowance;
   final double marriageAllowanceCreditApplied;
+  // NI breakdown for self-employed (Class 2 + Class 4 separately)
+  final double class2NI;
+  final double class4NI;
 
   const IncomeTaxResult({
     required this.grossIncome,
@@ -415,6 +418,8 @@ class IncomeTaxResult {
     this.isSelfEmployed = false,
     this.hasMarriageAllowance = false,
     this.marriageAllowanceCreditApplied = 0,
+    this.class2NI = 0.0,
+    this.class4NI = 0.0,
   });
 
   double get totalDeductions => incomeTax + nationalInsurance;
@@ -652,6 +657,25 @@ double calculateSelfEmployedNI(double grossProfit) {
   return ni;
 }
 
+/// Returns Class 2 + Class 4 as separate amounts for detailed display.
+/// Use alongside [calculateSelfEmployedNI] for self-employed scenarios.
+({double class2, double class4}) calculateSelfEmployedNIBreakdown(
+    double grossProfit) {
+  const double class2Weekly = 3.45;
+  const double spt = 12570.0;
+  const double lpl = 12570.0;
+  const double upl = 50270.0;
+  final class2 = grossProfit > spt ? class2Weekly * 52 : 0.0; // £179.40/yr
+  double class4 = 0;
+  if (grossProfit > lpl) {
+    class4 += (min(grossProfit, upl) - lpl) * 0.06; // 6% on £12,570-£50,270
+  }
+  if (grossProfit > upl) {
+    class4 += (grossProfit - upl) * 0.02; // 2% above £50,270
+  }
+  return (class2: class2, class4: class4);
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // Pension salary sacrifice helper
 // ══════════════════════════════════════════════════════════════════════════
@@ -798,6 +822,162 @@ CGTResult calculateCGT({
     totalTax: total,
     effectiveRate: gain > 0 ? total / gain : 0,
     isResidentialProperty: isResidentialProperty,
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Rental Income Tax (2025/26)
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Result model for UK rental income tax calculation (2025/26 rules).
+class RentalIncomeResult {
+  final double grossRental;
+  final double allowableExpenses;
+  final double taxableProfit;
+  final double mortgageInterestCredit; // 20% of mortgage interest
+  final double taxBeforeCredit;
+  final double taxAfterCredit;
+  final double netProfit; // after all tax
+  final double effectiveYield; // % of gross rental
+
+  const RentalIncomeResult({
+    required this.grossRental,
+    required this.allowableExpenses,
+    required this.taxableProfit,
+    required this.mortgageInterestCredit,
+    required this.taxBeforeCredit,
+    required this.taxAfterCredit,
+    required this.netProfit,
+    required this.effectiveYield,
+  });
+}
+
+/// Calculate UK rental income tax (2025/26 rules).
+/// Mortgage interest is NOT deducted from profit — instead a 20% tax credit applies.
+RentalIncomeResult calculateRentalIncomeTax({
+  required double grossRental,
+  required double managementFees,
+  required double repairs,
+  required double insurance,
+  required double councilTax,
+  required double utilities,
+  required double otherExpenses,
+  required double mortgageInterest,
+  required double otherIncome,
+}) {
+  final allowableExpenses =
+      managementFees + repairs + insurance + councilTax + utilities + otherExpenses;
+  final taxableProfit =
+      (grossRental - allowableExpenses).clamp(0.0, double.infinity);
+
+  // Marginal rate based on total income (other income + rental profit)
+  final totalIncome = otherIncome + taxableProfit;
+  final paTotal = UKTaxEngine.effectivePersonalAllowance(totalIncome);
+  final paOther = UKTaxEngine.effectivePersonalAllowance(otherIncome);
+  final taxOnTotal = UKTaxEngine.incomeTax(max(0, totalIncome - paTotal));
+  final taxOnOther = UKTaxEngine.incomeTax(max(0, otherIncome - paOther));
+  final taxBeforeCredit =
+      (taxOnTotal - taxOnOther).clamp(0.0, double.infinity);
+
+  // Mortgage interest: 20% basic rate tax credit
+  final mortgageInterestCredit = mortgageInterest * 0.20;
+  final taxAfterCredit =
+      (taxBeforeCredit - mortgageInterestCredit).clamp(0.0, double.infinity);
+
+  final netProfit = taxableProfit - taxAfterCredit;
+  final effectiveYield =
+      grossRental > 0 ? (netProfit / grossRental) * 100 : 0.0;
+
+  return RentalIncomeResult(
+    grossRental: grossRental,
+    allowableExpenses: allowableExpenses,
+    taxableProfit: taxableProfit,
+    mortgageInterestCredit: mortgageInterestCredit,
+    taxBeforeCredit: taxBeforeCredit,
+    taxAfterCredit: taxAfterCredit,
+    netProfit: netProfit,
+    effectiveYield: effectiveYield,
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Savings Interest Tax (2025/26)
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Personal Savings Allowance 2025/26.
+double personalSavingsAllowance(double grossIncome) {
+  const higherThreshold = 50270.0;
+  const additionalThreshold = 125140.0;
+  if (grossIncome <= higherThreshold) return 1000.0; // Basic rate
+  if (grossIncome <= additionalThreshold) return 500.0; // Higher rate
+  return 0.0; // Additional rate
+}
+
+/// Savings starter rate band (0% on savings if non-savings income < £17,570).
+double savingsStarterRateRelief(double nonSavingsIncome, double savingsIncome) {
+  const pa = 12570.0;
+  const starterBandMax = 5000.0;
+  final available =
+      (pa + starterBandMax - nonSavingsIncome).clamp(0.0, starterBandMax);
+  return available; // amount of savings taxed at 0%
+}
+
+class SavingsInterestResult {
+  final double grossInterest;
+  final double personalSavingsAllowance;
+  final double starterRateRelief;
+  final double taxableInterest;
+  final double taxDue;
+  final String band; // 'Basic Rate', 'Higher Rate', 'Additional Rate'
+  final double effectiveRate;
+
+  const SavingsInterestResult({
+    required this.grossInterest,
+    required this.personalSavingsAllowance,
+    required this.starterRateRelief,
+    required this.taxableInterest,
+    required this.taxDue,
+    required this.band,
+    required this.effectiveRate,
+  });
+}
+
+/// Calculate UK savings interest tax (2025/26).
+SavingsInterestResult calculateSavingsInterestTax({
+  required double grossInterest,
+  required double otherIncome, // employment/self-emp income
+}) {
+  final psa = personalSavingsAllowance(otherIncome);
+  final starterRelief = savingsStarterRateRelief(otherIncome, grossInterest);
+
+  // Determine marginal rate from total income
+  final totalIncome = otherIncome + grossInterest;
+  final marginalRate = UKTaxEngine.marginalTaxRate(totalIncome);
+
+  final String band;
+  if (marginalRate <= 0.20) {
+    band = 'Basic Rate';
+  } else if (marginalRate <= 0.40) {
+    band = 'Higher Rate';
+  } else {
+    band = 'Additional Rate';
+  }
+
+  // Taxable interest = gross − PSA − starter rate relief (clamped ≥ 0)
+  final taxableInterest =
+      (grossInterest - psa - starterRelief).clamp(0.0, double.infinity);
+  final taxDue = taxableInterest * marginalRate;
+  final effectiveRate =
+      grossInterest > 0 ? (taxDue / grossInterest) * 100 : 0.0;
+
+  return SavingsInterestResult(
+    grossInterest: grossInterest,
+    personalSavingsAllowance: psa,
+    starterRateRelief: starterRelief,
+    taxableInterest: taxableInterest,
+    taxDue: taxDue,
+    band: band,
+    effectiveRate: effectiveRate,
   );
 }
 

@@ -51,4 +51,26 @@ class AppStringsEN {
   static const personalAllowance = 'Personal Allowance';
   static const disclaimer = 'This app is for informational purposes only. '
       'Consult a financial professional or HMRC for official guidance.';
+  // Savings Interest screen
+  static const savingsInterest = 'Savings Interest Tax';
+  static const grossInterest = 'Gross Interest Earned';
+  static const personalSavingsAllowance = 'Personal Savings Allowance';
+  static const starterRateRelief = 'Starter Rate Relief';
+  static const taxableInterest = 'Taxable Interest';
+  static const taxRateBand = 'Tax Rate Band';
+  static const effectiveRatePct = 'Effective Rate';
+  static const otherIncome = 'Employment / Other Income';
+  // Rental Income screen
+  static const rentalIncome = 'Rental Income';
+  static const grossRental = 'Gross Rental Income';
+  static const allowableExpenses = 'Allowable Expenses';
+  static const taxableProfit = 'Taxable Profit';
+  static const mortgageInterestCredit = 'Mortgage Interest (annual)';
+  static const netProfit = 'Net Profit After Tax';
+  static const effectiveYield = 'Effective Yield';
+  static const managementFees = 'Management Fees';
+  static const repairs = 'Repairs & Maintenance';
+  static const insurance = 'Insurance';
+  static const councilTax = 'Council Tax';
+  static const utilities = 'Utilities';
 }

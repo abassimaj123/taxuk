@@ -77,6 +77,9 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
     final ni = _isSelfEmployed
         ? calculateSelfEmployedNI(effectiveGross)
         : UKTaxEngine.nationalInsurance(effectiveGross);
+    final niBreakdown = _isSelfEmployed
+        ? calculateSelfEmployedNIBreakdown(effectiveGross)
+        : (class2: 0.0, class4: 0.0);
     final maCredit = _hasMarriageAllowance ? marriageAllowanceCredit : 0.0;
     final taxAfterMA = max(0.0, tax - maCredit);
     final net = effectiveGross - taxAfterMA - ni;
@@ -104,6 +107,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
         isSelfEmployed: _isSelfEmployed,
         hasMarriageAllowance: _hasMarriageAllowance,
         marriageAllowanceCreditApplied: maCredit,
+        class2NI: niBreakdown.class2,
+        class4NI: niBreakdown.class4,
       );
     });
 
@@ -491,6 +496,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                         gross: r.effectiveGross,
                         ni: r.nationalInsurance,
                         isSelfEmployed: r.isSelfEmployed,
+                        class2NI: r.class2NI,
+                        class4NI: r.class4NI,
                         fmtGbp: _fmtGbp,
                         ct: ct,
                       ),
@@ -769,14 +776,22 @@ class _SummaryCard extends StatelessWidget {
               '− ${fmtGbp.format(result.marriageAllowanceCreditApplied)}',
               ct,
             ),
-          _Row(
-            result.isSelfEmployed
-                ? 'National Insurance (Class 2+4)'
-                : 'National Insurance (Class 1)',
-            fmtGbp.format(result.nationalInsurance),
-            ct,
-            highlight: true,
-          ),
+          if (result.isSelfEmployed) ...[
+            _Row(
+              'National Insurance (Class 2+4)',
+              fmtGbp.format(result.nationalInsurance),
+              ct,
+              highlight: true,
+            ),
+            _IndentRow(' ↳ Class 2 (£3.45/wk)', result.class2NI, fmtGbp, ct),
+            _IndentRow(' ↳ Class 4 (6%/2%)', result.class4NI, fmtGbp, ct),
+          ] else
+            _Row(
+              'National Insurance (Class 1)',
+              fmtGbp.format(result.nationalInsurance),
+              ct,
+              highlight: true,
+            ),
           _Divider(ct),
           _Row(
             'Take-Home Pay',
@@ -872,6 +887,8 @@ class _NiBreakdown extends StatelessWidget {
   final double gross;
   final double ni;
   final bool isSelfEmployed;
+  final double class2NI;
+  final double class4NI;
   final NumberFormat fmtGbp;
   final CalcwiseTheme ct;
 
@@ -879,6 +896,8 @@ class _NiBreakdown extends StatelessWidget {
     required this.gross,
     required this.ni,
     required this.isSelfEmployed,
+    required this.class2NI,
+    required this.class4NI,
     required this.fmtGbp,
     required this.ct,
   });
@@ -890,7 +909,7 @@ class _NiBreakdown extends StatelessWidget {
         : 'National Insurance (Class 1)';
 
     if (isSelfEmployed) {
-      final class2 = gross > 12570 ? 3.45 * 52 : 0.0;
+      // Derive Class 4 band split from the stored total class4NI
       final class4band1 = gross > 12570
           ? (min(gross, 50270) - 12570) * 0.06
           : 0.0;
@@ -899,8 +918,8 @@ class _NiBreakdown extends StatelessWidget {
       return SectionCard(
         title: title,
         children: [
-          if (class2 > 0)
-            _SubRow('Class 2 (£3.45/week)', class2, fmtGbp, ct),
+          if (class2NI > 0)
+            _SubRow('Class 2 (£3.45/week)', class2NI, fmtGbp, ct),
           if (class4band1 > 0)
             _SubRow('Class 4 @ 6% (£12,570–£50,270)', class4band1, fmtGbp, ct),
           if (class4band2 > 0)
@@ -1054,6 +1073,47 @@ class _Row extends StatelessWidget {
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
+class _IndentRow extends StatelessWidget {
+  final String label;
+  final double value;
+  final NumberFormat fmt;
+  final CalcwiseTheme ct;
+
+  const _IndentRow(this.label, this.value, this.fmt, this.ct);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(
+          left: AppSpacing.md,
+          top: 2,
+          bottom: 2,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: ct.textSecondary,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            Text(
+              fmt.format(value),
+              style: TextStyle(
+                fontSize: 12,
+                color: ct.textSecondary,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

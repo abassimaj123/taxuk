@@ -16,9 +16,11 @@ import 'screens/splash_screen.dart';
 import 'screens/vat_screen.dart';
 import 'screens/income_tax_screen.dart';
 import 'screens/dividend_screen.dart';
+import 'screens/rental_income_screen.dart';
 import 'screens/student_loan_screen.dart';
 import 'screens/cgt_screen.dart';
 import 'screens/tax_code_checker_screen.dart';
+import 'screens/savings_interest_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
@@ -269,6 +271,8 @@ class _MainShellState extends State<MainShell> {
           IncomeTaxScreen(),
           VatScreen(),
           DividendScreen(),
+          SavingsInterestScreen(),
+          RentalIncomeScreen(),
           StudentLoanScreen(),
           CGTScreen(),
           TaxCodeCheckerScreen(),
@@ -314,6 +318,16 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.bar_chart_outlined),
               selectedIcon: Icon(Icons.bar_chart_rounded),
               label: 'Dividends',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.savings_outlined),
+              selectedIcon: Icon(Icons.savings_rounded),
+              label: 'Savings',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_work_outlined),
+              selectedIcon: Icon(Icons.home_work_rounded),
+              label: 'Rental',
             ),
             NavigationDestination(
               icon: Icon(Icons.school_outlined),
