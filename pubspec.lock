@@ -94,10 +94,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "3b477f3484e6a305b1b2673e7998eedcceeb8c8c"
+      resolved-ref: c03ce5bfc15d625d3bc2325e74bdaa93cbc265b7
       url: "https://github.com/abassimaj123/calcwise_core.git"
     source: git
-    version: "1.0.0"
+    version: "1.0.13"
   calcwise_lint:
     dependency: "direct dev"
     description:

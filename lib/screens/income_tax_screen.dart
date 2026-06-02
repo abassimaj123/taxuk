@@ -649,7 +649,7 @@ class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
                   ),
                   sections: sections,
                 ),
-                swapAnimationDuration: const Duration(milliseconds: 350),
+                swapAnimationDuration: CalcwiseChartTokens.swapDuration,
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -708,6 +708,8 @@ class _DonutLegendRow extends StatelessWidget {
     required this.ct,
   });
 
+  bool get _isNI => label == 'National Insurance';
+
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
@@ -719,6 +721,13 @@ class _DonutLegendRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(3),
+                border: _isNI
+                    ? Border.all(
+                        color: color.withValues(alpha: 0.6),
+                        width: 1.5,
+                        strokeAlign: BorderSide.strokeAlignOutside,
+                      )
+                    : null,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
