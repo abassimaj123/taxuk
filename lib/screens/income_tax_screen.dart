@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:calcwise_core/calcwise_core.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -481,8 +482,17 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                         ct: ct,
                       ),
                     ),
+                    if (r.netIncome > 0)
+                      CalcwiseStaggerItem(
+                        index: 2,
+                        child: _TaxBreakdownDonut(
+                          result: r,
+                          fmtGbp: _fmtGbp,
+                          ct: ct,
+                        ),
+                      ),
                     CalcwiseStaggerItem(
-                      index: 2,
+                      index: 3,
                       child: _BandBreakdown(
                         bands: r.bandBreakdown,
                         fmtGbp: _fmtGbp,
@@ -491,7 +501,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       ),
                     ),
                     CalcwiseStaggerItem(
-                      index: 3,
+                      index: 4,
                       child: _NiBreakdown(
                         gross: r.effectiveGross,
                         ni: r.nationalInsurance,
@@ -503,7 +513,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       ),
                     ),
                     CalcwiseStaggerItem(
-                      index: 4,
+                      index: 5,
                       child: _MonthlyWeeklyCard(
                         result: r,
                         fmtGbp: _fmtGbp,
@@ -511,11 +521,11 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       ),
                     ),
                     CalcwiseStaggerItem(
-                      index: 5,
+                      index: 6,
                       child: _CompareButton(ct: ct),
                     ),
                     CalcwiseStaggerItem(
-                      index: 6,
+                      index: 7,
                       child: _SaveButton(onSave: _save),
                     ),
                   ]),
@@ -531,6 +541,217 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
+
+/// Donut chart visualising how the gross salary splits between take-home pay,
+/// Income Tax and National Insurance. Touch a segment to enlarge it and reveal
+/// the £ amount in the centre.
+class _TaxBreakdownDonut extends StatefulWidget {
+  final IncomeTaxResult result;
+  final NumberFormat fmtGbp;
+  final CalcwiseTheme ct;
+
+  const _TaxBreakdownDonut({
+    required this.result,
+    required this.fmtGbp,
+    required this.ct,
+  });
+
+  @override
+  State<_TaxBreakdownDonut> createState() => _TaxBreakdownDonutState();
+}
+
+class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
+  int _touchedIndex = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final r = widget.result;
+
+    // Build categories from the result — take-home, income tax, NI.
+    // (Student Loan is not deducted on this screen, so it's omitted.)
+    final entries = <({String label, double value, Color color})>[
+      (label: 'Take-Home', value: max(0.0, r.netIncome), color: cs.primary),
+      (label: 'Income Tax', value: max(0.0, r.incomeTax), color: cs.error),
+      (
+        label: 'National Insurance',
+        value: max(0.0, r.nationalInsurance),
+        color: cs.tertiary,
+      ),
+    ].where((e) => e.value > 0).toList();
+
+    final total = entries.fold<double>(0, (s, e) => s + e.value);
+    if (total <= 0) return const SizedBox.shrink();
+
+    final sections = <PieChartSectionData>[];
+    for (var i = 0; i < entries.length; i++) {
+      final e = entries[i];
+      final pct = e.value / total;
+      final touched = i == _touchedIndex;
+      sections.add(
+        PieChartSectionData(
+          value: e.value,
+          color: e.color,
+          radius: touched
+              ? CalcwiseChartTokens.donutSectionR * 1.25
+              : CalcwiseChartTokens.donutSectionR,
+          showTitle: true,
+          title: '${(pct * 100).toStringAsFixed(0)}%',
+          titleStyle: TextStyle(
+            fontSize: touched ? 13 : 11,
+            fontWeight: FontWeight.w700,
+            color: cs.onPrimary,
+          ),
+          titlePositionPercentageOffset: 0.55,
+        ),
+      );
+    }
+
+    // Center label — selected segment amount, or total take-home %.
+    final String centerTop;
+    final String centerBottom;
+    if (_touchedIndex >= 0 && _touchedIndex < entries.length) {
+      final e = entries[_touchedIndex];
+      centerTop = widget.fmtGbp.format(e.value);
+      centerBottom = e.label;
+    } else {
+      centerTop = widget.fmtGbp.format(r.netIncome);
+      centerBottom = 'Take-Home';
+    }
+
+    return SectionCard(
+      title: 'Salary Breakdown',
+      children: [
+        SizedBox(
+          height: 200,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: CalcwiseChartTokens.donutCenterR,
+                  startDegreeOffset: -90,
+                  pieTouchData: PieTouchData(
+                    enabled: true,
+                    touchCallback: (event, response) {
+                      setState(() {
+                        if (!event.isInterestedForInteractions ||
+                            response == null ||
+                            response.touchedSection == null) {
+                          _touchedIndex = -1;
+                          return;
+                        }
+                        _touchedIndex =
+                            response.touchedSection!.touchedSectionIndex;
+                      });
+                    },
+                  ),
+                  sections: sections,
+                ),
+                swapAnimationDuration: const Duration(milliseconds: 350),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    centerTop,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: widget.ct.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    centerBottom,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: widget.ct.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        // ── Legend ───────────────────────────────────────────────────────────
+        for (var i = 0; i < entries.length; i++)
+          _DonutLegendRow(
+            label: entries[i].label,
+            color: entries[i].color,
+            amount: widget.fmtGbp.format(entries[i].value),
+            pct: '${(entries[i].value / total * 100).toStringAsFixed(1)}%',
+            highlighted: i == _touchedIndex,
+            ct: widget.ct,
+          ),
+      ],
+    );
+  }
+}
+
+class _DonutLegendRow extends StatelessWidget {
+  final String label;
+  final Color color;
+  final String amount;
+  final String pct;
+  final bool highlighted;
+  final CalcwiseTheme ct;
+
+  const _DonutLegendRow({
+    required this.label,
+    required this.color,
+    required this.amount,
+    required this.pct,
+    required this.highlighted,
+    required this.ct,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Row(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: ct.textPrimary,
+                  fontWeight: highlighted ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              '$amount  ',
+              style: TextStyle(
+                fontSize: 13,
+                color: ct.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(
+              width: 48,
+              child: Text(
+                pct,
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 12, color: ct.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      );
+}
 
 class _SectionLabel extends StatelessWidget {
   final String text;
