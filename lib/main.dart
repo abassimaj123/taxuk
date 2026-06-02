@@ -265,9 +265,9 @@ class _MainShellState extends State<MainShell> {
         index: _index,
         children: const [
           IncomeTaxScreen(),
+          SalaryComparisonScreen(),
           InvestmentsShellScreen(),
           ToolsHubScreen(),
-          SalaryComparisonScreen(),
           HistoryScreen(),
         ],
       ),
@@ -302,6 +302,11 @@ class _MainShellState extends State<MainShell> {
               label: 'Income Tax',
             ),
             NavigationDestination(
+              icon: Icon(Icons.compare_arrows_outlined),
+              selectedIcon: Icon(Icons.compare_arrows_rounded),
+              label: 'Compare',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.bar_chart_outlined),
               selectedIcon: Icon(Icons.bar_chart_rounded),
               label: 'Investments',
@@ -310,11 +315,6 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.grid_view_outlined),
               selectedIcon: Icon(Icons.grid_view_rounded),
               label: 'Tools',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.compare_arrows_outlined),
-              selectedIcon: Icon(Icons.compare_arrows_rounded),
-              label: 'Compare',
             ),
             NavigationDestination(
               icon: Icon(Icons.history_outlined),
