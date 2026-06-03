@@ -60,7 +60,9 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -213,6 +215,7 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }

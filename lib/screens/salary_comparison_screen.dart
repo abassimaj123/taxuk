@@ -224,7 +224,9 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
     final rA = _resultA;
     final rB = _resultB;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -478,6 +480,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }

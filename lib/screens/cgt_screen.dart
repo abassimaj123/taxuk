@@ -173,7 +173,9 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -375,6 +377,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }

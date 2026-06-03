@@ -232,8 +232,9 @@ class _HistoryTile extends StatelessWidget {
       final taxAmt = (results['income_tax'] as num?)?.toDouble() ?? 0;
       final isScotland = inputs['is_scotland'] as bool? ?? false;
       title = 'Income Tax — ${fmtGbp.format(inputs['gross'] ?? 0)} gross';
+      final niAmt = (results['ni'] as num?)?.toDouble() ?? 0;
       subtitle =
-          'Take-home: ${fmtGbp.format(takeHome)} · Tax: ${fmtGbp.format(taxAmt)}'
+          'Take-home: ${fmtGbp.format(takeHome)} · Tax: ${fmtGbp.format(taxAmt)} · NI: ${fmtGbp.format(niAmt)}'
           '${isScotland ? ' (Scotland)' : ''}';
       icon = Icons.account_balance_rounded;
     } else if (type == 'dividend') {

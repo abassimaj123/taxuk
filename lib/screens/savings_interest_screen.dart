@@ -25,6 +25,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
 
   SavingsInterestResult? _result;
+  bool _isScotland = false;
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
     final result = calculateSavingsInterestTax(
       grossInterest: grossInterest,
       otherIncome: otherIncome,
+      isScotland: _isScotland,
     );
     setState(() => _result = result);
 
@@ -114,7 +116,9 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -171,6 +175,16 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                     color: ct.textSecondary,
                   ),
                 ),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Scottish taxpayer'),
+                subtitle: const Text('Uses Scottish income tax bands (Higher Rate: 42% from £43,662)'),
+                value: _isScotland,
+                onChanged: (v) {
+                  setState(() => _isScotland = v);
+                  _calculate();
+                },
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -246,6 +260,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }

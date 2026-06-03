@@ -112,7 +112,9 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -277,6 +279,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }

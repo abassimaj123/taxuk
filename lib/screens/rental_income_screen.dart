@@ -34,6 +34,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
   final _fmtPct = NumberFormat('##0.00', 'en_GB');
 
   RentalIncomeResult? _result;
+  bool _isScotland = false;
 
   @override
   void initState() {
@@ -81,6 +82,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       otherExpenses: otherExpenses,
       mortgageInterest: mortgageInterest,
       otherIncome: otherIncome,
+      isScotland: _isScotland,
     );
     setState(() => _result = result);
 
@@ -151,7 +153,9 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Column(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
       children: [
         Expanded(
           child: ListView(
@@ -173,6 +177,17 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
                 controller: _otherIncomeCtrl,
                 label: AppStringsEN.otherIncome,
                 hint: '35000',
+              ),
+              const SizedBox(height: AppSpacing.md),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Scottish taxpayer'),
+                subtitle: const Text('Uses Scottish income tax rates (42% Higher Rate from £43,662)'),
+                value: _isScotland,
+                onChanged: (v) {
+                  setState(() => _isScotland = v);
+                  _calculate();
+                },
               ),
               const SizedBox(height: AppSpacing.md),
 
@@ -314,6 +329,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 

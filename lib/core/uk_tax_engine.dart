@@ -864,6 +864,7 @@ RentalIncomeResult calculateRentalIncomeTax({
   required double otherExpenses,
   required double mortgageInterest,
   required double otherIncome,
+  bool isScotland = false,
 }) {
   final allowableExpenses =
       managementFees + repairs + insurance + councilTax + utilities + otherExpenses;
@@ -872,10 +873,8 @@ RentalIncomeResult calculateRentalIncomeTax({
 
   // Marginal rate based on total income (other income + rental profit)
   final totalIncome = otherIncome + taxableProfit;
-  final paTotal = UKTaxEngine.effectivePersonalAllowance(totalIncome);
-  final paOther = UKTaxEngine.effectivePersonalAllowance(otherIncome);
-  final taxOnTotal = UKTaxEngine.incomeTax(max(0, totalIncome - paTotal));
-  final taxOnOther = UKTaxEngine.incomeTax(max(0, otherIncome - paOther));
+  final taxOnTotal = UKTaxEngine.incomeTax(totalIncome, isScotland: isScotland);
+  final taxOnOther = UKTaxEngine.incomeTax(otherIncome, isScotland: isScotland);
   final taxBeforeCredit =
       (taxOnTotal - taxOnOther).clamp(0.0, double.infinity);
 
@@ -905,12 +904,13 @@ RentalIncomeResult calculateRentalIncomeTax({
 // ══════════════════════════════════════════════════════════════════════════
 
 /// Personal Savings Allowance 2025/26.
-double personalSavingsAllowance(double grossIncome) {
-  const higherThreshold = 50270.0;
+/// Scottish higher rate starts at £43,662 (vs £50,270 for rest of UK).
+double personalSavingsAllowance(double grossIncome, {bool isScotland = false}) {
+  final higherThreshold = isScotland ? 43662.0 : 50270.0;
   const additionalThreshold = 125140.0;
   if (grossIncome <= higherThreshold) return 1000.0; // Basic rate
   if (grossIncome <= additionalThreshold) return 500.0; // Higher rate
-  return 0.0; // Additional rate
+  return 0.0; // Additional/Top rate
 }
 
 /// Savings starter rate band (0% on savings if non-savings income < £17,570).
@@ -919,7 +919,7 @@ double savingsStarterRateRelief(double nonSavingsIncome, double savingsIncome) {
   const starterBandMax = 5000.0;
   final available =
       (pa + starterBandMax - nonSavingsIncome).clamp(0.0, starterBandMax);
-  return available; // amount of savings taxed at 0%
+  return min(available, savingsIncome); // amount of savings taxed at 0%
 }
 
 class SavingsInterestResult {
@@ -946,27 +946,47 @@ class SavingsInterestResult {
 SavingsInterestResult calculateSavingsInterestTax({
   required double grossInterest,
   required double otherIncome, // employment/self-emp income
+  bool isScotland = false,
 }) {
-  final psa = personalSavingsAllowance(otherIncome);
+  // Total income drives both the PSA tier and the band rate.
+  final totalIncome = otherIncome + grossInterest;
+  final psa = personalSavingsAllowance(totalIncome, isScotland: isScotland);
   final starterRelief = savingsStarterRateRelief(otherIncome, grossInterest);
 
-  // Determine marginal rate from total income
-  final totalIncome = otherIncome + grossInterest;
-  final marginalRate = UKTaxEngine.marginalTaxRate(totalIncome);
+  // Determine income tax band rate from total income.
+  // Savings interest is taxed at the BAND rate (20/40/45%), NOT the blended
+  // 60% marginal rate that applies in the PA taper zone (£100k–£125,140).
+  // Scotland: Higher Rate threshold is £43,662 (vs £50,270 England/Wales/NI).
+  // Advanced Rate threshold is £75,000; Top Rate is £125,140.
+  final double higherThreshold = isScotland ? 43662.0 : 50270.0;
+  final double advancedThreshold = isScotland ? 75000.0 : 125140.0;
+  final double higherBandRate = isScotland ? 0.42 : 0.40;
+  // Scotland: Advanced Rate = 45% (£75k–£125,140), Top Rate = 48% (>£125,140)
+  // England/Wales/NI: Additional Rate = 45% (>£125,140)
 
+  final double bandRate;
   final String band;
-  if (marginalRate <= 0.20) {
+  if (totalIncome <= higherThreshold) {
+    bandRate = 0.20;
     band = 'Basic Rate';
-  } else if (marginalRate <= 0.40) {
-    band = 'Higher Rate';
+  } else if (totalIncome <= advancedThreshold) {
+    bandRate = higherBandRate;
+    band = isScotland ? 'Higher Rate (Scotland)' : 'Higher Rate';
+  } else if (isScotland && totalIncome <= 125140.0) {
+    bandRate = 0.45;
+    band = 'Advanced Rate (Scotland)';
+  } else if (isScotland) {
+    bandRate = 0.48;
+    band = 'Top Rate (Scotland)';
   } else {
+    bandRate = 0.45;
     band = 'Additional Rate';
   }
 
   // Taxable interest = gross − PSA − starter rate relief (clamped ≥ 0)
   final taxableInterest =
       (grossInterest - psa - starterRelief).clamp(0.0, double.infinity);
-  final taxDue = taxableInterest * marginalRate;
+  final taxDue = taxableInterest * bandRate;
   final effectiveRate =
       grossInterest > 0 ? (taxDue / grossInterest) * 100 : 0.0;
 
