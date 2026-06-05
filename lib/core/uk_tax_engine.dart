@@ -436,7 +436,7 @@ extension DividendTax on UKTaxEngine {
   // All static — accessed via UKTaxEngine.calculateDividend(...)
 }
 
-/// 2024/25 UK dividend tax constants
+/// 2025/26 UK dividend tax constants (inchangés depuis 2024/25)
 class DividendTaxConstants {
   DividendTaxConstants._();
   static const double allowance = 500.0;
