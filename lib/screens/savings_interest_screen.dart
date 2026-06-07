@@ -87,8 +87,11 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       screenId: 'savings_interest',
       inputHash: inputHash,
       l1: {
-        'title': 'Savings — £${r.grossInterest.toStringAsFixed(0)} interest',
-        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · PSA: £${r.personalSavingsAllowance.toStringAsFixed(0)}',
+        'interest': r.grossInterest,
+        'other_income': otherIncome,
+        'psa_used': r.personalSavingsAllowance,
+        'tax_on_savings': r.taxDue,
+        'net_interest': r.grossInterest - r.taxDue,
       },
       l2: {
         'inputs': {
@@ -118,8 +121,11 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       screenId: 'savings_interest',
       inputHash: inputHash,
       l1: {
-        'title': 'Savings — £${r.grossInterest.toStringAsFixed(0)} interest',
-        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · PSA: £${r.personalSavingsAllowance.toStringAsFixed(0)}',
+        'interest': r.grossInterest,
+        'other_income': otherIncome,
+        'psa_used': r.personalSavingsAllowance,
+        'tax_on_savings': r.taxDue,
+        'net_interest': r.grossInterest - r.taxDue,
       },
       l2: {
         'inputs': {

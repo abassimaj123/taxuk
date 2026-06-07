@@ -117,8 +117,11 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       screenId: 'rental_income',
       inputHash: inputHash,
       l1: {
-        'title': 'Rental — £${r.grossRental.toStringAsFixed(0)} income',
-        'subtitle': 'Tax: £${r.taxAfterCredit.toStringAsFixed(0)} · Profit: £${r.netProfit.toStringAsFixed(0)}',
+        'rental_income': r.grossRental,
+        'other_income': otherIncome,
+        'taxable_profit': r.taxableProfit,
+        'tax': r.taxAfterCredit,
+        'net_profit': r.netProfit,
       },
       l2: {
         'inputs': {
@@ -148,8 +151,11 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       screenId: 'rental_income',
       inputHash: inputHash,
       l1: {
-        'title': 'Rental — £${r.grossRental.toStringAsFixed(0)} income',
-        'subtitle': 'Tax: £${r.taxAfterCredit.toStringAsFixed(0)} · Profit: £${r.netProfit.toStringAsFixed(0)}',
+        'rental_income': r.grossRental,
+        'other_income': otherIncome,
+        'taxable_profit': r.taxableProfit,
+        'tax': r.taxAfterCredit,
+        'net_profit': r.netProfit,
       },
       l2: {
         'inputs': {

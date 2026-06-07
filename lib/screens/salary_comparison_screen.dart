@@ -176,8 +176,11 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
       screenId: 'salary_comparison',
       inputHash: inputHash,
       l1: {
-        'title': 'Salary Compare — £${rA.gross.toStringAsFixed(0)} vs £${rB.gross.toStringAsFixed(0)}',
-        'subtitle': 'Net: £${rA.netPay.toStringAsFixed(0)} vs £${rB.netPay.toStringAsFixed(0)}',
+        'salary_a': rA.gross,
+        'salary_b': rB.gross,
+        'net_a': rA.netPay,
+        'net_b': rB.netPay,
+        'difference': (rA.netPay - rB.netPay).abs(),
       },
       l2: {
         'inputs': {
@@ -210,8 +213,11 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
       screenId: 'salary_comparison',
       inputHash: inputHash,
       l1: {
-        'title': 'Salary Compare — £${rA.gross.toStringAsFixed(0)} vs £${rB.gross.toStringAsFixed(0)}',
-        'subtitle': 'Net: £${rA.netPay.toStringAsFixed(0)} vs £${rB.netPay.toStringAsFixed(0)}',
+        'salary_a': rA.gross,
+        'salary_b': rB.gross,
+        'net_a': rA.netPay,
+        'net_b': rB.netPay,
+        'difference': (rA.netPay - rB.netPay).abs(),
       },
       l2: {
         'inputs': {

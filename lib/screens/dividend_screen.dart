@@ -90,8 +90,10 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       screenId: 'dividend',
       inputHash: inputHash,
       l1: {
-        'title': 'Dividend — £${r.grossDividend.toStringAsFixed(0)}',
-        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
+        'dividend_income': r.grossDividend,
+        'gross_income': salary,
+        'dividend_tax': r.taxDue,
+        'effective_rate': r.effectiveRate,
       },
       l2: {
         'inputs': {
@@ -120,8 +122,10 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       screenId: 'dividend',
       inputHash: inputHash,
       l1: {
-        'title': 'Dividend — £${r.grossDividend.toStringAsFixed(0)}',
-        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
+        'dividend_income': r.grossDividend,
+        'gross_income': salary,
+        'dividend_tax': r.taxDue,
+        'effective_rate': r.effectiveRate,
       },
       l2: {
         'inputs': {

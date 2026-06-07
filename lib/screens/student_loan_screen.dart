@@ -83,8 +83,11 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       screenId: 'student_loan_uk',
       inputHash: inputHash,
       l1: {
-        'title': 'Student Loan — ${r.plan.shortLabel}',
-        'subtitle': '£${r.monthlyRepayment.toStringAsFixed(0)}/mo · £${r.annualRepayment.toStringAsFixed(0)}/yr',
+        'salary': r.grossIncome,
+        'threshold': r.threshold,
+        'annual_repayment': r.annualRepayment,
+        'monthly_repayment': r.monthlyRepayment,
+        'weekly_repayment': r.weeklyRepayment,
       },
       l2: {
         'inputs': {
@@ -112,8 +115,11 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       screenId: 'student_loan_uk',
       inputHash: inputHash,
       l1: {
-        'title': 'Student Loan — ${r.plan.shortLabel}',
-        'subtitle': '£${r.monthlyRepayment.toStringAsFixed(0)}/mo · £${r.annualRepayment.toStringAsFixed(0)}/yr',
+        'salary': r.grossIncome,
+        'threshold': r.threshold,
+        'annual_repayment': r.annualRepayment,
+        'monthly_repayment': r.monthlyRepayment,
+        'weekly_repayment': r.weeklyRepayment,
       },
       l2: {
         'inputs': {

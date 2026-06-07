@@ -174,8 +174,12 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
   }
 
   Map<String, dynamic> _buildL1(IncomeTaxResult r) => {
-        'title': 'Income Tax — £${r.grossIncome.toStringAsFixed(0)} gross',
-        'subtitle': 'Take-home: £${r.netIncome.toStringAsFixed(0)}',
+        'gross_income': r.grossIncome,
+        'personal_allowance': r.personalAllowance,
+        'income_tax': r.incomeTax,
+        'ni_contributions': r.nationalInsurance,
+        'net_income': r.netIncome,
+        'effective_rate': r.effectiveTaxRate,
       };
 
   Map<String, dynamic> _buildL2(IncomeTaxResult r) => {
@@ -195,8 +199,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
         },
       };
 
-  num _roundTo(num value, num step) =>
-      step > 0 ? (value / step).round() * step : value;
+  double _roundTo(double v, double step) => (v / step).round() * step;
 
   Future<void> _saveScenario(String? label) async {
     final r = _result;

@@ -136,8 +136,11 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       screenId: 'cgt',
       inputHash: inputHash,
       l1: {
-        'title': 'CGT — Gain £${r.totalGain.toStringAsFixed(0)}',
-        'subtitle': 'Tax: £${r.totalTax.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
+        'gains': r.totalGain,
+        'gross_income': _grossIncome,
+        'taxable_gain': r.taxableGain,
+        'cgt_tax': r.totalTax,
+        'effective_rate': r.effectiveRate,
       },
       l2: {
         'inputs': {
@@ -167,8 +170,11 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       screenId: 'cgt',
       inputHash: inputHash,
       l1: {
-        'title': 'CGT — Gain £${r.totalGain.toStringAsFixed(0)}',
-        'subtitle': 'Tax: £${r.totalTax.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
+        'gains': r.totalGain,
+        'gross_income': _grossIncome,
+        'taxable_gain': r.taxableGain,
+        'cgt_tax': r.totalTax,
+        'effective_rate': r.effectiveRate,
       },
       l2: {
         'inputs': {

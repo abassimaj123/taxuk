@@ -140,8 +140,10 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
       screenId: 'vat',
       inputHash: inputHash,
       l1: {
-        'title': 'VAT — £${r.netAmount.toStringAsFixed(2)} net',
-        'subtitle': 'VAT: £${r.vatAmount.toStringAsFixed(2)} · ${r.rateLabel}',
+        'amount': r.netAmount,
+        'vat_rate': r.rate * 100,
+        'vat_amount': r.vatAmount,
+        'total': r.grossAmount,
       },
       l2: {
         'inputs': {
@@ -169,8 +171,10 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
       screenId: 'vat',
       inputHash: inputHash,
       l1: {
-        'title': 'VAT — £${r.netAmount.toStringAsFixed(2)} net',
-        'subtitle': 'VAT: £${r.vatAmount.toStringAsFixed(2)} · ${r.rateLabel}',
+        'amount': r.netAmount,
+        'vat_rate': r.rate * 100,
+        'vat_amount': r.vatAmount,
+        'total': r.grossAmount,
       },
       l2: {
         'inputs': {
