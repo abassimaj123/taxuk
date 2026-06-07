@@ -180,7 +180,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
 
     final count = await DatabaseService.instance.count();
     if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeHistoryLimit) {
+        count >= MonetizationConfig.freeRingBufferSize) {
       if (!mounted) return;
       await PaywallSoft.show(
         context,

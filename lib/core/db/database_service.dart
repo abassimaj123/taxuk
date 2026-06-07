@@ -17,20 +17,35 @@ class DatabaseService {
     final path = join(await getDatabasesPath(), 'taxuk_history.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, v) => db.execute('''
         CREATE TABLE history (
-          id        INTEGER PRIMARY KEY AUTOINCREMENT,
-          timestamp TEXT    NOT NULL,
-          inputs    TEXT    NOT NULL,
-          results   TEXT    NOT NULL
+          id         INTEGER PRIMARY KEY AUTOINCREMENT,
+          timestamp  TEXT    NOT NULL,
+          inputs     TEXT    NOT NULL,
+          results    TEXT    NOT NULL,
+          is_pinned  INTEGER NOT NULL DEFAULT 0,
+          input_hash TEXT,
+          pin_label  TEXT,
+          pin_order  INTEGER NOT NULL DEFAULT 0,
+          l1_json    TEXT
         )
       '''),
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Future schema migrations go here
+        if (oldVersion < 2) {
+          await db.execute(
+              'ALTER TABLE history ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0');
+          await db.execute('ALTER TABLE history ADD COLUMN input_hash TEXT');
+          await db.execute('ALTER TABLE history ADD COLUMN pin_label TEXT');
+          await db.execute(
+              'ALTER TABLE history ADD COLUMN pin_order INTEGER NOT NULL DEFAULT 0');
+          await db.execute('ALTER TABLE history ADD COLUMN l1_json TEXT');
+        }
       },
     );
   }
+
+  // ── Legacy insert (used by secondary calculators: VAT, CGT, etc.) ──────────
 
   /// Insert a calculation entry. Returns the new row id.
   Future<int> insert({
@@ -45,32 +60,89 @@ class DatabaseService {
     });
   }
 
-  /// Returns all history entries, newest first, up to [limit].
+  // ── SmartHistory-aware insert (used by TaxUKDatabaseAdapter) ───────────────
+
+  /// Insert a full row map (called by TaxUKDatabaseAdapter). Returns the row id.
+  Future<int> insertHistory(Map<String, dynamic> row) async {
+    final database = await db;
+    return database.insert('history', row,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // ── Queries ────────────────────────────────────────────────────────────────
+
+  /// Returns all history entries ordered: pinned first, then newest first.
   Future<List<Map<String, dynamic>>> getAll({int limit = 999999}) async {
     final database = await db;
     final rows = await database.query(
       'history',
-      orderBy: 'id DESC',
+      orderBy: 'is_pinned DESC, pin_order DESC, id DESC',
       limit: limit,
     );
-    return rows.map((r) {
-      return {
-        'id': r['id'],
-        'timestamp': r['timestamp'],
-        'inputs': jsonDecode(r['inputs'] as String) as Map<String, dynamic>,
-        'results': jsonDecode(r['results'] as String) as Map<String, dynamic>,
-      };
-    }).toList();
+    return rows.map(_decodeRow).toList();
   }
 
-  Future<int> count() async {
+  Future<Map<String, dynamic>?> getHistoryByHash(String hash) async {
     final database = await db;
-    final result =
-        await database.rawQuery('SELECT COUNT(*) as cnt FROM history');
+    final rows = await database.query('history',
+        where: 'input_hash = ?', whereArgs: [hash], limit: 1);
+    if (rows.isEmpty) return null;
+    return _decodeRow(rows.first);
+  }
+
+  Future<int> countHistory({bool? isPinned}) async {
+    final database = await db;
+    final where = isPinned != null ? ' WHERE is_pinned = ?' : '';
+    final args = isPinned != null ? [isPinned ? 1 : 0] : <Object?>[];
+    final result = await database
+        .rawQuery('SELECT COUNT(*) as cnt FROM history$where', args);
     return (result.first['cnt'] as int?) ?? 0;
   }
 
-  Future<void> delete(int id) async {
+  /// Oldest non-pinned rows for FIFO eviction — ordered by id ASC.
+  Future<List<Map<String, dynamic>>> getOldestAutoSaves(int limit) async {
+    final database = await db;
+    final rows = await database.query(
+      'history',
+      where: 'is_pinned = 0',
+      orderBy: 'id ASC',
+      limit: limit,
+    );
+    return rows.map(_decodeRow).toList();
+  }
+
+  /// Oldest pinned rows for free-tier cap eviction — ordered by pin_order ASC.
+  Future<List<Map<String, dynamic>>> getOldestPinnedEntries(int limit) async {
+    final database = await db;
+    final rows = await database.query(
+      'history',
+      where: 'is_pinned = 1',
+      orderBy: 'pin_order ASC',
+      limit: limit,
+    );
+    return rows.map(_decodeRow).toList();
+  }
+
+  // ── Legacy compatibility aliases (used by secondary calculators) ──────────
+
+  /// Alias for [countHistory] — used by VAT, CGT, Dividend, etc. screens.
+  Future<int> count() => countHistory();
+
+  /// Alias for [deleteHistory] — used by legacy screens.
+  Future<void> delete(int id) => deleteHistory(id);
+
+  /// Alias for [updateHistoryEntry] — used by legacy screens.
+  Future<int> update(int id, Map<String, dynamic> fields) =>
+      updateHistoryEntry(id, fields);
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
+
+  Future<int> updateHistoryEntry(int id, Map<String, dynamic> fields) async {
+    final database = await db;
+    return database.update('history', fields, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> deleteHistory(int id) async {
     final database = await db;
     await database.delete('history', where: 'id = ?', whereArgs: [id]);
   }
@@ -79,4 +151,22 @@ class DatabaseService {
     final database = await db;
     await database.delete('history');
   }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  Map<String, dynamic> _decodeRow(Map<String, dynamic> r) => {
+        'id': r['id'],
+        'timestamp': r['timestamp'],
+        'inputs': r['inputs'] is String
+            ? jsonDecode(r['inputs'] as String) as Map<String, dynamic>
+            : (r['inputs'] as Map?)?.cast<String, dynamic>() ?? {},
+        'results': r['results'] is String
+            ? jsonDecode(r['results'] as String) as Map<String, dynamic>
+            : (r['results'] as Map?)?.cast<String, dynamic>() ?? {},
+        'is_pinned': r['is_pinned'] ?? 0,
+        'input_hash': r['input_hash'],
+        'pin_label': r['pin_label'],
+        'pin_order': r['pin_order'] ?? 0,
+        'l1_json': r['l1_json'],
+      };
 }

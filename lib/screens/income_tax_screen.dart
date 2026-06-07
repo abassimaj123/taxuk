@@ -6,12 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
-import '../core/db/database_service.dart';
-import '../core/freemium/freemium_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
-import '../main.dart';
-import '../widgets/paywall_soft.dart';
+import '../main.dart' show adService, analyticsService, smartHistoryService;
+import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
@@ -51,6 +49,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
     _grossCtrl.dispose();
     _pensionCtrl.dispose();
     _targetNetCtrl.dispose();
+    smartHistoryService.cancelPendingSave('taxuk', 'income_tax');
     super.dispose();
   }
 
@@ -118,6 +117,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       isScotland: _isScotland,
     );
     adService.onAction();
+    _scheduleAutoSave();
   }
 
   void _calculateReverse() {
@@ -148,43 +148,70 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
     adService.onAction();
   }
 
-  // ── Save ─────────────────────────────────────────────────────────────────────
+  // ── Auto-save & pin ──────────────────────────────────────────────────────────
 
-  Future<void> _save() async {
+  void _scheduleAutoSave() {
     final r = _result;
-    if (r == null) return;
-    final count = await DatabaseService.instance.count();
-    if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeHistoryLimit) {
-      if (!mounted) return;
-      await PaywallSoft.show(
-        context,
-        featureTitle: AppStringsEN.historyLimit,
-        featureSubtitle: 'Upgrade to save unlimited calculations.',
-      );
-      return;
-    }
-    await DatabaseService.instance.insert(
-      inputs: {
-        'type': 'income_tax',
-        'gross': r.grossIncome,
-        'is_scotland': r.isScotland,
-        'is_self_employed': r.isSelfEmployed,
-        'pension': r.pensionContribution,
-      },
-      results: {
-        'net': r.netIncome,
-        'income_tax': r.incomeTax,
-        'ni': r.nationalInsurance,
-        'effective_rate': r.effectiveTaxRate,
-        'marginal_rate': r.marginalTaxRate,
-      },
+    if (r == null || r.grossIncome <= 0) return;
+    final inputHash = ResultHasher.hashMixed({
+      'gross': _roundTo(r.grossIncome, 1000),
+      'is_scotland': _isScotland ? 1 : 0,
+      'is_self_employed': _isSelfEmployed ? 1 : 0,
+      'pension': _roundTo(r.pensionContribution, 100),
+    });
+    smartHistoryService.scheduleAutoSave(
+      appKey: 'taxuk',
+      screenId: 'income_tax',
+      inputHash: inputHash,
+      l1: _buildL1(r),
+      l2: _buildL2(r),
+    );
+  }
+
+  Map<String, dynamic> _buildL1(IncomeTaxResult r) => {
+        'title': 'Income Tax — £${r.grossIncome.toStringAsFixed(0)} gross',
+        'subtitle': 'Take-home: £${r.netIncome.toStringAsFixed(0)}',
+      };
+
+  Map<String, dynamic> _buildL2(IncomeTaxResult r) => {
+        'inputs': {
+          'type': 'income_tax',
+          'gross': r.grossIncome,
+          'is_scotland': r.isScotland,
+          'is_self_employed': r.isSelfEmployed,
+          'pension': r.pensionContribution,
+        },
+        'results': {
+          'net': r.netIncome,
+          'income_tax': r.incomeTax,
+          'ni': r.nationalInsurance,
+          'effective_rate': r.effectiveTaxRate,
+          'marginal_rate': r.marginalTaxRate,
+        },
+      };
+
+  num _roundTo(num value, num step) =>
+      step > 0 ? (value / step).round() * step : value;
+
+  Future<void> _saveScenario(String? label) async {
+    final r = _result;
+    if (r == null || r.grossIncome <= 0) return;
+    final inputHash = ResultHasher.hashMixed({
+      'gross': _roundTo(r.grossIncome, 1000),
+      'is_scotland': _isScotland ? 1 : 0,
+      'is_self_employed': _isSelfEmployed ? 1 : 0,
+      'pension': _roundTo(r.pensionContribution, 100),
+    });
+    await smartHistoryService.saveScenario(
+      appKey: 'taxuk',
+      screenId: 'income_tax',
+      inputHash: inputHash,
+      l1: _buildL1(r),
+      l2: _buildL2(r),
+      label: label,
     );
     analyticsService.logResultSaved();
     adService.onSave();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved to history')));
   }
 
   void _reset() {
@@ -528,7 +555,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                     ),
                     CalcwiseStaggerItem(
                       index: 7,
-                      child: _SaveButton(onSave: _save),
+                      child: SaveScenarioButton(onSave: _saveScenario),
                     ),
                   ]),
                 ),
@@ -1249,21 +1276,6 @@ class _CompareButton extends StatelessWidget {
           ),
           icon: const Icon(Icons.compare_arrows_rounded, size: 18),
           label: const Text('Compare Two Salaries →'),
-        ),
-      );
-}
-
-class _SaveButton extends StatelessWidget {
-  final VoidCallback onSave;
-  const _SaveButton({required this.onSave});
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.xs),
-        child: OutlinedButton.icon(
-          onPressed: onSave,
-          icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
-          label: const Text('Save to History'),
         ),
       );
 }

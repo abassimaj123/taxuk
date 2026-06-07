@@ -102,7 +102,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
     if (r == null) return;
     final count = await DatabaseService.instance.count();
     if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeHistoryLimit) {
+        count >= MonetizationConfig.freeRingBufferSize) {
       if (!mounted) return;
       await PaywallSoft.show(
         context,

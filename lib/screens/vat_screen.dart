@@ -129,13 +129,13 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
     if (r == null) return;
     final count = await DatabaseService.instance.count();
     if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeHistoryLimit) {
+        count >= MonetizationConfig.freeRingBufferSize) {
       if (!mounted) return;
       await PaywallSoft.show(
         context,
         featureTitle: 'Unlimited History',
         featureSubtitle:
-            'You\'ve saved ${MonetizationConfig.freeHistoryLimit} calculations. '
+            'You\'ve saved ${MonetizationConfig.freeRingBufferSize} calculations. '
             'Upgrade to save more.',
       );
       return;

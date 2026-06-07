@@ -92,20 +92,16 @@ packages:
   calcwise_core:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: c03ce5bfc15d625d3bc2325e74bdaa93cbc265b7
-      url: "https://github.com/abassimaj123/calcwise_core.git"
-    source: git
-    version: "1.0.13"
+      path: "../packages/calcwise_core"
+      relative: true
+    source: path
+    version: "1.0.24"
   calcwise_lint:
     dependency: "direct dev"
     description:
-      path: calcwise_lint
-      ref: main
-      resolved-ref: "1e1c6ca950a6b61d4d776a1d3bd361e122dd07c1"
-      url: "https://github.com/abassimaj123/calcwise_core.git"
-    source: git
+      path: "../packages/calcwise_core/calcwise_lint"
+      relative: true
+    source: path
     version: "0.1.0"
   characters:
     dependency: transitive

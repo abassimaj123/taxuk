@@ -1,4 +1,5 @@
 import 'package:calcwise_core/calcwise_core.dart' hide CrashlyticsService;
+import 'core/db/taxuk_database_adapter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'config/ad_config.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,6 +26,12 @@ import 'widgets/paywall_hard.dart';
 final paywallSession = PaywallSessionService(
   appKey: 'taxuk',
   hasFullAccess: () => freemiumService.hasFullAccess,
+);
+
+/// SmartHistory ring buffer + pinned scenarios service.
+final smartHistoryService = SmartHistoryService(
+  db: const TaxUKDatabaseAdapter(),
+  freemium: freemiumService,
 );
 
 /// Requests the main shell to switch to a given bottom-nav tab index.
