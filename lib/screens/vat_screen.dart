@@ -7,6 +7,7 @@ import '../core/analytics/analytics_service.dart';
 import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/freemium/iap_service.dart';
+import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
 import '../main.dart';
@@ -173,6 +174,28 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
     });
   }
 
+  Future<void> _exportPdf() async {
+    final r = _result;
+    if (r == null) return;
+    if (!freemiumService.hasFullAccess) {
+      if (!mounted) return;
+      await PaywallSoft.show(
+        context,
+        featureTitle: 'Export PDF',
+        featureSubtitle: 'Upgrade to export and share your results as PDF.',
+      );
+      return;
+    }
+    await TaxUkPdfExportService.exportVat(
+      context: context,
+      netAmount: r.netAmount,
+      vatRate: r.rate,
+      vatAmount: r.vatAmount,
+      grossAmount: r.grossAmount,
+      rateLabel: r.rateLabel,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ct = CalcwiseTheme.of(context);
@@ -332,6 +355,23 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                     CalcwiseStaggerItem(
                       index: 2,
                       child: _SaveButton(onSave: _save),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacing.xs,
+                          bottom: AppSpacing.sm,
+                        ),
+                        child: OutlinedButton.icon(
+                          onPressed: _exportPdf,
+                          icon: const Icon(
+                            Icons.picture_as_pdf_outlined,
+                            size: 18,
+                          ),
+                          label: const Text('Export PDF'),
+                        ),
+                      ),
                     ),
                   ]),
                 ),

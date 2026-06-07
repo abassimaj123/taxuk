@@ -6,6 +6,7 @@ import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
 import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
+import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
 import '../main.dart';
@@ -110,6 +111,34 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
     _grossInterestCtrl.text = '2000';
     _otherIncomeCtrl.text = '35000';
     setState(() => _result = null);
+  }
+
+  Future<void> _exportPdf() async {
+    final r = _result;
+    if (r == null) return;
+    if (!freemiumService.hasFullAccess) {
+      if (!mounted) return;
+      await PaywallSoft.show(
+        context,
+        featureTitle: 'Export PDF',
+        featureSubtitle: 'Upgrade to export and share your results as PDF.',
+      );
+      return;
+    }
+    await TaxUkPdfExportService.exportSavingsInterest(
+      context: context,
+      grossInterest: r.grossInterest,
+      otherIncome:
+          double.tryParse(
+            _otherIncomeCtrl.text.replaceAll(',', '.').trim(),
+          ) ??
+          0,
+      personalSavingsAllowance: r.personalSavingsAllowance,
+      taxableInterest: r.taxableInterest,
+      taxDue: r.taxDue,
+      band: r.band,
+      effectiveRate: r.effectiveRate,
+    );
   }
 
   @override
@@ -252,6 +281,23 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                     CalcwiseStaggerItem(
                       index: 4,
                       child: _SaveButton(onSave: _save),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacing.xs,
+                          bottom: AppSpacing.sm,
+                        ),
+                        child: OutlinedButton.icon(
+                          onPressed: _exportPdf,
+                          icon: const Icon(
+                            Icons.picture_as_pdf_outlined,
+                            size: 18,
+                          ),
+                          label: const Text('Export PDF'),
+                        ),
+                      ),
                     ),
                   ]),
                 ),

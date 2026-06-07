@@ -8,7 +8,10 @@ import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
+import '../core/freemium/freemium_service.dart';
+import '../core/services/pdf_export_service.dart';
 import '../main.dart' show adService, analyticsService, grossIncomeNotifier, smartHistoryService;
+import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
 
@@ -228,6 +231,35 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       _result = null;
       _reverseGross = null;
     });
+  }
+
+  Future<void> _exportPdf() async {
+    final r = _result;
+    if (r == null) return;
+    if (!freemiumService.hasFullAccess) {
+      if (!mounted) return;
+      await PaywallSoft.show(
+        context,
+        featureTitle: 'Export PDF',
+        featureSubtitle: 'Upgrade to export and share your results as PDF.',
+      );
+      return;
+    }
+    await TaxUkPdfExportService.exportIncomeTax(
+      context: context,
+      gross: r.grossIncome,
+      tax: r.incomeTax,
+      ni: r.nationalInsurance,
+      takeHome: r.netIncome,
+      effectiveTaxRate: r.effectiveTaxRate,
+      marginalTaxRate: r.marginalTaxRate,
+      region: _region.label,
+      pension: r.pensionContribution,
+      isSelfEmployed: r.isSelfEmployed,
+    );
+    analyticsService.logCalculationCompleted(
+      params: {'type': 'income_tax_pdf_exported'},
+    );
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────────
@@ -558,6 +590,10 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                     CalcwiseStaggerItem(
                       index: 7,
                       child: SaveScenarioButton(onSave: _saveScenario),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 8,
+                      child: _ExportPdfButton(onExport: _exportPdf),
                     ),
                   ]),
                 ),
@@ -1416,5 +1452,20 @@ class _Divider extends StatelessWidget {
         color: ct.cardBorder,
         height: AppSpacing.xl,
         thickness: 1,
+      );
+}
+
+class _ExportPdfButton extends StatelessWidget {
+  final VoidCallback onExport;
+  const _ExportPdfButton({required this.onExport});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: OutlinedButton.icon(
+          onPressed: onExport,
+          icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+          label: const Text('Export PDF'),
+        ),
       );
 }

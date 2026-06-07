@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../core/analytics/analytics_service.dart';
 import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
+import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/uk_tax_engine.dart';
 import '../l10n/strings_en.dart';
@@ -217,6 +218,37 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Saved to history')));
+  }
+
+  Future<void> _exportPdf() async {
+    final rA = _resultA;
+    final rB = _resultB;
+    if (rA == null || rB == null) return;
+    if (!freemiumService.hasFullAccess) {
+      if (!mounted) return;
+      await PaywallSoft.show(
+        context,
+        featureTitle: 'Export PDF',
+        featureSubtitle: 'Upgrade to export and share your results as PDF.',
+      );
+      return;
+    }
+    await TaxUkPdfExportService.exportSalaryComparison(
+      context: context,
+      nameA: rA.name,
+      grossA: rA.gross,
+      taxA: rA.tax,
+      niA: rA.ni,
+      netA: rA.netPay,
+      monthlyA: rA.monthly,
+      nameB: rB.name,
+      grossB: rB.gross,
+      taxB: rB.tax,
+      niB: rB.ni,
+      netB: rB.netPay,
+      monthlyB: rB.monthly,
+      isScotland: _isScotland,
+    );
   }
 
   @override
@@ -469,6 +501,24 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                               size: 18,
                             ),
                             label: const Text('Save to History'),
+                          ),
+                        ),
+                      ),
+                      // Export PDF button
+                      CalcwiseStaggerItem(
+                        index: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: AppSpacing.xs,
+                            bottom: AppSpacing.sm,
+                          ),
+                          child: OutlinedButton.icon(
+                            onPressed: _exportPdf,
+                            icon: const Icon(
+                              Icons.picture_as_pdf_outlined,
+                              size: 18,
+                            ),
+                            label: const Text('Export PDF'),
                           ),
                         ),
                       ),

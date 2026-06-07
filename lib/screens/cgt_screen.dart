@@ -6,6 +6,7 @@ import '../core/analytics/analytics_service.dart';
 import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/freemium/iap_service.dart';
+import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/uk_tax_engine.dart';
 import '../l10n/strings_en.dart';
@@ -167,6 +168,33 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       _costs = 0;
       _grossIncome = 0;
     });
+  }
+
+  Future<void> _exportPdf() async {
+    final r = _result;
+    if (r == null) return;
+    if (!freemiumService.hasFullAccess) {
+      if (!mounted) return;
+      await PaywallSoft.show(
+        context,
+        featureTitle: 'Export PDF',
+        featureSubtitle: 'Upgrade to export and share your results as PDF.',
+      );
+      return;
+    }
+    await TaxUkPdfExportService.exportCgt(
+      context: context,
+      totalGain: r.totalGain,
+      annualExemption: r.annualExemption,
+      taxableGain: r.taxableGain,
+      totalTax: r.totalTax,
+      effectiveRate: r.effectiveRate,
+      assetType: _assetType.label,
+      grossIncome: _grossIncome,
+      salePrice: _salePrice,
+      purchasePrice: _purchasePrice,
+      costs: _costs,
+    );
   }
 
   @override
@@ -369,6 +397,23 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                     CalcwiseStaggerItem(
                       index: 4,
                       child: _SaveButton(onSave: _save),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacing.xs,
+                          bottom: AppSpacing.sm,
+                        ),
+                        child: OutlinedButton.icon(
+                          onPressed: _exportPdf,
+                          icon: const Icon(
+                            Icons.picture_as_pdf_outlined,
+                            size: 18,
+                          ),
+                          label: const Text('Export PDF'),
+                        ),
+                      ),
                     ),
                   ]),
                 ),
