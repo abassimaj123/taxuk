@@ -4,13 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
-import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
-import '../main.dart';
+import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
+import '../widgets/save_scenario_button.dart';
 
 class SavingsInterestScreen extends StatefulWidget {
   const SavingsInterestScreen({super.key});
@@ -41,6 +41,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
   void dispose() {
     _grossInterestCtrl.dispose();
     _otherIncomeCtrl.dispose();
+    smartHistoryService.cancelPendingSave('taxuk', 'savings_interest');
     super.dispose();
   }
 
@@ -67,45 +68,77 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       },
     );
     adService.onAction();
+    _scheduleAutoSave();
   }
 
-  Future<void> _save() async {
+  double _roundTo(double v, double step) => (v / step).round() * step;
+
+  void _scheduleAutoSave() {
     final r = _result;
     if (r == null) return;
-    final count = await DatabaseService.instance.count();
-    if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeRingBufferSize) {
-      if (!mounted) return;
-      await PaywallSoft.show(
-        context,
-        featureTitle: AppStringsEN.historyLimit,
-        featureSubtitle: 'Upgrade to save unlimited calculations.',
-      );
-      return;
-    }
-    final otherIncome =
-        double.tryParse(_otherIncomeCtrl.text.replaceAll(',', '.').trim()) ?? 0;
-    await DatabaseService.instance.insert(
-      inputs: {
-        'type': 'savings_interest',
-        'other_income': otherIncome,
-        'gross_interest': r.grossInterest,
+    if (r.grossInterest <= 0) return;
+    final otherIncome = double.tryParse(_otherIncomeCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    final inputHash = ResultHasher.hashMixed({
+      'interest': _roundTo(r.grossInterest, 100),
+      'other_income': _roundTo(otherIncome, 1000),
+    });
+    smartHistoryService.scheduleAutoSave(
+      appKey: 'taxuk',
+      screenId: 'savings_interest',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Savings — £${r.grossInterest.toStringAsFixed(0)} interest',
+        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · PSA: £${r.personalSavingsAllowance.toStringAsFixed(0)}',
       },
-      results: {
-        'personal_savings_allowance': r.personalSavingsAllowance,
-        'starter_rate_relief': r.starterRateRelief,
-        'taxable_interest': r.taxableInterest,
-        'tax_due': r.taxDue,
-        'effective_rate': r.effectiveRate,
-        'band': r.band,
+      l2: {
+        'inputs': {
+          'interest': r.grossInterest,
+          'otherIncome': otherIncome,
+        },
+        'results': {
+          'psa': r.personalSavingsAllowance,
+          'taxableSavings': r.taxableInterest,
+          'tax': r.taxDue,
+          'netInterest': r.grossInterest - r.taxDue,
+        },
       },
+    );
+  }
+
+  Future<void> _saveScenario(String? label) async {
+    final r = _result;
+    if (r == null) return;
+    final otherIncome = double.tryParse(_otherIncomeCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    final inputHash = ResultHasher.hashMixed({
+      'interest': _roundTo(r.grossInterest, 100),
+      'other_income': _roundTo(otherIncome, 1000),
+    });
+    await smartHistoryService.saveScenario(
+      appKey: 'taxuk',
+      screenId: 'savings_interest',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Savings — £${r.grossInterest.toStringAsFixed(0)} interest',
+        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · PSA: £${r.personalSavingsAllowance.toStringAsFixed(0)}',
+      },
+      l2: {
+        'inputs': {
+          'interest': r.grossInterest,
+          'otherIncome': otherIncome,
+        },
+        'results': {
+          'psa': r.personalSavingsAllowance,
+          'taxableSavings': r.taxableInterest,
+          'tax': r.taxDue,
+          'netInterest': r.grossInterest - r.taxDue,
+        },
+      },
+      label: label,
     );
     analyticsService.logResultSaved();
     adService.onSave();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved to history')));
   }
+
 
   void _reset() {
     _grossInterestCtrl.text = '2000';
@@ -280,7 +313,10 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                     ),
                     CalcwiseStaggerItem(
                       index: 4,
-                      child: _SaveButton(onSave: _save),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.sm),
+                        child: SaveScenarioButton(onSave: _saveScenario),
+                      ),
                     ),
                     CalcwiseStaggerItem(
                       index: 5,

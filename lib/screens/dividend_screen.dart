@@ -4,13 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
-import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
-import '../l10n/strings_en.dart';
-import '../main.dart';
+import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
+import '../widgets/save_scenario_button.dart';
 
 class DividendScreen extends StatefulWidget {
   /// Optional pre-filled gross salary from the income tax tab.
@@ -47,6 +46,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
   void dispose() {
     _salaryCtrl.dispose();
     _dividendCtrl.dispose();
+    smartHistoryService.cancelPendingSave('taxuk', 'dividend');
     super.dispose();
   }
 
@@ -71,43 +71,75 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       },
     );
     adService.onAction();
+    _scheduleAutoSave();
   }
 
-  Future<void> _save() async {
+  double _roundTo(double v, double step) => (v / step).round() * step;
+
+  void _scheduleAutoSave() {
     final r = _result;
     if (r == null) return;
-    final count = await DatabaseService.instance.count();
-    if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeRingBufferSize) {
-      if (!mounted) return;
-      await PaywallSoft.show(
-        context,
-        featureTitle: AppStringsEN.historyLimit,
-        featureSubtitle: 'Upgrade to save unlimited calculations.',
-      );
-      return;
-    }
-    final salary =
-        double.tryParse(_salaryCtrl.text.replaceAll(',', '.').trim()) ?? 0;
-    await DatabaseService.instance.insert(
-      inputs: {
-        'type': 'dividend',
-        'gross_income': salary,
-        'gross_dividend': r.grossDividend,
+    final salary = double.tryParse(_salaryCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    if (r.grossDividend <= 0 && salary <= 0) return;
+    final inputHash = ResultHasher.hashMixed({
+      'dividend_income': _roundTo(r.grossDividend, 500),
+      'gross_income': _roundTo(salary, 1000),
+    });
+    smartHistoryService.scheduleAutoSave(
+      appKey: 'taxuk',
+      screenId: 'dividend',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Dividend — £${r.grossDividend.toStringAsFixed(0)}',
+        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
       },
-      results: {
-        'taxable_dividend': r.taxableDividend,
-        'tax_due': r.taxDue,
-        'effective_rate': r.effectiveRate,
-        'band': r.band,
+      l2: {
+        'inputs': {
+          'dividendIncome': r.grossDividend,
+          'grossIncome': salary,
+        },
+        'results': {
+          'allowanceUsed': r.allowance,
+          'taxableDiv': r.taxableDividend,
+          'dividendTax': r.taxDue,
+        },
       },
+    );
+  }
+
+  Future<void> _saveScenario(String? label) async {
+    final r = _result;
+    if (r == null) return;
+    final salary = double.tryParse(_salaryCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    final inputHash = ResultHasher.hashMixed({
+      'dividend_income': _roundTo(r.grossDividend, 500),
+      'gross_income': _roundTo(salary, 1000),
+    });
+    await smartHistoryService.saveScenario(
+      appKey: 'taxuk',
+      screenId: 'dividend',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Dividend — £${r.grossDividend.toStringAsFixed(0)}',
+        'subtitle': 'Tax: £${r.taxDue.toStringAsFixed(0)} · Rate: ${(r.effectiveRate * 100).toStringAsFixed(1)}%',
+      },
+      l2: {
+        'inputs': {
+          'dividendIncome': r.grossDividend,
+          'grossIncome': salary,
+        },
+        'results': {
+          'allowanceUsed': r.allowance,
+          'taxableDiv': r.taxableDividend,
+          'dividendTax': r.taxDue,
+        },
+      },
+      label: label,
     );
     analyticsService.logResultSaved();
     adService.onSave();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved to history')));
   }
+
 
   void _reset() {
     _salaryCtrl.text = '35000';
@@ -268,7 +300,10 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                     ),
                     CalcwiseStaggerItem(
                       index: 4,
-                      child: _SaveButton(onSave: _save),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.sm),
+                        child: SaveScenarioButton(onSave: _saveScenario),
+                      ),
                     ),
                     CalcwiseStaggerItem(
                       index: 5,

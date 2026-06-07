@@ -4,14 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../core/analytics/analytics_service.dart';
-import '../core/db/database_service.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/uk_tax_engine.dart';
-import '../l10n/strings_en.dart';
-import '../main.dart';
+import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
+import '../widgets/save_scenario_button.dart';
 
 // ── Result model ──────────────────────────────────────────────────────────────
 
@@ -86,6 +85,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
     _nameBCtrl.dispose();
     _grossBCtrl.dispose();
     _pensionBCtrl.dispose();
+    smartHistoryService.cancelPendingSave('taxuk', 'salary_comparison');
     super.dispose();
   }
 
@@ -157,6 +157,81 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
       'is_scotland': '$_isScotland',
     });
     adService.onAction();
+    _scheduleAutoSave();
+  }
+
+  double _roundTo(double v, double step) => (v / step).round() * step;
+
+  void _scheduleAutoSave() {
+    final rA = _resultA;
+    final rB = _resultB;
+    if (rA == null || rB == null) return;
+    if (rA.gross <= 0 && rB.gross <= 0) return;
+    final inputHash = ResultHasher.hashMixed({
+      'salary_a': _roundTo(rA.gross, 1000),
+      'salary_b': _roundTo(rB.gross, 1000),
+    });
+    smartHistoryService.scheduleAutoSave(
+      appKey: 'taxuk',
+      screenId: 'salary_comparison',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Salary Compare — £${rA.gross.toStringAsFixed(0)} vs £${rB.gross.toStringAsFixed(0)}',
+        'subtitle': 'Net: £${rA.netPay.toStringAsFixed(0)} vs £${rB.netPay.toStringAsFixed(0)}',
+      },
+      l2: {
+        'inputs': {
+          'salaryA': rA.gross,
+          'salaryB': rB.gross,
+          'regionA': _isScotland ? 'scotland' : 'england',
+          'regionB': _isScotland ? 'scotland' : 'england',
+        },
+        'results': {
+          'netA': rA.netPay,
+          'netB': rB.netPay,
+          'taxA': rA.tax,
+          'taxB': rB.tax,
+          'difference': (rA.netPay - rB.netPay).abs(),
+        },
+      },
+    );
+  }
+
+  Future<void> _saveScenario(String? label) async {
+    final rA = _resultA;
+    final rB = _resultB;
+    if (rA == null || rB == null) return;
+    final inputHash = ResultHasher.hashMixed({
+      'salary_a': _roundTo(rA.gross, 1000),
+      'salary_b': _roundTo(rB.gross, 1000),
+    });
+    await smartHistoryService.saveScenario(
+      appKey: 'taxuk',
+      screenId: 'salary_comparison',
+      inputHash: inputHash,
+      l1: {
+        'title': 'Salary Compare — £${rA.gross.toStringAsFixed(0)} vs £${rB.gross.toStringAsFixed(0)}',
+        'subtitle': 'Net: £${rA.netPay.toStringAsFixed(0)} vs £${rB.netPay.toStringAsFixed(0)}',
+      },
+      l2: {
+        'inputs': {
+          'salaryA': rA.gross,
+          'salaryB': rB.gross,
+          'regionA': _isScotland ? 'scotland' : 'england',
+          'regionB': _isScotland ? 'scotland' : 'england',
+        },
+        'results': {
+          'netA': rA.netPay,
+          'netB': rB.netPay,
+          'taxA': rA.tax,
+          'taxB': rB.tax,
+          'difference': (rA.netPay - rB.netPay).abs(),
+        },
+      },
+      label: label,
+    );
+    analyticsService.logResultSaved();
+    adService.onSave();
   }
 
   void _reset() {
@@ -175,50 +250,6 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
     });
   }
 
-  Future<void> _save() async {
-    final rA = _resultA;
-    final rB = _resultB;
-    if (rA == null || rB == null) return;
-
-    final count = await DatabaseService.instance.count();
-    if (!freemiumService.hasFullAccess &&
-        count >= MonetizationConfig.freeRingBufferSize) {
-      if (!mounted) return;
-      await PaywallSoft.show(
-        context,
-        featureTitle: AppStringsEN.historyLimit,
-        featureSubtitle: 'Upgrade to save unlimited calculations.',
-      );
-      return;
-    }
-
-    await DatabaseService.instance.insert(
-      inputs: {
-        'type': 'salary_compare',
-        'gross_a': rA.gross,
-        'gross_b': rB.gross,
-        'name_a': rA.name,
-        'name_b': rB.name,
-        'pension_pct_a': rA.gross > 0 ? rA.pension / rA.gross * 100 : 0,
-        'pension_pct_b': rB.gross > 0 ? rB.pension / rB.gross * 100 : 0,
-        'self_employed_a': _selfEmployedA,
-        'self_employed_b': _selfEmployedB,
-        'is_scotland': _isScotland,
-      },
-      results: {
-        'net_a': rA.netPay,
-        'net_b': rB.netPay,
-        'diff_monthly': (rA.monthly - rB.monthly).abs(),
-      },
-    );
-
-    analyticsService.logResultSaved();
-    adService.onSave();
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved to history')));
-  }
 
   Future<void> _exportPdf() async {
     final rA = _resultA;
@@ -494,14 +525,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                         index: 3,
                         child: Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.sm),
-                          child: OutlinedButton.icon(
-                            onPressed: _save,
-                            icon: const Icon(
-                              Icons.bookmark_outline_rounded,
-                              size: 18,
-                            ),
-                            label: const Text('Save to History'),
-                          ),
+                          child: SaveScenarioButton(onSave: _saveScenario),
                         ),
                       ),
                       // Export PDF button
