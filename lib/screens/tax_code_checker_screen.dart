@@ -24,6 +24,7 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('tax_code_checker');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _check();
     });

@@ -8,7 +8,7 @@ import '../core/uk_tax_engine.dart';
 import '../core/analytics/analytics_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
-import '../main.dart' show adService, analyticsService, smartHistoryService;
+import '../main.dart' show adService, analyticsService, grossIncomeNotifier, smartHistoryService;
 import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
 
@@ -39,6 +39,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('income_tax');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });
@@ -112,6 +113,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       );
     });
 
+    grossIncomeNotifier.value = gross;
     analyticsService.logIncomeTaxCalculated(
       grossIncome: gross,
       isScotland: _isScotland,

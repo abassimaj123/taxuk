@@ -65,6 +65,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('vat');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });

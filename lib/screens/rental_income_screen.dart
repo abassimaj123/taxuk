@@ -39,6 +39,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('rental_income');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });

@@ -30,6 +30,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('savings_interest');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });

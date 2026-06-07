@@ -50,6 +50,11 @@ class _MainTabNotifier extends ChangeNotifier {
 
 final _MainTabNotifier mainTabNotifier = _MainTabNotifier();
 
+/// Shared gross income from the Income Tax calculator.
+/// Updated on every calculation so Dividend and Student Loan screens
+/// can pre-fill their salary field when the user navigates to them.
+final ValueNotifier<double?> grossIncomeNotifier = ValueNotifier<double?>(null);
+
 final adService = CalcwiseAdService(
   config: CalcwiseAdConfig(
     bannerAndroid: AdConfig.bannerAndroid,

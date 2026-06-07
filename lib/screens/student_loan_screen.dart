@@ -33,6 +33,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('student_loan');
     final initial = widget.initialGrossIncome;
     _grossCtrl = TextEditingController(
       text: initial != null ? initial.round().toString() : '35000',

@@ -5,6 +5,7 @@ import 'tax_code_checker_screen.dart';
 import 'student_loan_screen.dart';
 import 'rental_income_screen.dart';
 import 'savings_interest_screen.dart';
+import '../main.dart' show grossIncomeNotifier;
 
 class ToolsHubScreen extends StatelessWidget {
   const ToolsHubScreen({super.key});
@@ -29,7 +30,9 @@ class ToolsHubScreen extends StatelessWidget {
         icon: Icons.school_rounded,
         label: 'Student Loan',
         subtitle: 'Plan 1, 2, 4 & 5 repayment calc',
-        screen: const StudentLoanScreen(),
+        screenBuilder: () => StudentLoanScreen(
+          initialGrossIncome: grossIncomeNotifier.value,
+        ),
       ),
       _ToolEntry(
         icon: Icons.home_work_rounded,
@@ -66,14 +69,17 @@ class _ToolEntry {
   final IconData icon;
   final String label;
   final String subtitle;
-  final Widget screen;
+  final Widget? screen;
+  final Widget Function()? screenBuilder;
 
   const _ToolEntry({
     required this.icon,
     required this.label,
     required this.subtitle,
-    required this.screen,
-  });
+    this.screen,
+    this.screenBuilder,
+  }) : assert(screen != null || screenBuilder != null,
+            '_ToolEntry requires screen or screenBuilder');
 }
 
 class _ToolTile extends StatelessWidget {
@@ -92,7 +98,9 @@ class _ToolTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => entry.screen),
+          MaterialPageRoute(
+            builder: (_) => entry.screenBuilder?.call() ?? entry.screen!,
+          ),
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

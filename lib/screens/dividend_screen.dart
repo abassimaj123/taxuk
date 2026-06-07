@@ -32,6 +32,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('dividend');
     final initial = widget.initialGrossIncome;
     _salaryCtrl = TextEditingController(
       text: initial != null ? initial.round().toString() : '35000',

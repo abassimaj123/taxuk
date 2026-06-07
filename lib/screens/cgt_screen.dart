@@ -65,6 +65,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('cgt');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });

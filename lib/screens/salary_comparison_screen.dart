@@ -71,6 +71,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
   @override
   void initState() {
     super.initState();
+    analyticsService.logScreenView('salary_comparison');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });
