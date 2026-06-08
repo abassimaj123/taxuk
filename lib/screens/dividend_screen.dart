@@ -525,14 +525,17 @@ class _Row extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: highlight ? AppTheme.accent : ct.textSecondary,
-                fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: highlight ? AppTheme.accent : ct.textSecondary,
+                  fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               value,
               style: TextStyle(
