@@ -446,7 +446,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                       index: 5,
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: AppSpacing.xs,
+                          top: AppSpacing.md,
                           bottom: AppSpacing.sm,
                         ),
                         child: OutlinedButton.icon(

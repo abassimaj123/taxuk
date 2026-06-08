@@ -306,15 +306,15 @@ class _WarningCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.orange.withValues(alpha: 0.10),
+          color: AppTheme.warning.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: Colors.orange.withValues(alpha: 0.35)),
+          border: Border.all(color: AppTheme.warning.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Icon(Icons.warning_amber_rounded,
-                color: Colors.orange, size: 20),
+                color: AppTheme.warning, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

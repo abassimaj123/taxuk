@@ -313,7 +313,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                       index: 5,
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: AppSpacing.xs,
+                          top: AppSpacing.md,
                           bottom: AppSpacing.sm,
                         ),
                         child: OutlinedButton.icon(

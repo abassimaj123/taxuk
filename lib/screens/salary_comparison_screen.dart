@@ -859,12 +859,12 @@ class _HeroJobCard extends StatelessWidget {
                       color: AppTheme.successGreen,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
+                    child: Text(
                       'BETTER ↑',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         letterSpacing: 0.5,
                       ),
                     ),
