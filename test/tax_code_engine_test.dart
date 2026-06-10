@@ -2,6 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:taxuk/core/tax_code_engine.dart';
 
 void main() {
+  // ── HMRC Tax Code Reference (2025/26) ────────────────────────────────────
+  // Standard code: 1257L → personal allowance £12,570 (multiply code number by 10)
+  // Source: HMRC — gov.uk/tax-codes/what-your-tax-code-means
+  //
+  // Letter meanings: L=standard PA, M=marriage allowance received (+10%),
+  // N=transferred to partner, T=other, BR=all income at basic rate,
+  // D0=higher rate, D1=additional rate, 0T=no PA, NT=no tax, K=negative PA
+  // S prefix=Scotland, C prefix=Wales
+  // Emergency codes: W1/M1/X suffix = non-cumulative (week/month basis)
   group('TaxCodeEngine.parse — standard numeric codes', () {
     test('1257L → £12,570 standard allowance, England/NI', () {
       final r = TaxCodeEngine.parse('1257L');
@@ -69,6 +78,9 @@ void main() {
     });
   });
 
+  // K codes: negative allowance — income added to taxable pay. Common for: company car
+  // benefit-in-kind exceeding personal allowance.
+  // Source: HMRC Employment Income Manual — gov.uk/hmrc-internal-manuals/employment-income-manual
   group('TaxCodeEngine.parse — K codes', () {
     test('K475 → +£4,750 added to taxable income', () {
       final r = TaxCodeEngine.parse('K475');
