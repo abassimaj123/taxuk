@@ -10,6 +10,7 @@ import '../core/theme/app_theme.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 // ── VAT rate options ─────────────────────────────────────────────────────────
 
@@ -156,6 +157,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
           'totalOrNet': r.grossAmount,
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

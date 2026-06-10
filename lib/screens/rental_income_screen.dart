@@ -11,6 +11,7 @@ import '../l10n/strings_en.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 class RentalIncomeScreen extends StatefulWidget {
   const RentalIncomeScreen({super.key});
@@ -135,6 +136,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
           'tax': r.taxAfterCredit,
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

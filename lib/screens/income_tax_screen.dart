@@ -14,6 +14,7 @@ import '../main.dart' show adService, analyticsService, grossIncomeNotifier, sma
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
+import 'history_screen.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
   const IncomeTaxScreen({super.key});
@@ -170,6 +171,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       inputHash: inputHash,
       l1: _buildL1(r),
       l2: _buildL2(r),
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

@@ -10,6 +10,7 @@ import '../core/theme/app_theme.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 class DividendScreen extends StatefulWidget {
   /// Optional pre-filled gross salary from the income tax tab.
@@ -106,6 +107,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
           'dividendTax': r.taxDue,
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

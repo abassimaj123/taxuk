@@ -11,6 +11,7 @@ import '../core/uk_tax_engine.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 // ── Result model ──────────────────────────────────────────────────────────────
 
@@ -197,6 +198,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
           'difference': (rA.netPay - rB.netPay).abs(),
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

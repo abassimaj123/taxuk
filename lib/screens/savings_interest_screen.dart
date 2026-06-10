@@ -11,6 +11,7 @@ import '../l10n/strings_en.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 class SavingsInterestScreen extends StatefulWidget {
   const SavingsInterestScreen({super.key});
@@ -105,6 +106,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
           'netInterest': r.grossInterest - r.taxDue,
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 

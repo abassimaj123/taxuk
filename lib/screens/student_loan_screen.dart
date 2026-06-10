@@ -10,6 +10,7 @@ import '../core/theme/app_theme.dart';
 import '../main.dart' show adService, analyticsService, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
+import 'history_screen.dart';
 
 class StudentLoanScreen extends StatefulWidget {
   /// Optional pre-filled gross salary from the income tax tab.
@@ -101,6 +102,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
           'threshold': r.threshold,
         },
       },
+      onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
     );
   }
 
