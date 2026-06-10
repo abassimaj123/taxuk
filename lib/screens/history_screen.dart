@@ -153,7 +153,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final ct = CalcwiseTheme.of(context);
 
     if (_rows.isEmpty) {
-      return Column(
+      return CalcwisePageEntrance(
+        child: Column(
         children: [
           Expanded(
             child: CalcwiseEmptyState(
@@ -166,15 +167,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onAction: () => mainTabNotifier.requestTab(0),
             ),
           ),
-          const CalcwiseAdFooter(),
-        ],
+            const CalcwiseAdFooter(),
+          ],
+        ),
       );
     }
 
     final pinned = _pinned;
     final recent = _visibleAutoSaves;
 
-    return Column(
+    return CalcwisePageEntrance(
+      child: Column(
       children: [
         Expanded(
           child: CustomScrollView(
@@ -301,6 +304,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         const CalcwiseAdFooter(),
       ],
+      ),
     );
   }
 }
