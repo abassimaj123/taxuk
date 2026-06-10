@@ -274,7 +274,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
                 child: Text(
                   AppStringsEN.allowableExpenses,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppTextSize.md,
                     fontWeight: FontWeight.w600,
                     color: ct.textSecondary,
                     letterSpacing: 0.3,
@@ -329,7 +329,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: Text(
                   'Mortgage interest is not deductible from profit. A 20% tax credit applies instead (2025/26 rules).',
-                  style: TextStyle(fontSize: 12, color: ct.textSecondary),
+                  style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -494,7 +494,7 @@ class _RentalInsightCard extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                  fontSize: 13, color: ct.textPrimary, height: 1.45),
+                  fontSize: AppTextSize.md, color: ct.textPrimary, height: 1.45),
             ),
           ),
         ],
@@ -579,7 +579,7 @@ class _RentalRulesCard extends StatelessWidget {
                     child: Text(
                       entry.$1,
                       style: TextStyle(
-                          fontSize: 13, color: ct.textSecondary, height: 1.45),
+                          fontSize: AppTextSize.md, color: ct.textSecondary, height: 1.45),
                     ),
                   ),
                 ],
@@ -590,7 +590,7 @@ class _RentalRulesCard extends StatelessWidget {
             'Source: HMRC PIM2054 — Section 24 Finance Act 2015. '
             'For informational purposes only.',
             style: TextStyle(
-                fontSize: 11, color: ct.textSecondary, height: 1.5),
+                fontSize: AppTextSize.xs, color: ct.textSecondary, height: 1.5),
           ),
         ],
       );
@@ -621,7 +621,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -630,7 +630,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,

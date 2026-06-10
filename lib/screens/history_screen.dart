@@ -259,7 +259,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           child: Text(
                             AppStringsEN.historyLimit,
                             style: TextStyle(
-                                fontSize: 12, color: ct.textSecondary),
+                                fontSize: AppTextSize.sm, color: ct.textSecondary),
                           ),
                         ),
                         TextButton(
@@ -334,7 +334,7 @@ class _SectionHeader extends StatelessWidget {
           Text(
             title.toUpperCase(),
             style: TextStyle(
-              fontSize: 11,
+              fontSize: AppTextSize.xs,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
               color: ct.textSecondary,
@@ -344,7 +344,7 @@ class _SectionHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               subtitle!,
-              style: TextStyle(fontSize: 11, color: ct.textSecondary),
+              style: TextStyle(fontSize: AppTextSize.xs, color: ct.textSecondary),
             ),
           ],
         ]),
@@ -482,7 +482,7 @@ class _HistoryCard extends StatelessWidget {
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppTextSize.md,
             fontWeight: FontWeight.w600,
             color: ct.textPrimary,
           ),
@@ -492,12 +492,12 @@ class _HistoryCard extends StatelessWidget {
           children: [
             Text(
               subtitle,
-              style: TextStyle(fontSize: 12, color: ct.textSecondary),
+              style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
             ),
             Text(
               dateStr,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppTextSize.xs,
                 color: ct.textSecondary.withValues(alpha: 0.6),
               ),
             ),

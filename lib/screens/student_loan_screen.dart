@@ -225,7 +225,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
                     Text(
                       'Student Loan Plan',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppTextSize.md,
                         fontWeight: FontWeight.w500,
                         color: ct.textSecondary,
                       ),
@@ -237,7 +237,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
                         isExpanded: true,
                         dropdownColor: ct.surface,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppTextSize.body,
                           fontWeight: FontWeight.w600,
                           color: ct.textPrimary,
                         ),
@@ -261,7 +261,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
                       '${_plan.repaymentRate == 0.09 ? '9%' : '6%'} above threshold  ·  '
                       '${_plan.writeOffNote}',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: AppTextSize.xs,
                         color: ct.textSecondary,
                         height: 1.5,
                       ),
@@ -408,7 +408,7 @@ class _InsightCard extends StatelessWidget {
             child: Text(
               msg,
               style:
-                  TextStyle(fontSize: 13, color: ct.textPrimary, height: 1.45),
+                  TextStyle(fontSize: AppTextSize.md, color: ct.textPrimary, height: 1.45),
             ),
           ),
         ],
@@ -455,7 +455,7 @@ class _SummaryCard extends StatelessWidget {
           Text(
             result.plan.writeOffNote,
             style:
-                TextStyle(fontSize: 12, color: ct.textSecondary, height: 1.4),
+                TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary, height: 1.4),
           ),
         ],
       );
@@ -497,7 +497,7 @@ class _AllPlansCard extends StatelessWidget {
                       Text(
                         row.plan.shortLabel,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: AppTextSize.md,
                           fontWeight: row.plan == currentPlan
                               ? FontWeight.w700
                               : FontWeight.w500,
@@ -509,7 +509,7 @@ class _AllPlansCard extends StatelessWidget {
                       Text(
                         'Threshold: ${fmtGbp.format(row.threshold)}',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppTextSize.xs,
                           color: ct.textSecondary,
                         ),
                       ),
@@ -519,7 +519,7 @@ class _AllPlansCard extends StatelessWidget {
                 Text(
                   '${fmtGbp.format(row.monthly)}/mo',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppTextSize.md,
                     fontWeight: row.plan == currentPlan
                         ? FontWeight.w700
                         : FontWeight.w500,
@@ -562,7 +562,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -572,7 +572,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,

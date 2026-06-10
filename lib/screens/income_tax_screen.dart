@@ -373,7 +373,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
               const SizedBox(height: AppSpacing.xs),
               Text(
                 _region.ratesNote,
-                style: TextStyle(fontSize: 12, color: ct.textSecondary),
+                style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -390,7 +390,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       title: Text(
                         'Self-Employed (Class 2 + 4 NI)',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppTextSize.body,
                           fontWeight: FontWeight.w500,
                           color: ct.textPrimary,
                         ),
@@ -400,7 +400,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                             ? 'NI: £3.45/wk (Class 2) + 6%/2% on profits (Class 4)'
                             : 'PAYE: Class 1 NI (8% / 2%)',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppTextSize.sm,
                           color: ct.textSecondary,
                         ),
                       ),
@@ -426,7 +426,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       title: Text(
                         'Marriage Allowance (recipient)',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppTextSize.body,
                           fontWeight: FontWeight.w500,
                           color: ct.textPrimary,
                         ),
@@ -436,7 +436,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                             ? '+£252/year tax credit from partner\'s unused allowance'
                             : 'Partner transfers 10% of Personal Allowance to you',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppTextSize.sm,
                           color: ct.textSecondary,
                         ),
                       ),
@@ -730,7 +730,7 @@ class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
                   Text(
                     centerTop,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: AppTextSize.subtitle,
                       fontWeight: FontWeight.w700,
                       color: widget.ct.textPrimary,
                     ),
@@ -739,7 +739,7 @@ class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
                   Text(
                     centerBottom,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: AppTextSize.xs,
                       color: widget.ct.textSecondary,
                     ),
                   ),
@@ -808,7 +808,7 @@ class _DonutLegendRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: ct.textPrimary,
                   fontWeight: highlighted ? FontWeight.w700 : FontWeight.w500,
                 ),
@@ -817,7 +817,7 @@ class _DonutLegendRow extends StatelessWidget {
             Text(
               '$amount  ',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppTextSize.md,
                 color: ct.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
@@ -827,7 +827,7 @@ class _DonutLegendRow extends StatelessWidget {
               child: Text(
                 pct,
                 textAlign: TextAlign.end,
-                style: TextStyle(fontSize: 12, color: ct.textSecondary),
+                style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
               ),
             ),
           ],
@@ -844,7 +844,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: AppTextSize.xs,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
           color: ct.textSecondary,
@@ -875,7 +875,7 @@ class _RegionSelector extends StatelessWidget {
             onSelected: (_) => onChanged(r),
             selectedColor: AppTheme.primary.withValues(alpha: 0.15),
             labelStyle: TextStyle(
-              fontSize: 13,
+              fontSize: AppTextSize.md,
               color: sel ? AppTheme.primary : ct.textSecondary,
               fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
             ),
@@ -972,7 +972,7 @@ class _ToggleOption extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppTextSize.md,
                     fontWeight:
                         selected ? FontWeight.w600 : FontWeight.w400,
                     color: selected ? AppTheme.primary : ct.textSecondary,
@@ -1022,7 +1022,7 @@ class _ReverseInsightCard extends StatelessWidget {
                 '(${fmtGbp.format(gross / 12)}/month gross). '
                 'Deductions total ${fmtGbp.format(gross - targetNet)}.',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: ct.textPrimary,
                   height: 1.45,
                 ),
@@ -1151,7 +1151,7 @@ class _BandBreakdown extends StatelessWidget {
                         Text(
                           b.name,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: AppTextSize.md,
                             fontWeight: FontWeight.w600,
                             color: b.amount > 0
                                 ? ct.textPrimary
@@ -1163,7 +1163,7 @@ class _BandBreakdown extends StatelessWidget {
                           '${fmtGbp.format(b.rangeFrom)}–'
                           '${b.rangeTo.isInfinite ? '∞' : fmtGbp.format(b.rangeTo)}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: AppTextSize.xs,
                             color: ct.textSecondary,
                           ),
                         ),
@@ -1173,7 +1173,7 @@ class _BandBreakdown extends StatelessWidget {
                   Text(
                     b.amount > 0 ? fmtGbp.format(b.amount) : '—',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppTextSize.body,
                       fontWeight: FontWeight.w600,
                       color:
                           b.amount > 0 ? AppTheme.primary : ct.textSecondary,
@@ -1348,7 +1348,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -1357,7 +1357,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,
@@ -1390,7 +1390,7 @@ class _IndentRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppTextSize.sm,
                   color: ct.textSecondary,
                   fontWeight: FontWeight.w400,
                 ),
@@ -1399,7 +1399,7 @@ class _IndentRow extends StatelessWidget {
             Text(
               fmt.format(value),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppTextSize.sm,
                 color: ct.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
@@ -1429,7 +1429,7 @@ class _SubRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -1438,7 +1438,7 @@ class _SubRow extends StatelessWidget {
             Text(
               fmt.format(value),
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppTextSize.md,
                 color: bold ? AppTheme.primary : ct.textPrimary,
                 fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
               ),

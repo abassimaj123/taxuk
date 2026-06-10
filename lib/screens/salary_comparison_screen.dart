@@ -443,7 +443,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                   title: Text(
                     'Scottish Income Tax Rates',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppTextSize.body,
                       fontWeight: FontWeight.w500,
                       color: ct.textPrimary,
                     ),
@@ -453,7 +453,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                         ? 'Scotland: 6 bands (19%–48%)'
                         : 'England / Wales / NI: 3 bands (20%–45%)',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppTextSize.sm,
                       color: ct.textSecondary,
                     ),
                   ),
@@ -583,7 +583,7 @@ class _ColumnHeaders extends StatelessWidget {
               child: Text(
                 'JOB A',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: AppTextSize.xs,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary,
                   letterSpacing: 1.0,
@@ -597,7 +597,7 @@ class _ColumnHeaders extends StatelessWidget {
               child: Text(
                 'JOB B',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: AppTextSize.xs,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.accent,
                   letterSpacing: 1.0,
@@ -627,7 +627,7 @@ class _InputRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppTextSize.sm,
               fontWeight: FontWeight.w500,
               color: CalcwiseTheme.of(context).textSecondary,
             ),
@@ -668,7 +668,7 @@ class _ToggleRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppTextSize.sm,
               fontWeight: FontWeight.w500,
               color: ct.textSecondary,
             ),
@@ -744,7 +744,7 @@ class _ToggleChip extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppTextSize.sm,
                   fontWeight: FontWeight.w500,
                   color: value ? AppTheme.primary : ct.textSecondary,
                 ),
@@ -844,7 +844,7 @@ class _HeroJobCard extends StatelessWidget {
                   child: Text(
                     result.name,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppTextSize.md,
                       fontWeight: FontWeight.w700,
                       color: ct.textPrimary,
                     ),
@@ -864,7 +864,7 @@ class _HeroJobCard extends StatelessWidget {
                     child: Text(
                       'BETTER ↑',
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: AppTextSize.xxs,
                         fontWeight: FontWeight.w800,
                         color: Theme.of(context).colorScheme.onPrimary,
                         letterSpacing: 0.5,
@@ -896,7 +896,7 @@ class _HeroJobCard extends StatelessWidget {
             Text(
               '${fmtGbp.format(result.netPay)} / yr',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppTextSize.sm,
                 color: ct.textSecondary,
               ),
             ),
@@ -904,7 +904,7 @@ class _HeroJobCard extends StatelessWidget {
             Text(
               'Eff. rate: ${(result.effectiveRate * 100).toStringAsFixed(1)}%',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppTextSize.xs,
                 color: ct.textSecondary,
               ),
             ),
@@ -1010,7 +1010,7 @@ class _ComparisonTable extends StatelessWidget {
                   child: Text(
                     'Monthly Difference',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppTextSize.md,
                       fontWeight: FontWeight.w700,
                       color: ct.textPrimary,
                     ),
@@ -1019,7 +1019,7 @@ class _ComparisonTable extends StatelessWidget {
                 Text(
                   '${fmtGbp.format(diffAbs)}/mo',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: AppTextSize.body,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.successGreen,
                   ),
@@ -1033,7 +1033,7 @@ class _ComparisonTable extends StatelessWidget {
           child: Text(
             'in favour of $betterName',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppTextSize.sm,
               color: ct.textSecondary,
             ),
           ),
@@ -1066,7 +1066,7 @@ class _TableHeader extends StatelessWidget {
                 nameA,
                 textAlign: TextAlign.end,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppTextSize.sm,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary,
                 ),
@@ -1080,7 +1080,7 @@ class _TableHeader extends StatelessWidget {
                 nameB,
                 textAlign: TextAlign.end,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: AppTextSize.sm,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.accent,
                 ),
@@ -1119,7 +1119,7 @@ class _CmpRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
                 ),
@@ -1131,7 +1131,7 @@ class _CmpRow extends StatelessWidget {
                 valueA,
                 textAlign: TextAlign.end,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: bold
                       ? AppTheme.primary
                       : highlight
@@ -1149,7 +1149,7 @@ class _CmpRow extends StatelessWidget {
                 valueB,
                 textAlign: TextAlign.end,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   color: bold
                       ? AppTheme.accent
                       : highlight
@@ -1293,7 +1293,7 @@ class _InsightBullet extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppTextSize.md,
                 color: ct.textPrimary,
                 height: 1.4,
               ),

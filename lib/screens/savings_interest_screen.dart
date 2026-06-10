@@ -242,7 +242,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                   'Personal Savings Allowance: £1,000 (Basic), £500 (Higher), £0 (Additional rate). '
                   'Starter rate relief applies if non-savings income is under £17,570.',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppTextSize.sm,
                     color: ct.textSecondary,
                   ),
                 ),
@@ -400,7 +400,7 @@ class _SavingsInsightCard extends StatelessWidget {
             child: Text(
               _insightText,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppTextSize.md,
                 color: ct.textPrimary,
                 height: 1.45,
               ),
@@ -487,7 +487,7 @@ class _SavingsRatesCard extends StatelessWidget {
                     child: Text(
                       entry.$1,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppTextSize.md,
                         color: entry.$3 == result.band
                             ? ct.textPrimary
                             : ct.textSecondary,
@@ -510,7 +510,7 @@ class _SavingsRatesCard extends StatelessWidget {
                     child: Text(
                       entry.$2,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppTextSize.md,
                         fontWeight: FontWeight.w700,
                         color: entry.$3 == result.band
                             ? AppTheme.primary
@@ -528,7 +528,7 @@ class _SavingsRatesCard extends StatelessWidget {
             'If non-savings income is under £17,570, you may also benefit from the '
             '0% savings starter rate on up to £5,000 of interest.',
             style:
-                TextStyle(fontSize: 11, color: ct.textSecondary, height: 1.5),
+                TextStyle(fontSize: AppTextSize.xs, color: ct.textSecondary, height: 1.5),
           ),
         ],
       );
@@ -559,7 +559,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -569,7 +569,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,

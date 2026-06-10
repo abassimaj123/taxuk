@@ -238,7 +238,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                 child: Text(
                   'Dividend allowance: £500. Scottish taxpayers use the same dividend rates.',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppTextSize.sm,
                     color: ct.textSecondary,
                   ),
                 ),
@@ -385,7 +385,7 @@ class _DividendInsightCard extends StatelessWidget {
                       'Only dividends above the £500 allowance are taxed.'
                   : 'Your dividends are fully covered by the £500 allowance — no tax to pay.',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppTextSize.md,
                 color: ct.textPrimary,
                 height: 1.45,
               ),
@@ -460,7 +460,7 @@ class _DividendRatesCard extends StatelessWidget {
                     child: Text(
                       entry.$1,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppTextSize.md,
                         color: entry.$3 == result.band
                             ? ct.textPrimary
                             : ct.textSecondary,
@@ -483,7 +483,7 @@ class _DividendRatesCard extends StatelessWidget {
                     child: Text(
                       entry.$2,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppTextSize.md,
                         fontWeight: FontWeight.w700,
                         color: entry.$3 == result.band
                             ? AppTheme.primary
@@ -500,7 +500,7 @@ class _DividendRatesCard extends StatelessWidget {
             'Dividend allowance: £500 (2025/26). '
             'Dividends are not subject to Scottish income tax — same rates apply throughout the UK.',
             style:
-                TextStyle(fontSize: 11, color: ct.textSecondary, height: 1.5),
+                TextStyle(fontSize: AppTextSize.xs, color: ct.textSecondary, height: 1.5),
           ),
         ],
       );
@@ -531,7 +531,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -541,7 +541,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,

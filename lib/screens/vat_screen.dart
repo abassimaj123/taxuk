@@ -432,7 +432,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: AppTextSize.xs,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
           color: ct.textSecondary,
@@ -512,7 +512,7 @@ class _ToggleOption extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: AppTextSize.md,
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               color: selected ? AppTheme.primary : ct.textSecondary,
             ),
@@ -544,7 +544,7 @@ class _ResultRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.primary : ct.textSecondary,
                   fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -554,7 +554,7 @@ class _ResultRow extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.primary : ct.textPrimary,
                 fontWeight: highlight ? FontWeight.w700 : FontWeight.w600,
               ),

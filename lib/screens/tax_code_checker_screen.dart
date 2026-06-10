@@ -112,7 +112,7 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
                           backgroundColor: ct.surface,
                           side: BorderSide(color: ct.cardBorder),
                           labelStyle: TextStyle(
-                            fontSize: 12,
+                            fontSize: AppTextSize.sm,
                             color: ct.textSecondary,
                           ),
                         ))
@@ -232,7 +232,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: AppTextSize.xs,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
           color: ct.textSecondary,
@@ -268,7 +268,7 @@ class _ExplainRow extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppTextSize.body,
                       fontWeight: FontWeight.w600,
                       color: ct.textPrimary,
                     ),
@@ -277,7 +277,7 @@ class _ExplainRow extends StatelessWidget {
                   Text(
                     body,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppTextSize.md,
                       height: 1.45,
                       color: ct.textSecondary,
                     ),
@@ -323,7 +323,7 @@ class _WarningCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppTextSize.body,
                       fontWeight: FontWeight.w700,
                       color: ct.textPrimary,
                     ),
@@ -332,7 +332,7 @@ class _WarningCard extends StatelessWidget {
                   Text(
                     body,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppTextSize.md,
                       height: 1.45,
                       color: ct.textSecondary,
                     ),
@@ -368,7 +368,7 @@ class _InvalidCard extends StatelessWidget {
               child: Text(
                 message,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   height: 1.45,
                   color: ct.textPrimary,
                 ),
@@ -390,7 +390,7 @@ class _DisclaimerCard extends StatelessWidget {
           'This is a guide based on HMRC 2025/26 tax codes. Always check your '
           'official tax code with HMRC or your employer.',
           style: TextStyle(
-            fontSize: 11,
+            fontSize: AppTextSize.xs,
             height: 1.4,
             color: ct.textSecondary,
           ),

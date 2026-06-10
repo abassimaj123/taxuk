@@ -485,7 +485,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: AppTextSize.xs,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
           color: ct.textSecondary,
@@ -614,7 +614,7 @@ class _RatesReferenceCard extends StatelessWidget {
                 child: Text(
                   'Asset Type',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: AppTextSize.xs,
                     fontWeight: FontWeight.w600,
                     color: ct.textSecondary,
                     letterSpacing: 0.5,
@@ -645,7 +645,7 @@ class _RatesReferenceCard extends StatelessWidget {
           'Annual CGT exemption: £3,000 (2025/26). '
           'Basic rate applies to gains within your remaining Income Tax basic rate band.',
           style: TextStyle(
-            fontSize: 11,
+            fontSize: AppTextSize.xs,
             color: ct.textSecondary,
             height: 1.5,
           ),
@@ -667,7 +667,7 @@ class _HeaderCell extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: AppTextSize.xs,
             fontWeight: FontWeight.w600,
             color: ct.textSecondary,
             letterSpacing: 0.5,
@@ -713,7 +713,7 @@ class _RateRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppTextSize.md,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                   color: isActive ? ct.textPrimary : ct.textSecondary,
                 ),
@@ -751,7 +751,7 @@ class _RateBadge extends StatelessWidget {
         child: Text(
           rate,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppTextSize.md,
             fontWeight: FontWeight.w700,
             color: isActive ? AppTheme.primary : ct.textSecondary,
           ),
@@ -850,7 +850,7 @@ class _TipsCard extends StatelessWidget {
                   child: Text(
                     _buildInsight(),
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppTextSize.md,
                       color: ct.textPrimary,
                       height: 1.5,
                     ),
@@ -865,7 +865,7 @@ class _TipsCard extends StatelessWidget {
             'other than property. Residential property gains must be reported '
             'to HMRC within 60 days of completion.',
             style: TextStyle(
-              fontSize: 11,
+              fontSize: AppTextSize.xs,
               color: ct.textSecondary,
               height: 1.5,
             ),
@@ -901,7 +901,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTextSize.body,
                   color: highlight ? AppTheme.accent : ct.textSecondary,
                   fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -910,7 +910,7 @@ class _Row extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppTextSize.body,
                 color: highlight ? AppTheme.accent : ct.textPrimary,
                 fontWeight:
                     bold || highlight ? FontWeight.w700 : FontWeight.w600,

@@ -167,7 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text('About', style: TextStyle(color: ct.textPrimary)),
             subtitle: Text(
               AppStringsEN.disclaimer,
-              style: TextStyle(fontSize: 12, color: ct.textSecondary),
+              style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
             ),
           ),
           ListTile(
@@ -209,7 +209,7 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: AppTextSize.xs,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.0,
           color: ct.textSecondary,
