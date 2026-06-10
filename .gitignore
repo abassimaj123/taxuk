@@ -33,3 +33,4 @@ ios/build/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 coverage/
+release.env
