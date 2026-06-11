@@ -155,6 +155,14 @@ class _MainShellState extends State<MainShell> {
   int _index = 0;
   bool _wasPremium = false;
 
+  static const List<Widget> _screens = [
+    IncomeTaxScreen(),
+    SalaryComparisonScreen(),
+    InvestmentsShellScreen(),
+    ToolsHubScreen(),
+    HistoryScreen(),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -273,15 +281,15 @@ class _MainShellState extends State<MainShell> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _index,
-        children: const [
-          IncomeTaxScreen(),
-          SalaryComparisonScreen(),
-          InvestmentsShellScreen(),
-          ToolsHubScreen(),
-          HistoryScreen(),
-        ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: List.generate(
+          _screens.length,
+          (i) => IgnorePointer(
+            ignoring: _index != i,
+            child: CalcwiseTabReveal(active: _index == i, child: _screens[i]),
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
