@@ -286,6 +286,8 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                         value: _fmtGbp.format(r.taxDue),
                         secondary:
                             '2025/26 rates · ${r.band} taxpayer',
+                        rawValue: r.taxDue,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         stats: [
                           (
                             label: 'Taxable Interest',

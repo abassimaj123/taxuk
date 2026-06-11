@@ -361,6 +361,8 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
                         value: _fmtGbp.format(r.taxAfterCredit),
                         secondary:
                             '2025/26 rates · Rental Income',
+                        rawValue: r.taxAfterCredit,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         stats: [
                           (
                             label: 'Taxable Profit',

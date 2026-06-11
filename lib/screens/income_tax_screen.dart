@@ -485,6 +485,13 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                         value: _fmtGbp.format(_reverseGross),
                         secondary:
                             '${_region.label} · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
+                        rawValue: _reverseGross,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Target Net', value: double.tryParse(_targetNetCtrl.text) ?? 0, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          if (_reverseGross! > 0)
+                            (label: 'Est. Monthly', value: _reverseGross! / 12, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                        ],
                         stats: [
                           (
                             label: 'Target Net',
@@ -525,6 +532,13 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                         label: 'ANNUAL TAKE-HOME',
                         value: _fmtGbp.format(r.netIncome),
                         secondary: '${_region.label} rates 2025/26',
+                        rawValue: r.netIncome,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Income Tax', value: r.incomeTax, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI', value: r.nationalInsurance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Effective Rate', value: r.effectiveOverallRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                        ],
                         stats: [
                           (
                             label: 'Income Tax',

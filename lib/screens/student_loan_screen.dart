@@ -296,6 +296,8 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
                       child: CalcwiseHeroCard(
                         label: 'MONTHLY REPAYMENT',
                         value: _fmtGbp.format(r.monthlyRepayment),
+                        rawValue: r.monthlyRepayment,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         secondary: r.hasRepayment
                             ? '${r.plan.shortLabel} · ${_fmtGbp.format(r.annualRepayment)}/year'
                             : 'Income below threshold — no repayment',

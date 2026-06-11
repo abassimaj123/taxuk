@@ -393,6 +393,13 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                         value: _fmtGbp.format(r.totalTax),
                         secondary:
                             '${_assetType.shortLabel} · 2025/26 rates',
+                        rawValue: r.totalTax,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Total Gain', value: r.totalGain, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Taxable Gain', value: r.taxableGain, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Effective Rate', value: r.effectiveRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                        ],
                         stats: [
                           (
                             label: 'Total Gain',

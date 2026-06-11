@@ -350,6 +350,8 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                       child: CalcwiseHeroCard(
                         label: 'VAT AMOUNT',
                         value: _fmtGbp.format(r.vatAmount),
+                        rawValue: r.vatAmount,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         secondary: 'At ${r.rateLabel}',
                         stats: [
                           (label: 'Net', value: _fmtGbp.format(r.netAmount)),

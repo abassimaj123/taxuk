@@ -271,6 +271,13 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                         label: 'DIVIDEND TAX DUE',
                         value: _fmtGbp.format(r.taxDue),
                         secondary: '2025/26 rates · ${r.band} Rate taxpayer',
+                        rawValue: r.taxDue,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Taxable Dividend', value: r.taxableDividend, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Allowance Used', value: r.allowance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Effective Rate', value: r.effectiveRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                        ],
                         stats: [
                           (
                             label: 'Taxable Dividend',
