@@ -96,6 +96,7 @@ Future<void> main() async {
     freemium: freemiumService,
     isSpanishNotifier: ValueNotifier<bool>(false), // EN-only app
     onGetPremium: () => IAPService.instance.buy(),
+    analytics: AnalyticsService.instance,
   );
   CalcwiseRewardAdSheet.configure(
     adService: adService,
