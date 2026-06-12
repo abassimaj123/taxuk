@@ -2,10 +2,9 @@
 import 'package:calcwise_core/calcwise_core.dart';
 import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'freemium_service.dart';
+import '../analytics/analytics_service.dart' show analyticsService;
 
 export 'package:calcwise_core/services/iap_service.dart' show iapErrorNotifier;
-
-final _analytics = CalcwiseAnalytics(appName: 'TaxUK');
 
 class IAPService {
   IAPService._();
@@ -18,7 +17,7 @@ class IAPService {
     _iap = CalcwiseIAP(
       productId: productId,
       freemium: freemiumService,
-      analytics: _analytics,
+      analytics: analyticsService,
       onPurchaseCompleted: () =>
           CalcwiseReviewService.instance.requestAfterSave(),
     );

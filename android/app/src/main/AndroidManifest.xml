@@ -24,10 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- AdMob App ID — TEST. Replace before release. -->
+        <!-- AdMob App ID — injected from android/local.properties (admob.app.id); falls back to Google TEST App ID. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="${admobAppId}"/>
         <meta-data
             android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
             android:value="true"/>

@@ -557,7 +557,7 @@ extension StudentLoanPlanLabel on StudentLoanPlan {
   double get threshold {
     switch (this) {
       case StudentLoanPlan.plan1:
-        return 24990.0;
+        return 26065.0;
       case StudentLoanPlan.plan2:
         return 27295.0;
       case StudentLoanPlan.plan4:

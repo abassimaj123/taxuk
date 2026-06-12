@@ -122,6 +122,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       grossIncome: gross,
       isScotland: _isScotland,
     );
+    analyticsService.maybeLogFirstCalculate();
     adService.onAction();
     _scheduleAutoSave();
   }

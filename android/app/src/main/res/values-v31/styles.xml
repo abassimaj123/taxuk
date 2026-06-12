@@ -7,7 +7,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:windowSplashScreenBackground">#003087</item>
-        
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/animated_splash_dots</item>
         <item name="android:windowSplashScreenIconBackgroundColor">#003087</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">

@@ -1,54 +1,79 @@
 APP TITLE (30 chars)
 --------------------
-Credit Card APR Calculator
+TaxUK – UK Tax Calculator
 
 SHORT DESCRIPTION (80 chars)
 ------------------------------
-Master your credit card debt. APR, payoff, comparison & more. Free.
+UK income tax, NI & CGT calculator — 2025/26
 
 FULL DESCRIPTION
 -----------------
-CreditCardAPR is the most complete credit card calculator for the United States — built for cardholders who want to understand the real cost of debt and build a plan to get out of it.
+TaxUK is the most complete UK tax calculator for 2025/26 — built for employees, self-employed workers and investors who want to understand exactly what they owe and keep more of what they earn.
 
-★ 5 POWERFUL TOOLS IN ONE APP
+★ INCOME TAX — ENGLAND, WALES & SCOTLAND
 
-💳 APR CALCULATOR
-Enter your balance, APR, and monthly payment. Instantly see:
-• Monthly interest charge (what you're paying the bank)
-• Interest over 12 months at current rate
-• Total interest until card is paid off
-• Exact payoff timeline (months to freedom)
+Calculate your income tax across all 6 bands with full 2025/26 rates:
+• Personal Allowance (£12,570)
+• Starter, Basic, Intermediate, Higher and Additional Rate
+• Scottish rate bands automatically applied when selected
+• Marriage Allowance credit
+• Pension sacrifice (salary sacrifice reduces your taxable income)
+• Instant net pay breakdown — see annual, monthly and weekly figures
 
-📊 AMORTIZATION SCHEDULE
-Full payment-by-payment breakdown. See how your balance drops each month, how much goes to interest vs. principal, and exactly when you'll be debt-free.
+★ NATIONAL INSURANCE
 
-⚖️ CARD COMPARATOR
-Compare up to 3 credit cards side by side — different APRs, balances, payments. Choose the strategy that saves you the most.
+• Class 1 NI for employees (2025/26 thresholds)
+• Class 2 & Class 4 NI for self-employed
+• Combined effective rate shown alongside income tax
 
-📉 PAYOFF OPTIMIZER
-Find the minimum payment that makes sense. See how small extra payments dramatically shorten your payoff timeline.
+★ CAPITAL GAINS TAX
 
-📁 HISTORY & PDF EXPORT
-Save every calculation. Review, compare, and export results as PDF for your records.
+• CGT on shares and investments (10% / 20%)
+• CGT on residential property (18% / 24%)
+• Annual exempt amount applied automatically
+• Carried-forward losses supported
 
-★ BUILT FOR THE US
+★ DIVIDEND TAX
 
-✅ Standard APR + promotional APR scenarios
-✅ Stress-tested with all US APR ranges (0% to 36%+)
-✅ Minimum payment calculation (2% of balance or $25 floor)
-✅ English + Spanish (EN/ES) — fully bilingual
-✅ 100% offline — your data stays on your device
-✅ Dark mode support
+• UK dividend allowance (£500 for 2025/26)
+• Dividend ordinary, upper and additional rates
+• Combine with salary for full picture
+
+★ SALARY VS DIVIDENDS COMPARISON
+
+• Model different salary + dividend splits
+• Find the most tax-efficient mix for your situation
+• Side-by-side effective rate comparison
+
+★ STUDENT LOAN REPAYMENTS
+
+• Plan 1 — threshold £26,065
+• Plan 2 — threshold £27,295
+• Plan 4 (Scotland) — threshold £31,395
+• Plan 5 (new England/Wales undergraduate)
+• Postgraduate loan
+• Monthly repayments calculated automatically
+
+★ MORE TOOLS
+
+• Marriage Allowance transfer calculator
+• VAT calculator (standard 20%, reduced 5%, zero)
+• Save calculations to history
+• Share results as text or export as PDF
+• Full English & French support (EN/FR)
+• 100% offline — your data stays on your device
+• Dark mode support
 
 ★ FREEMIUM MODEL
-Free: all 5 calculators, 100 saved calculations
-Premium ($2.99, one-time): unlimited saves, no ads, PDF export, full history
-Watch a short ad: 60 minutes ad-free (up to 3× per day)
+
+Free: all calculators, 5 saved calculations, basic results
+Premium (one-time): unlimited saves, no ads, PDF export, full history
+Watch a short ad: 60 minutes ad-free
 
 KEYWORDS
 ---------
-credit card calculator, APR calculator, credit card payoff, interest calculator, debt payoff, credit card debt, amortization, minimum payment calculator, credit card comparison, debt snowball, debt avalanche, credit card payoff calculator
+uk tax calculator, income tax calculator, national insurance calculator, capital gains tax, dividend tax, self assessment, salary calculator uk, take home pay uk, hmrc tax, cgt calculator, student loan repayment, tax 2025 uk, scottish income tax, pension tax relief
 
 CATEGORY: Finance | CONTENT RATING: Everyone
 CONTACT: abassimaj@gmail.com
-PRIVACY: https://abassimaj.github.io/creditcardapr-privacy/
+PRIVACY: https://calqwise.com/privacy

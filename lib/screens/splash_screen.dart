@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:calcwise_core/calcwise_core.dart';
 import '../core/theme/app_theme.dart';
-import '../core/analytics/analytics_service.dart';
-import '../main.dart' show paywallSession;
 import 'onboarding_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    try {
-      analyticsService.logAppOpen();
-    } catch (_) {}
-  }
 
   @override
   Widget build(BuildContext context) => CalcwiseSplash(
@@ -47,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           } else {
             Navigator.of(context).pushReplacementNamed('/home');
-            await paywallSession.recordSession();
           }
         },
       );

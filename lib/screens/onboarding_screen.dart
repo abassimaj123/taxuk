@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:calcwise_core/calcwise_core.dart';
-import '../main.dart' show paywallSession;
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -8,9 +7,8 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => CalcwiseOnboarding(
         appKey: 'taxuk',
-        onDone: () async {
+        onDone: () {
           Navigator.of(context).pushReplacementNamed('/home');
-          await paywallSession.recordSession();
         },
         pages: const [
           OnboardingPage(
