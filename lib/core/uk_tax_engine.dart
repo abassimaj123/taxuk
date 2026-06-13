@@ -106,36 +106,42 @@ class UKTaxEngine {
   static double incomeTax(double grossIncome, {bool isScotland = false}) {
     final pa = effectivePersonalAllowance(grossIncome);
     final taxable = max(0.0, grossIncome - pa);
-    return isScotland ? _calculateScottish(taxable) : _calculateUK(taxable);
+    return isScotland
+        ? _calculateScottish(taxable, pa)
+        : _calculateUK(taxable, pa);
   }
 
   /// England/Wales/NI bands (applied to taxable income = gross - PA)
-  static double _calculateUK(double taxable) {
+  static double _calculateUK(double taxable, double pa) {
     double tax = 0;
     if (taxable <= 0) return 0;
+    // Additional rate (45%) applies from £125,140 gross → dynamic in taxable terms
+    final higherLimit = 125140.0 - pa;
 
     // Basic rate band: 0–37,700 @ 20%
     final basic = min(taxable, ukBasicLimit);
     tax += basic * 0.20;
 
-    // Higher rate band: 37,700–112,570 @ 40%
+    // Higher rate band: 37,700–higherLimit @ 40%
     if (taxable > ukBasicLimit) {
-      final higher = min(taxable - ukBasicLimit, ukHigherLimit - ukBasicLimit);
+      final higher = min(taxable - ukBasicLimit, higherLimit - ukBasicLimit);
       tax += higher * 0.40;
     }
 
-    // Additional rate: above 112,570 @ 45%
-    if (taxable > ukHigherLimit) {
-      tax += (taxable - ukHigherLimit) * 0.45;
+    // Additional rate: above higherLimit @ 45%
+    if (taxable > higherLimit) {
+      tax += (taxable - higherLimit) * 0.45;
     }
 
     return tax;
   }
 
   /// Scottish rates (applied to taxable income = gross - PA)
-  static double _calculateScottish(double taxable) {
+  static double _calculateScottish(double taxable, double pa) {
     double tax = 0;
     if (taxable <= 0) return 0;
+    // Top rate (48%) applies from £125,140 gross → dynamic in taxable terms
+    final advancedLimit = 125140.0 - pa;
 
     // Starter: 0–2,306 @ 19%
     final starter = min(taxable, scotStarterLimit);
@@ -162,16 +168,16 @@ class UKTaxEngine {
       tax += higher * 0.42;
     }
 
-    // Advanced: 62,430–112,570 @ 45%
+    // Advanced: 62,430–advancedLimit @ 45%
     if (taxable > scotHigherLimit) {
       final advanced =
-          min(taxable - scotHigherLimit, scotAdvancedLimit - scotHigherLimit);
+          min(taxable - scotHigherLimit, advancedLimit - scotHigherLimit);
       tax += advanced * 0.45;
     }
 
-    // Top: above 112,570 @ 48%
-    if (taxable > scotAdvancedLimit) {
-      tax += (taxable - scotAdvancedLimit) * 0.48;
+    // Top: above advancedLimit @ 48%
+    if (taxable > advancedLimit) {
+      tax += (taxable - advancedLimit) * 0.48;
     }
 
     return tax;
@@ -234,6 +240,7 @@ class UKTaxEngine {
 
   static void _addUKBands(double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
+    final higherLimit = 125140.0 - pa;
     final basic = min(taxable, ukBasicLimit);
     rows.add(TaxBandRow(
       name: 'Basic Rate',
@@ -243,7 +250,7 @@ class UKTaxEngine {
       rangeTo: pa + basic,
     ));
     if (taxable > ukBasicLimit) {
-      final higher = min(taxable - ukBasicLimit, ukHigherLimit - ukBasicLimit);
+      final higher = min(taxable - ukBasicLimit, higherLimit - ukBasicLimit);
       rows.add(TaxBandRow(
         name: 'Higher Rate',
         rate: 0.40,
@@ -252,13 +259,13 @@ class UKTaxEngine {
         rangeTo: pa + ukBasicLimit + higher,
       ));
     }
-    if (taxable > ukHigherLimit) {
-      final add = taxable - ukHigherLimit;
+    if (taxable > higherLimit) {
+      final add = taxable - higherLimit;
       rows.add(TaxBandRow(
         name: 'Additional Rate',
         rate: 0.45,
         amount: add * 0.45,
-        rangeFrom: pa + ukHigherLimit,
+        rangeFrom: pa + higherLimit,
         rangeTo: pa + taxable,
       ));
     }
@@ -267,6 +274,7 @@ class UKTaxEngine {
   static void _addScottishBands(
       double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
+    final advancedLimit = 125140.0 - pa;
     final bands = [
       (name: 'Starter Rate', rate: 0.19, from: 0.0, to: scotStarterLimit),
       (
@@ -291,12 +299,12 @@ class UKTaxEngine {
         name: 'Advanced Rate',
         rate: 0.45,
         from: scotHigherLimit,
-        to: scotAdvancedLimit
+        to: advancedLimit
       ),
       (
         name: 'Top Rate',
         rate: 0.48,
-        from: scotAdvancedLimit,
+        from: advancedLimit,
         to: double.infinity
       ),
     ];
@@ -642,7 +650,7 @@ extension SelfEmployedNI on UKTaxEngine {
 
 /// Self-employed NI: Class 2 (£3.45/week if profits > SPT) + Class 4 (6%/2%)
 double calculateSelfEmployedNI(double grossProfit) {
-  const double class2Weekly = 3.45;
+  const double class2Weekly = 3.50; // 2025-26
   const double spt = 12570.0; // Small Profits Threshold
   const double lpl = 12570.0; // Lower Profits Limit
   const double upl = 50270.0; // Upper Profits Limit
@@ -661,7 +669,7 @@ double calculateSelfEmployedNI(double grossProfit) {
 /// Use alongside [calculateSelfEmployedNI] for self-employed scenarios.
 ({double class2, double class4}) calculateSelfEmployedNIBreakdown(
     double grossProfit) {
-  const double class2Weekly = 3.45;
+  const double class2Weekly = 3.50; // 2025-26
   const double spt = 12570.0;
   const double lpl = 12570.0;
   const double upl = 50270.0;

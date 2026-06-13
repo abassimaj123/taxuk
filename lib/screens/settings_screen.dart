@@ -181,6 +181,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading:
+                const Icon(Icons.manage_search_rounded, color: AppTheme.primary),
+            title: Text('Privacy Settings',
+                style: TextStyle(color: ct.textPrimary)),
+            onTap: showCalcwisePrivacyOptions,
+          ),
+          ListTile(
+            leading:
                 const Icon(Icons.mail_outline_rounded, color: AppTheme.primary),
             title: Text(AppStringsEN.contactSupport,
                 style: TextStyle(color: ct.textPrimary)),
