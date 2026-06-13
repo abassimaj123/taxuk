@@ -12,7 +12,7 @@ TaxUK es la calculadora de impuestos más completa para el Reino Unido — dise�
 
 ★ IMPUESTO SOBRE LA RENTA — INGLATERRA, GALES Y ESCOCIA
 
-Calcula tu impuesto en todas las bandas con las tasas 2025/26 y 2026/27:
+Calcula tu impuesto en todas las bandas con las tasas 2025/26:
 • Desgravación personal (Personal Allowance £12,570)
 • Banda básica (20%), superior (40%) y adicional (45%)
 • Bandas escocesas aplicadas automáticamente al seleccionar Escocia

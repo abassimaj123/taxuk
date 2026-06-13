@@ -60,7 +60,7 @@ Calculate your income tax across all 6 bands with full 2025/26 rates:
 • VAT calculator (standard 20%, reduced 5%, zero)
 • Save calculations to history
 • Share results as text or export as PDF
-• Full English & French support (EN/FR)
+• Full English support (EN)
 • 100% offline — your data stays on your device
 • Dark mode support
 
