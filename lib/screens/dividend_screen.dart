@@ -52,6 +52,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final salary =
         double.tryParse(_salaryCtrl.text.replaceAll(',', '.').trim()) ?? 0;
     final dividend =

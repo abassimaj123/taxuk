@@ -66,6 +66,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       double.tryParse(ctrl.text.replaceAll(',', '.').trim()) ?? 0;
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final grossRental = _parse(_grossRentalCtrl);
     final management = _parse(_managementCtrl);
     final repairs = _parse(_repairsCtrl);

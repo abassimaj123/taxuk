@@ -82,6 +82,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final gross =
         double.tryParse(_grossCtrl.text.replaceAll(',', '.').trim()) ?? 0;
     final salePrice =

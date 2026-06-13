@@ -124,6 +124,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final grossA =
         double.tryParse(_grossACtrl.text.replaceAll(',', '.').trim()) ?? 0;
     final grossB =

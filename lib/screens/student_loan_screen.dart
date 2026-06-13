@@ -52,6 +52,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final gross =
         double.tryParse(_grossCtrl.text.replaceAll(',', '.').trim()) ?? 0;
     if (gross < 0) return;

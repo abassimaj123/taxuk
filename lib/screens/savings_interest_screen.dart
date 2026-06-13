@@ -47,6 +47,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final grossInterest =
         double.tryParse(_grossInterestCtrl.text.replaceAll(',', '.').trim()) ??
             0;

@@ -87,6 +87,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
   }
 
   void _calculate() {
+    analyticsService.maybeLogFirstCalculate();
     final amount = double.tryParse(
           _amountCtrl.text.replaceAll(',', '.').trim(),
         ) ??
