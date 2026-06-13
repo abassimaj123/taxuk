@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:calcwise_core/calcwise_core.dart';
+
 /// UK income-tax region. Only Scotland has its own rates/bands for 2025/26.
 ///
 /// Wales has the Welsh Rate of Income Tax (WRIT): the UK rates are reduced by
@@ -73,12 +75,23 @@ class UKTaxEngine {
   // PA taper: £1 lost per £2 above £100k gross
   static const double paTaperStart = 100000.0;
 
-  // Scottish band thresholds (taxable income above PA)
-  static const double scotStarterLimit = 2306.0;
-  static const double scotBasicLimit = 13991.0;
+  // Scottish band rate limits 2025/26 — expressed NET of the Personal Allowance
+  // (i.e. applied to taxable income = gross − PA), per the Scottish Rate
+  // Resolution 2025-26. Verified against gov.scot (see dataVerification):
+  //   Starter      19%  up to £2,827      (gross £12,571–£15,397)
+  //   Basic        20%  £2,827–£14,921    (gross £15,398–£27,491)
+  //   Intermediate 21%  £14,921–£31,092   (gross £27,492–£43,662)
+  //   Higher       42%  £31,092–£62,430   (gross £43,663–£75,000)
+  //   Advanced     45%  £62,430–£125,140  (gross £75,001–£125,140)
+  //   Top          48%  above £125,140
+  // The Advanced→Top boundary is the GROSS £125,140 (PA is fully tapered there),
+  // so it is computed dynamically as 125140 − pa in the band logic below.
+  static const double scotStarterLimit = 2827.0; // 2025/26 (was £2,306 in 24/25)
+  static const double scotBasicLimit = 14921.0; // 2025/26 (was £13,991 in 24/25)
   static const double scotIntermediateLimit = 31092.0;
   static const double scotHigherLimit = 62430.0;
-  static const double scotAdvancedLimit = 112570.0;
+  // Advanced→Top boundary is the GROSS £125,140 threshold (see marginalTaxRate
+  // and _calculateScottish, which derive it as 125140 − pa).
 
   // ── NI Class 1 (employee) thresholds ──────────────────────────────────────
   static const double niPrimaryThreshold = 12570.0;
@@ -143,18 +156,18 @@ class UKTaxEngine {
     // Top rate (48%) applies from £125,140 gross → dynamic in taxable terms
     final advancedLimit = 125140.0 - pa;
 
-    // Starter: 0–2,306 @ 19%
+    // Starter: 0–2,827 @ 19%
     final starter = min(taxable, scotStarterLimit);
     tax += starter * 0.19;
 
-    // Basic: 2,306–13,991 @ 20%
+    // Basic: 2,827–14,921 @ 20%
     if (taxable > scotStarterLimit) {
       final basic =
           min(taxable - scotStarterLimit, scotBasicLimit - scotStarterLimit);
       tax += basic * 0.20;
     }
 
-    // Intermediate: 13,991–31,092 @ 21%
+    // Intermediate: 14,921–31,092 @ 21%
     if (taxable > scotBasicLimit) {
       final intermediate =
           min(taxable - scotBasicLimit, scotIntermediateLimit - scotBasicLimit);
@@ -347,7 +360,8 @@ class UKTaxEngine {
       if (taxable <= scotBasicLimit) return 0.20;
       if (taxable <= scotIntermediateLimit) return 0.21;
       if (taxable <= scotHigherLimit) return 0.42;
-      if (taxable <= scotAdvancedLimit) return 0.45;
+      // Advanced→Top boundary is GROSS £125,140 (PA fully tapered there).
+      if (grossIncome <= 125140.0) return 0.45;
       return 0.48;
     } else {
       if (taxable <= 0) return 0;
@@ -703,9 +717,38 @@ const double marriageAllowanceCredit = 252.0;
 // Reverse calculator — target net → required gross
 // ══════════════════════════════════════════════════════════════════════════
 
-/// Binary search: find gross salary needed to achieve [targetNet] take-home.
-/// Accounts for pension salary sacrifice (reduces taxable income).
-/// Uses Class 1 NI (PAYE) or Class 2+4 (self-employed).
+/// Net take-home for a given gross — the app's existing FORWARD income-tax
+/// function, expressed as a single pure helper so it can be reused both for
+/// forward display AND as the `forward` of [CalcwiseReverseSolver].
+///
+/// This is the single source of truth for "gross → net": it applies pension
+/// salary sacrifice, the real Income-Tax bands (England/Wales/NI or Scotland),
+/// and the correct NI (Class 1 PAYE, or Class 2+4 self-employed). Because the
+/// reverse solver wraps THIS function, the reverse mode automatically inherits
+/// every tax rate/threshold defined above — it introduces NO new tax values.
+double netTakeHomeForGross(
+  double gross, {
+  bool isScotland = false,
+  double pensionContrib = 0,
+  bool selfEmployed = false,
+}) {
+  final effective = grossAfterPension(gross, pensionContrib);
+  final tax = UKTaxEngine.incomeTax(effective, isScotland: isScotland);
+  final ni = selfEmployed
+      ? calculateSelfEmployedNI(effective)
+      : UKTaxEngine.nationalInsurance(effective);
+  return effective - tax - ni;
+}
+
+/// Find the gross salary needed to achieve [targetNet] take-home.
+///
+/// Wraps the app's existing forward function [netTakeHomeForGross] as the
+/// `forward` of the shared [CalcwiseReverseSolver] (calcwise_core). The solver
+/// is a battle-tested monotonic binary search, so this function adds no tax
+/// logic of its own — it merely inverts the forward calculation.
+///
+/// Bounds: lo = 0, hi = a generous multiple of the target net (net is always
+/// ≤ gross, so the required gross can never exceed a few × the target).
 double reverseCalculateGross({
   required double targetNet,
   bool isScotland = false,
@@ -714,35 +757,21 @@ double reverseCalculateGross({
 }) {
   if (targetNet <= 0) return 0;
 
-  // net(gross) function
-  double netFor(double gross) {
-    final effective = grossAfterPension(gross, pensionContrib);
-    final tax = UKTaxEngine.incomeTax(effective, isScotland: isScotland);
-    final ni = selfEmployed
-        ? calculateSelfEmployedNI(effective)
-        : UKTaxEngine.nationalInsurance(effective);
-    return effective - tax - ni;
-  }
+  // hi: 3× target net is comfortably above the required gross even at the
+  // top marginal rate (~48% Scotland top), where gross ≈ net / 0.52 < 2× net.
+  final hi = max(targetNet * 3, 1000.0);
 
-  // Find upper bound
-  double lo = targetNet;
-  double hi = targetNet * 2.5;
-  for (int i = 0; i < 12; i++) {
-    if (netFor(hi) >= targetNet) break;
-    hi *= 2;
-  }
-
-  // Binary search (50 iterations → precision < £0.01)
-  for (int i = 0; i < 60; i++) {
-    final mid = (lo + hi) / 2;
-    if ((hi - lo) < 0.01) break;
-    if (netFor(mid) < targetNet) {
-      lo = mid;
-    } else {
-      hi = mid;
-    }
-  }
-  return (lo + hi) / 2;
+  return CalcwiseReverseSolver.solve(
+    forward: (gross) => netTakeHomeForGross(
+      gross,
+      isScotland: isScotland,
+      pensionContrib: pensionContrib,
+      selfEmployed: selfEmployed,
+    ),
+    target: targetNet,
+    lo: 0,
+    hi: hi,
+  );
 }
 
 // ══════════════════════════════════════════════════════════════════════════
