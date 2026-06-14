@@ -5,6 +5,7 @@ import 'tax_code_checker_screen.dart';
 import 'student_loan_screen.dart';
 import 'rental_income_screen.dart';
 import 'savings_interest_screen.dart';
+import 'salary_dividends_screen.dart';
 import '../main.dart' show grossIncomeNotifier;
 
 class ToolsHubScreen extends StatelessWidget {
@@ -45,6 +46,12 @@ class ToolsHubScreen extends StatelessWidget {
         label: 'Savings Interest',
         subtitle: 'PSA & ISA tax on savings',
         screen: const SavingsInterestScreen(),
+      ),
+      _ToolEntry(
+        icon: Icons.balance_rounded,
+        label: 'Salary vs Dividends',
+        subtitle: 'Optimal split for limited company directors',
+        screen: const SalaryDividendsScreen(),
       ),
     ];
 
