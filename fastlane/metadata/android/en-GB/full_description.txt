@@ -1,0 +1,11 @@
+The most comprehensive UK personal tax calculator for 2025/26 — covering every tax that affects individuals in one app. HMRC rates updated at the start of each tax year so your calculations are always correct.
+
+Income Tax calculator covers the full 2025/26 personal allowance (£12,570), basic, higher, and additional rate bands for England/Wales/Northern Ireland — and all six Scottish rate bands (Starter, Basic, Intermediate, Higher, Advanced, Top). Allowance taper modelled correctly for incomes above £100,000 (£1 lost for every £2 over £100k, reaching zero at £125,140). National Insurance Class 1 primary contributions at all thresholds.
+
+VAT calculator: add 20% standard rate, 5% reduced rate, or 0% to any net price, or strip VAT from a gross amount — with a clear breakdown. Capital Gains Tax calculator covers residential property (24% higher rate) and other assets (20% higher, 10% basic), with annual CGT exemption applied automatically. Dividend Tax calculator separates your dividend income from PAYE salary, applies the £500 dividend allowance, and computes tax in each band correctly.
+
+Salary vs Dividends Split Planner: enter your company profit and find the optimal salary/dividend combination to minimise your total tax bill — factoring in employer NI, personal allowance, and dividend allowance. Rental Income calculator computes tax on rental profits. Savings Interest calculator applies the Personal Savings Allowance (£1,000 basic rate, £500 higher rate, £0 additional rate). Tax Code Checker decodes your HMRC tax code to confirm your personal allowance.
+
+Dark mode, calculation history, and PDF export. Works 100% offline — no account required.
+
+Keywords: UK tax calculator, income tax calculator UK, PAYE calculator, Scottish income tax calculator, VAT calculator UK, capital gains tax calculator, dividend tax calculator 2025/26, UK self assessment, HMRC tax calculator, NI calculator, tax code checker, personal allowance taper.
