@@ -348,7 +348,19 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                   child: Column(children: [
                     CalcwiseStaggerItem(
                       index: 0,
-                      child: CalcwiseHeroCard(
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: CalcwiseHeroCard(
                         label: 'VAT AMOUNT',
                         value: _fmtGbp.format(r.vatAmount),
                         rawValue: r.vatAmount,
@@ -362,6 +374,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                           ),
                         ],
                       ),
+                    ),
                     ),
                     CalcwiseStaggerItem(
                       index: 1,
