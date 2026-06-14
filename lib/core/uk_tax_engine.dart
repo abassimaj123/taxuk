@@ -63,35 +63,17 @@ extension IncomeTaxRegionInfo on IncomeTaxRegion {
 class UKTaxEngine {
   UKTaxEngine._();
 
-  // ── Personal Allowance ─────────────────────────────────────────────────────
+  // ── Personal Allowance fallback (baked-in floor) ──────────────────────────
+  // The live values come from CalcwiseTax.registry; these are fallbacks only.
   static const double personalAllowance = 12570.0;
-
-  // ── Income Tax band limits (taxable income above PA) ──────────────────────
-  // England / Wales / NI
-  static const double ukBasicLimit = 37700.0; // 0–37700 = 20%
-  static const double ukHigherLimit =
-      112570.0; // 37700–112570 = 40% (above PA+37700=50270)
-
-  // PA taper: £1 lost per £2 above £100k gross
   static const double paTaperStart = 100000.0;
-
-  // Scottish band rate limits 2025/26 — expressed NET of the Personal Allowance
-  // (i.e. applied to taxable income = gross − PA), per the Scottish Rate
-  // Resolution 2025-26. Verified against gov.scot (see dataVerification):
-  //   Starter      19%  up to £2,827      (gross £12,571–£15,397)
-  //   Basic        20%  £2,827–£14,921    (gross £15,398–£27,491)
-  //   Intermediate 21%  £14,921–£31,092   (gross £27,492–£43,662)
-  //   Higher       42%  £31,092–£62,430   (gross £43,663–£75,000)
-  //   Advanced     45%  £62,430–£125,140  (gross £75,001–£125,140)
-  //   Top          48%  above £125,140
-  // The Advanced→Top boundary is the GROSS £125,140 (PA is fully tapered there),
-  // so it is computed dynamically as 125140 − pa in the band logic below.
-  static const double scotStarterLimit = 2827.0; // 2025/26 (was £2,306 in 24/25)
-  static const double scotBasicLimit = 14921.0; // 2025/26 (was £13,991 in 24/25)
+  // UK band fallback limits (used only by marginalTaxRate — main calc uses registry)
+  static const double ukBasicLimit = 37700.0;
+  static const double ukHigherLimit = 112570.0;
+  static const double scotStarterLimit = 2827.0;
+  static const double scotBasicLimit = 14921.0;
   static const double scotIntermediateLimit = 31092.0;
   static const double scotHigherLimit = 62430.0;
-  // Advanced→Top boundary is the GROSS £125,140 threshold (see marginalTaxRate
-  // and _calculateScottish, which derive it as 125140 − pa).
 
   // ── NI Class 1 (employee) thresholds ──────────────────────────────────────
   static const double niPrimaryThreshold = 12570.0;
@@ -108,93 +90,21 @@ class UKTaxEngine {
   // Income Tax
   // ══════════════════════════════════════════════════════════════════════════
 
-  /// Effective personal allowance (tapered above £100k)
-  static double effectivePersonalAllowance(double grossIncome) {
-    if (grossIncome <= paTaperStart) return personalAllowance;
-    final excess = grossIncome - paTaperStart;
-    return max(0, personalAllowance - excess / 2);
-  }
+  /// Effective personal allowance (tapered above £100k).
+  /// Delegates to the registry so taper thresholds update with remote data.
+  static double effectivePersonalAllowance(double grossIncome) =>
+      CalcwiseTax.registry.annual('uk', 2025)?.effectiveAllowance(grossIncome) ??
+      (grossIncome <= paTaperStart
+          ? personalAllowance
+          : max(0, personalAllowance - (grossIncome - paTaperStart) / 2));
 
-  /// Income tax for England/Wales/NI or Scotland
-  static double incomeTax(double grossIncome, {bool isScotland = false}) {
-    final pa = effectivePersonalAllowance(grossIncome);
-    final taxable = max(0.0, grossIncome - pa);
-    return isScotland
-        ? _calculateScottish(taxable, pa)
-        : _calculateUK(taxable, pa);
-  }
-
-  /// England/Wales/NI bands (applied to taxable income = gross - PA)
-  static double _calculateUK(double taxable, double pa) {
-    double tax = 0;
-    if (taxable <= 0) return 0;
-    // Additional rate (45%) applies from £125,140 gross → dynamic in taxable terms
-    final higherLimit = 125140.0 - pa;
-
-    // Basic rate band: 0–37,700 @ 20%
-    final basic = min(taxable, ukBasicLimit);
-    tax += basic * 0.20;
-
-    // Higher rate band: 37,700–higherLimit @ 40%
-    if (taxable > ukBasicLimit) {
-      final higher = min(taxable - ukBasicLimit, higherLimit - ukBasicLimit);
-      tax += higher * 0.40;
-    }
-
-    // Additional rate: above higherLimit @ 45%
-    if (taxable > higherLimit) {
-      tax += (taxable - higherLimit) * 0.45;
-    }
-
-    return tax;
-  }
-
-  /// Scottish rates (applied to taxable income = gross - PA)
-  static double _calculateScottish(double taxable, double pa) {
-    double tax = 0;
-    if (taxable <= 0) return 0;
-    // Top rate (48%) applies from £125,140 gross → dynamic in taxable terms
-    final advancedLimit = 125140.0 - pa;
-
-    // Starter: 0–2,827 @ 19%
-    final starter = min(taxable, scotStarterLimit);
-    tax += starter * 0.19;
-
-    // Basic: 2,827–14,921 @ 20%
-    if (taxable > scotStarterLimit) {
-      final basic =
-          min(taxable - scotStarterLimit, scotBasicLimit - scotStarterLimit);
-      tax += basic * 0.20;
-    }
-
-    // Intermediate: 14,921–31,092 @ 21%
-    if (taxable > scotBasicLimit) {
-      final intermediate =
-          min(taxable - scotBasicLimit, scotIntermediateLimit - scotBasicLimit);
-      tax += intermediate * 0.21;
-    }
-
-    // Higher: 31,092–62,430 @ 42%
-    if (taxable > scotIntermediateLimit) {
-      final higher = min(taxable - scotIntermediateLimit,
-          scotHigherLimit - scotIntermediateLimit);
-      tax += higher * 0.42;
-    }
-
-    // Advanced: 62,430–advancedLimit @ 45%
-    if (taxable > scotHigherLimit) {
-      final advanced =
-          min(taxable - scotHigherLimit, advancedLimit - scotHigherLimit);
-      tax += advanced * 0.45;
-    }
-
-    // Top: above advancedLimit @ 48%
-    if (taxable > advancedLimit) {
-      tax += (taxable - advancedLimit) * 0.48;
-    }
-
-    return tax;
-  }
+  /// Income tax for England/Wales/NI or Scotland.
+  /// Delegated to the shared CalcwiseTax registry — bands and allowances
+  /// are remote-updatable without an app release.
+  static double incomeTax(double grossIncome, {bool isScotland = false}) =>
+      CalcwiseTax.registry
+          .incomeTax(isScotland ? 'uk_scotland' : 'uk', 2025, grossIncome) ??
+      0.0;
 
   // ══════════════════════════════════════════════════════════════════════════
   // National Insurance (Class 1 employee)
@@ -253,85 +163,57 @@ class UKTaxEngine {
 
   static void _addUKBands(double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
-    final higherLimit = 125140.0 - pa;
-    final basic = min(taxable, ukBasicLimit);
-    rows.add(TaxBandRow(
-      name: 'Basic Rate',
-      rate: 0.20,
-      amount: basic * 0.20,
-      rangeFrom: pa,
-      rangeTo: pa + basic,
-    ));
-    if (taxable > ukBasicLimit) {
-      final higher = min(taxable - ukBasicLimit, higherLimit - ukBasicLimit);
+    final set = CalcwiseTax.registry.annual('uk', 2025);
+    if (set == null) return;
+    const names = ['Basic Rate', 'Higher Rate', 'Additional Rate'];
+    double prev = 0;
+    for (int i = 0; i < set.bands.length; i++) {
+      final band = set.bands[i];
+      final upper = band.upTo;
+      final chunk =
+          (upper == double.infinity ? taxable : min(taxable, upper)) - prev;
+      if (chunk <= 0) break;
       rows.add(TaxBandRow(
-        name: 'Higher Rate',
-        rate: 0.40,
-        amount: higher * 0.40,
-        rangeFrom: pa + ukBasicLimit,
-        rangeTo: pa + ukBasicLimit + higher,
+        name: i < names.length ? names[i] : '${(band.rate * 100).toStringAsFixed(0)}% Rate',
+        rate: band.rate,
+        amount: chunk * band.rate,
+        rangeFrom: pa + prev,
+        rangeTo: pa + prev + chunk,
       ));
-    }
-    if (taxable > higherLimit) {
-      final add = taxable - higherLimit;
-      rows.add(TaxBandRow(
-        name: 'Additional Rate',
-        rate: 0.45,
-        amount: add * 0.45,
-        rangeFrom: pa + higherLimit,
-        rangeTo: pa + taxable,
-      ));
+      if (upper == double.infinity) break;
+      prev = upper;
     }
   }
 
   static void _addScottishBands(
       double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
-    final advancedLimit = 125140.0 - pa;
-    final bands = [
-      (name: 'Starter Rate', rate: 0.19, from: 0.0, to: scotStarterLimit),
-      (
-        name: 'Basic Rate',
-        rate: 0.20,
-        from: scotStarterLimit,
-        to: scotBasicLimit
-      ),
-      (
-        name: 'Intermediate Rate',
-        rate: 0.21,
-        from: scotBasicLimit,
-        to: scotIntermediateLimit
-      ),
-      (
-        name: 'Higher Rate',
-        rate: 0.42,
-        from: scotIntermediateLimit,
-        to: scotHigherLimit
-      ),
-      (
-        name: 'Advanced Rate',
-        rate: 0.45,
-        from: scotHigherLimit,
-        to: advancedLimit
-      ),
-      (
-        name: 'Top Rate',
-        rate: 0.48,
-        from: advancedLimit,
-        to: double.infinity
-      ),
+    final set = CalcwiseTax.registry.annual('uk_scotland', 2025);
+    if (set == null) return;
+    const names = [
+      'Starter Rate',
+      'Basic Rate',
+      'Intermediate Rate',
+      'Higher Rate',
+      'Advanced Rate',
+      'Top Rate',
     ];
-    for (final b in bands) {
-      if (taxable <= b.from) break;
-      final inBand = min(taxable, b.to) - b.from;
-      if (inBand <= 0) continue;
+    double prev = 0;
+    for (int i = 0; i < set.bands.length; i++) {
+      final band = set.bands[i];
+      final upper = band.upTo;
+      final chunk =
+          (upper == double.infinity ? taxable : min(taxable, upper)) - prev;
+      if (chunk <= 0) break;
       rows.add(TaxBandRow(
-        name: b.name,
-        rate: b.rate,
-        amount: inBand * b.rate,
-        rangeFrom: pa + b.from,
-        rangeTo: pa + b.from + inBand,
+        name: i < names.length ? names[i] : '${(band.rate * 100).toStringAsFixed(0)}% Rate',
+        rate: band.rate,
+        amount: chunk * band.rate,
+        rangeFrom: pa + prev,
+        rangeTo: pa + prev + chunk,
       ));
+      if (upper == double.infinity) break;
+      prev = upper;
     }
   }
 
