@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:calcwise_core/calcwise_core.dart' hide CrashlyticsService;
 import 'core/db/taxuk_database_adapter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -70,6 +71,7 @@ final adService = CalcwiseAdService(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  unawaited(CalcwiseRemoteConfig.initialize());
   await CalcwiseTax.init(remoteFetcher: calcwiseTaxRemoteFetch);
   await CrashlyticsService.init();
   await analyticsService.initialize();
