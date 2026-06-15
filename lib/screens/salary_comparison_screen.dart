@@ -774,29 +774,31 @@ class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final aIsBetter = rA.monthly >= rB.monthly;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: _HeroJobCard(
-            result: rA,
-            isBetter: aIsBetter,
-            accentColor: AppTheme.primary,
-            fmtGbp: fmtGbp,
-            ct: ct,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _HeroJobCard(
+              result: rA,
+              isBetter: aIsBetter,
+              accentColor: AppTheme.primary,
+              fmtGbp: fmtGbp,
+              ct: ct,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _HeroJobCard(
-            result: rB,
-            isBetter: !aIsBetter,
-            accentColor: AppTheme.accent,
-            fmtGbp: fmtGbp,
-            ct: ct,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _HeroJobCard(
+              result: rB,
+              isBetter: !aIsBetter,
+              accentColor: AppTheme.accent,
+              fmtGbp: fmtGbp,
+              ct: ct,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
