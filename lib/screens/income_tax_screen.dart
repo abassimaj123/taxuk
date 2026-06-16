@@ -10,7 +10,7 @@ import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
-import '../main.dart' show adService, analyticsService, grossIncomeNotifier, smartHistoryService;
+import '../main.dart' show adService, analyticsService, grossIncomeNotifier, paywallSession, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
@@ -221,8 +221,11 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       l2: _buildL2(r),
       label: label,
     );
+    HistoryScreen.refreshNotifier.value++;
+    try { analyticsService.logSave(); } catch (_) {}
     analyticsService.logResultSaved();
     adService.onSave();
+    paywallSession.recordAction().ignore();
   }
 
   void _reset() {

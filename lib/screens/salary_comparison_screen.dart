@@ -8,7 +8,7 @@ import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/uk_tax_engine.dart';
-import '../main.dart' show adService, analyticsService, smartHistoryService;
+import '../main.dart' show adService, analyticsService, paywallSession, smartHistoryService;
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
 import 'history_screen.dart';
@@ -239,8 +239,11 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
       },
       label: label,
     );
+    HistoryScreen.refreshNotifier.value++;
+    try { analyticsService.logSave(); } catch (_) {}
     analyticsService.logResultSaved();
     adService.onSave();
+    paywallSession.recordAction().ignore();
   }
 
   void _reset() {

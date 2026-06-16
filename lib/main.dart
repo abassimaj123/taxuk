@@ -85,6 +85,9 @@ Future<void> main() async {
   try {
     await requestCalcwiseConsent();
     await MobileAds.instance.initialize();
+    unawaited(MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(testDeviceIds: ['FD16D4616C3A21C3ACE5E48F8DC9C1DC']),
+    ));
     if (AdConfig.adsEnabled) await adService.initialize();
   } catch (e) {
     debugPrint('AdMob init error: $e');
@@ -93,6 +96,8 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
+
+  AnalyticsService.instance.setUserPremium(freemiumService.hasFullAccess);
 
   CalcwiseAdFooter.configure(
     adService: adService,
@@ -173,6 +178,7 @@ class _MainShellState extends State<MainShell> {
     _wasPremium = freemiumService.hasFullAccess;
     freemiumService.isPremiumNotifier.addListener(_onPremiumChange);
     iapErrorNotifier.addListener(_onIapError);
+    iapRestoreResultNotifier.addListener(_onRestoreResult);
     mainTabNotifier.addListener(_onTabRequested);
     WidgetsBinding.instance.addPostFrameCallback(
         (_) async => await paywallSession.recordSession());
@@ -182,8 +188,19 @@ class _MainShellState extends State<MainShell> {
   void dispose() {
     freemiumService.isPremiumNotifier.removeListener(_onPremiumChange);
     iapErrorNotifier.removeListener(_onIapError);
+    iapRestoreResultNotifier.removeListener(_onRestoreResult);
     mainTabNotifier.removeListener(_onTabRequested);
     super.dispose();
+  }
+
+  void _onRestoreResult() {
+    final result = iapRestoreResultNotifier.value;
+    if (result == null || !mounted) return;
+    final msg = result == 'restored' ? 'Premium restored!' : 'No purchases to restore.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+    );
+    iapRestoreResultNotifier.value = null;
   }
 
   void _onTabRequested() {
@@ -198,6 +215,7 @@ class _MainShellState extends State<MainShell> {
       showPremiumWelcomeSnackBar(context, isSpanish: false);
     }
     _wasPremium = now;
+    unawaited(AnalyticsService.instance.setUserPremium(now));
   }
 
   void _onIapError() {
@@ -281,7 +299,10 @@ class _MainShellState extends State<MainShell> {
               ),
             ),
             onRewardAd: () => CalcwiseRewardAdSheet.show(context),
-            onPremium: () => PaywallHard.show(context),
+            onPremium: () {
+              analyticsService.logPaywallShown('hard');
+              PaywallHard.show(context);
+            },
           ),
         ],
       ),
@@ -311,8 +332,10 @@ class _MainShellState extends State<MainShell> {
             if (!mounted) return;
             if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
             if (trigger == PaywallTrigger.hard) {
+              analyticsService.logPaywallShown('hard');
               PaywallHard.show(context);
             } else if (trigger == PaywallTrigger.soft) {
+              analyticsService.logPaywallShown('soft');
               PaywallSoft.show(
                 context,
                 featureTitle: 'Unlimited History',
