@@ -69,7 +69,7 @@ class UKTaxEngine {
   static const double paTaperStart = 100000.0;
   // UK band fallback limits (used only by marginalTaxRate — main calc uses registry)
   static const double ukBasicLimit = 37700.0;
-  static const double ukHigherLimit = 112570.0;
+  static const double ukHigherLimit = 125140.0;
   static const double scotStarterLimit = 2827.0;
   static const double scotBasicLimit = 14921.0;
   static const double scotIntermediateLimit = 31092.0;
