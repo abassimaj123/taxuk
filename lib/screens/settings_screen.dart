@@ -98,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: TextStyle(color: ct.textSecondary)),
                   trailing: Icon(Icons.chevron_right_rounded,
                       color: ct.textSecondary),
-                  onTap: () => IAPService.instance.buy(),
+                  onTap: () => PaywallHard.show(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.restore, color: AppTheme.primary),

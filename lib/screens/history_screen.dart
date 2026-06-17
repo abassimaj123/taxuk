@@ -266,7 +266,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () => IAPService.instance.buy(),
+                          onPressed: () => PaywallHard.show(context),
                           child: const Text(
                             'Upgrade',
                             style: TextStyle(
