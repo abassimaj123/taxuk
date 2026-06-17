@@ -291,15 +291,104 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
               AppSpacing.xxxl,
             ),
             children: [
+              // ── Reverse result (top) ─────────────────────────────────────
+              if (_isReverse && _reverseGross != null) ...[
+                CalcwisePageEntrance(
+                  child: Column(children: [
+                    CalcwiseStaggerItem(
+                      index: 0,
+                      child: CalcwiseHeroCard(
+                        label: 'REQUIRED GROSS SALARY',
+                        value: _fmtGbp.format(_reverseGross),
+                        secondary:
+                            '${_region.label} · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
+                        rawValue: _reverseGross,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Target Net', value: double.tryParse(_targetNetCtrl.text) ?? 0, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          if (_reverseGross! > 0)
+                            (label: 'Est. Monthly', value: _reverseGross! / 12, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                        ],
+                        stats: [
+                          (
+                            label: 'Target Net',
+                            value: _fmtGbp.format(
+                              double.tryParse(_targetNetCtrl.text) ?? 0,
+                            ),
+                          ),
+                          if (_reverseGross! > 0)
+                            (
+                              label: 'Est. Monthly',
+                              value: _fmtGbp.format(_reverseGross! / 12),
+                            ),
+                        ],
+                      ),
+                    ),
+                    CalcwiseStaggerItem(
+                      index: 1,
+                      child: _ReverseInsightCard(
+                        gross: _reverseGross!,
+                        targetNet:
+                            double.tryParse(_targetNetCtrl.text) ?? 0,
+                        fmtGbp: _fmtGbp,
+                        ct: ct,
+                      ),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+
+              // ── Forward results (top) ────────────────────────────────────
+              if (!_isReverse && r != null) ...[
+                CalcwisePageEntrance(
+                  child: Column(children: [
+                    CalcwiseStaggerItem(
+                      index: 0,
+                      child: CalcwiseHeroCard(
+                        label: 'ANNUAL TAKE-HOME',
+                        value: _fmtGbp.format(r.netIncome),
+                        secondary: '${_region.label} rates 2025/26',
+                        rawValue: r.netIncome,
+                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
+                        rawStats: [
+                          (label: 'Income Tax', value: r.incomeTax, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI', value: r.nationalInsurance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
+                          (label: 'Effective Rate', value: r.effectiveOverallRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                        ],
+                        stats: [
+                          (
+                            label: 'Income Tax',
+                            value: _fmtGbp.format(r.incomeTax),
+                          ),
+                          (
+                            label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI',
+                            value: _fmtGbp.format(r.nationalInsurance),
+                          ),
+                          (
+                            label: 'Effective Rate',
+                            value: _fmtPct.format(r.effectiveOverallRate),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+
               // ── Mode toggle (Forward / Reverse) ─────────────────────────
               _ModeToggle(
                 isReverse: _isReverse,
                 ct: ct,
-                onChanged: (v) => setState(() {
-                  _isReverse = v;
-                  _result = null;
-                  _reverseGross = null;
-                }),
+                onChanged: (v) {
+                  setState(() {
+                    _isReverse = v;
+                    _result = null;
+                    _reverseGross = null;
+                  });
+                  scheduleCalc(_calculate);
+                },
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -369,9 +458,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                   setState(() => _region = r);
                   analyticsService.logRegionSelected(r.label);
                   analyticsService.logScotlandToggled(r.usesScottishRates);
-                  if (_result != null || _reverseGross != null) {
-                    _calculate();
-                  }
+                  scheduleCalc(_calculate);
                 },
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -412,9 +499,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       activeColor: AppTheme.primary,
                       onChanged: (v) {
                         setState(() => _isSelfEmployed = v);
-                        if (_result != null || _reverseGross != null) {
-                          _calculate();
-                        }
+                        scheduleCalc(_calculate);
                       },
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -448,7 +533,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       activeColor: AppTheme.primary,
                       onChanged: (v) {
                         setState(() => _hasMarriageAllowance = v);
-                        if (_result != null) _calculate();
+                        scheduleCalc(_calculate);
                       },
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -460,105 +545,20 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Action buttons ───────────────────────────────────────────
-              Row(children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: _calculate,
-                    child: Text(_isReverse
-                        ? 'Find Required Gross'
-                        : 'Calculate'),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                OutlinedButton(
+              // ── Reset button ─────────────────────────────────────────────
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton(
                   onPressed: _reset,
                   child: const Text('Reset'),
                 ),
-              ]),
+              ),
 
-              // ── Reverse result ───────────────────────────────────────────
-              if (_isReverse && _reverseGross != null) ...[
-                const SizedBox(height: AppSpacing.xl),
-                CalcwisePageEntrance(
-                  child: Column(children: [
-                    CalcwiseStaggerItem(
-                      index: 0,
-                      child: CalcwiseHeroCard(
-                        label: 'REQUIRED GROSS SALARY',
-                        value: _fmtGbp.format(_reverseGross),
-                        secondary:
-                            '${_region.label} · ${_isSelfEmployed ? 'Self-employed' : 'PAYE'}',
-                        rawValue: _reverseGross,
-                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
-                        rawStats: [
-                          (label: 'Target Net', value: double.tryParse(_targetNetCtrl.text) ?? 0, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                          if (_reverseGross! > 0)
-                            (label: 'Est. Monthly', value: _reverseGross! / 12, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                        ],
-                        stats: [
-                          (
-                            label: 'Target Net',
-                            value: _fmtGbp.format(
-                              double.tryParse(_targetNetCtrl.text) ?? 0,
-                            ),
-                          ),
-                          if (_reverseGross! > 0)
-                            (
-                              label: 'Est. Monthly',
-                              value: _fmtGbp.format(_reverseGross! / 12),
-                            ),
-                        ],
-                      ),
-                    ),
-                    CalcwiseStaggerItem(
-                      index: 1,
-                      child: _ReverseInsightCard(
-                        gross: _reverseGross!,
-                        targetNet:
-                            double.tryParse(_targetNetCtrl.text) ?? 0,
-                        fmtGbp: _fmtGbp,
-                        ct: ct,
-                      ),
-                    ),
-                  ]),
-                ),
-              ],
-
-              // ── Forward results ──────────────────────────────────────────
+              // ── Detailed results (below inputs) ──────────────────────────
               if (!_isReverse && r != null) ...[
                 const SizedBox(height: AppSpacing.xl),
                 CalcwisePageEntrance(
                   child: Column(children: [
-                    CalcwiseStaggerItem(
-                      index: 0,
-                      child: CalcwiseHeroCard(
-                        label: 'ANNUAL TAKE-HOME',
-                        value: _fmtGbp.format(r.netIncome),
-                        secondary: '${_region.label} rates 2025/26',
-                        rawValue: r.netIncome,
-                        valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
-                        rawStats: [
-                          (label: 'Income Tax', value: r.incomeTax, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                          (label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI', value: r.nationalInsurance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                          (label: 'Effective Rate', value: r.effectiveOverallRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
-                        ],
-                        stats: [
-                          (
-                            label: 'Income Tax',
-                            value: _fmtGbp.format(r.incomeTax),
-                          ),
-                          (
-                            label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI',
-                            value: _fmtGbp.format(r.nationalInsurance),
-                          ),
-                          (
-                            label: 'Effective Rate',
-                            value: _fmtPct.format(r.effectiveOverallRate),
-                          ),
-                        ],
-                      ),
-                    ),
                     CalcwiseStaggerItem(
                       index: 1,
                       child: _SummaryCard(
