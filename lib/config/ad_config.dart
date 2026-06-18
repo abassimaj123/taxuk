@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 class AdConfig {
   AdConfig._();
   static const bool adsEnabled = true;
-  static const int calcThreshold = 3;
+  static const int calcThreshold = 8;
   static const int cooldownMinutes = 5;
 
   // ── Google official TEST ad unit IDs (debug + release fallback) ──────────
