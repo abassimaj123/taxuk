@@ -220,6 +220,7 @@ class _SalaryDividendsScreenState extends State<SalaryDividendsScreen>
   }
 
   void _showPaywall() {
+    if (freemiumService.hasFullAccess) return;
     PaywallSoft.show(
       context,
       featureTitle: 'Detailed Tax Breakdown',
