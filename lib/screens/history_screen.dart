@@ -23,7 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool _loading = true;
 
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
-  final _fmtDate = DateFormat('MMM d, yyyy · hh:mm a');
+  final _fmtDate = DateFormat('MMM d, yyyy · hh:mm a', 'en');
 
   // ── Getters ────────────────────────────────────────────────────────────────
 
@@ -419,10 +419,10 @@ class _HistoryCard extends StatelessWidget {
         final plan = inputs['plan'] as String? ?? '';
         title = 'Student Loan — $plan';
         subtitle =
-            'Monthly: ${fmtGbp.format(monthly)} · ${fmtGbp.format(inputs['gross_income'] ?? 0)} income';
+            'Monthly: ${fmtGbp.format(monthly)} · ${fmtGbp.format(inputs['salary'] ?? inputs['gross_income'] ?? 0)} income';
         icon = Icons.school_rounded;
       case 'cgt':
-        final taxDue = (results['tax_due'] as num?)?.toDouble() ?? 0;
+        final taxDue = (results['cgtTax'] as num?)?.toDouble() ?? (results['tax_due'] as num?)?.toDouble() ?? 0;
         final gain = (inputs['gain'] as num?)?.toDouble() ?? 0;
         final assetType = inputs['asset_type'] as String? ?? 'Other Assets';
         title = 'CGT — ${fmtGbp.format(gain)} gain';

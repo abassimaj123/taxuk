@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:calcwise_core/calcwise_core.dart' hide CrashlyticsService;
+import 'package:intl/date_symbol_data_local.dart';
 import 'core/db/taxuk_database_adapter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'config/ad_config.dart';
@@ -68,6 +69,7 @@ final adService = CalcwiseAdService(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   unawaited(CalcwiseRemoteConfig.initialize());
   await CalcwiseTax.init(remoteFetcher: calcwiseTaxRemoteFetch);

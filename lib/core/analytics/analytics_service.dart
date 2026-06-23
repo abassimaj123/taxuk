@@ -57,8 +57,6 @@ class AnalyticsService extends CalcwiseAnalytics {
   Future<void> logResultShared() => log('result_shared');
   Future<void> logFeatureGated(String feature) =>
       log('feature_gated', {'feature': feature});
-  Future<void> logScreenView(String screenName) =>
-      log('screen_view', {'screen_name': screenName});
   Future<void> logOnboardingComplete() => log('onboarding_complete');
   Future<void> logOnboardingSkipped() => log('onboarding_skipped');
   Future<void> logFirstCalculate() => log('first_calculate');

@@ -398,11 +398,20 @@ DividendResult calculateDividend({
     rate = DividendTaxConstants.additionalRate;
   }
 
-  // Dividends that push into a higher band are taxed at the higher rate
-  // For simplicity we apply a single band (the band of total income).
-  // For borderline cases a split calculation would be more precise, but
-  // this matches what most Play Store apps do.
-  final taxDue = taxable * rate;
+  // Split the taxable dividend across bands: other income fills the band first,
+  // then dividends are stacked on top.
+  const double personalAllowance = 12570.0;
+  final basicBandLimit = DividendTaxConstants.basicRateThreshold - personalAllowance; // 37700
+  final higherBandWidth = DividendTaxConstants.higherRateThreshold - DividendTaxConstants.basicRateThreshold; // 74870
+  final otherIncomeTaxable = max(0.0, grossIncome - personalAllowance);
+  final remainingBasicBand = max(0.0, basicBandLimit - otherIncomeTaxable);
+  final remainingHigherBand = max(0.0, higherBandWidth - max(0.0, otherIncomeTaxable - basicBandLimit));
+  final dividendInBasic = min(taxable, remainingBasicBand);
+  final dividendInHigher = min(taxable - dividendInBasic, remainingHigherBand);
+  final dividendInAdditional = max(0.0, taxable - dividendInBasic - dividendInHigher);
+  final taxDue = dividendInBasic * DividendTaxConstants.basicRate
+      + dividendInHigher * DividendTaxConstants.higherRate
+      + dividendInAdditional * DividendTaxConstants.additionalRate;
   final effectiveRate = grossDividend > 0 ? taxDue / grossDividend : 0.0;
 
   return DividendResult(

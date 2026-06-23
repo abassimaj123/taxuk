@@ -19,7 +19,7 @@ const _taxukAccent = PdfColor(0.102, 0.580, 0.969); // #1A94F7 — accent
 final _gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
 final _gbp0 = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 0);
 final _pct = NumberFormat('##0.00', 'en_GB');
-final _dateShort = DateFormat('dd MMM yyyy');
+final _dateShort = DateFormat('dd MMM yyyy', 'en');
 
 // ── Params classes (only sendable types: primitives + Uint8List) ──────────────
 
@@ -363,7 +363,7 @@ Future<Uint8List> _buildStudentLoanPdf(_StudentLoanParams p) async {
         _isoSection('REPAYMENT BREAKDOWN', [
           _isoRowHighlight('Annual Repayment', gbp.format(p.annualRepayment)),
           _isoRow('Monthly Repayment', gbp.format(p.monthlyRepayment)),
-          _isoRow('Weekly Repayment', gbp.format(p.monthlyRepayment / 4.33)),
+          _isoRow('Weekly Repayment', gbp.format(p.monthlyRepayment * 12 / 52)),
           _isoRow(
             'Income Above Threshold',
             gbp.format(p.salary > p.threshold ? p.salary - p.threshold : 0),
@@ -775,7 +775,7 @@ class TaxUkPdfExportService {
       region: region,
       pension: pension,
       isSelfEmployed: isSelfEmployed,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildIncomeTaxPdf(params));
     await _saveBytes(bytes, 'taxuk_income_tax');
@@ -813,7 +813,7 @@ class TaxUkPdfExportService {
       netB: netB,
       monthlyB: monthlyB,
       isScotland: isScotland,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildSalaryComparisonPdf(params));
     await _saveBytes(bytes, 'taxuk_salary_comparison');
@@ -845,7 +845,7 @@ class TaxUkPdfExportService {
       salePrice: salePrice,
       purchasePrice: purchasePrice,
       costs: costs,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildCgtPdf(params));
     await _saveBytes(bytes, 'taxuk_cgt');
@@ -871,7 +871,7 @@ class TaxUkPdfExportService {
       taxDue: taxDue,
       effectiveRate: effectiveRate,
       band: band,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildDividendPdf(params));
     await _saveBytes(bytes, 'taxuk_dividend');
@@ -893,7 +893,7 @@ class TaxUkPdfExportService {
       vatAmount: vatAmount,
       grossAmount: grossAmount,
       rateLabel: rateLabel,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildVatPdf(params));
     await _saveBytes(bytes, 'taxuk_vat');
@@ -915,7 +915,7 @@ class TaxUkPdfExportService {
       annualRepayment: annualRepayment,
       monthlyRepayment: monthlyRepayment,
       plan: plan,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildStudentLoanPdf(params));
     await _saveBytes(bytes, 'taxuk_student_loan');
@@ -943,7 +943,7 @@ class TaxUkPdfExportService {
       effectiveYield: effectiveYield,
       mortgageInterestCredit: mortgageInterestCredit,
       otherIncome: otherIncome,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildRentalIncomePdf(params));
     await _saveBytes(bytes, 'taxuk_rental_income');
@@ -969,7 +969,7 @@ class TaxUkPdfExportService {
       taxDue: taxDue,
       band: band,
       effectiveRate: effectiveRate,
-      dateStr: DateFormat('dd MMM yyyy').format(DateTime.now()),
+      dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildSavingsInterestPdf(params));
     await _saveBytes(bytes, 'taxuk_savings_interest');
