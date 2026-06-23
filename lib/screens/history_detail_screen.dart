@@ -27,7 +27,7 @@ class HistoryDetailScreen extends StatelessWidget {
     final rows = _rowsFor(type, inputs, results, fmtGbp);
 
     return Scaffold(
-      backgroundColor: ct.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: ct.surface,
         elevation: 0,
@@ -298,7 +298,7 @@ class _DataRow extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: highlight ? AppTextSize.mdPlus : AppTextSize.sm,
+              fontSize: highlight ? AppTextSize.body : AppTextSize.sm,
               fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
               color: highlight ? AppTheme.primary : ct.textPrimary,
             ),
