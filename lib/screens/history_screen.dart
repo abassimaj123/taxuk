@@ -409,26 +409,38 @@ class _HistoryCard extends StatelessWidget {
             ' · NI: ${fmtGbp.format(niAmt)}${isScotland ? ' (Scotland)' : ''}';
         icon = Icons.account_balance_rounded;
       case 'dividend':
-        final taxDue = (results['tax_due'] as num?)?.toDouble() ?? 0;
-        final band = results['band'] as String? ?? '';
-        title = 'Dividend — ${fmtGbp.format(inputs['gross_dividend'] ?? 0)}';
-        subtitle = 'Tax due: ${fmtGbp.format(taxDue)} · $band Rate';
+        final divTax = (results['dividendTax'] as num?)?.toDouble() ?? 0;
+        final divIncome = (inputs['dividendIncome'] as num?)?.toDouble() ?? 0;
+        title = 'Dividend — ${fmtGbp.format(divIncome)}';
+        subtitle = 'Tax due: ${fmtGbp.format(divTax)}';
         icon = Icons.bar_chart_rounded;
       case 'student_loan':
         final monthly =
-            (results['monthly_repayment'] as num?)?.toDouble() ?? 0;
+            (results['monthlyRepayment'] as num?)?.toDouble() ?? 0;
         final plan = inputs['plan'] as String? ?? '';
         title = 'Student Loan — $plan';
         subtitle =
-            'Monthly: ${fmtGbp.format(monthly)} · ${fmtGbp.format(inputs['salary'] ?? inputs['gross_income'] ?? 0)} income';
+            'Monthly: ${fmtGbp.format(monthly)} · ${fmtGbp.format(inputs['salary'] ?? 0)} income';
         icon = Icons.school_rounded;
       case 'cgt':
-        final taxDue = (results['cgtTax'] as num?)?.toDouble() ?? (results['tax_due'] as num?)?.toDouble() ?? 0;
-        final gain = (inputs['gain'] as num?)?.toDouble() ?? 0;
-        final assetType = inputs['asset_type'] as String? ?? 'Other Assets';
-        title = 'CGT — ${fmtGbp.format(gain)} gain';
-        subtitle = 'Tax due: ${fmtGbp.format(taxDue)} · $assetType';
+        final cgtTax = (results['cgtTax'] as num?)?.toDouble() ?? 0;
+        final gains = (inputs['gains'] as num?)?.toDouble() ?? 0;
+        final assetType = inputs['assetType'] as String? ?? 'Other Assets';
+        title = 'CGT — ${fmtGbp.format(gains)} gain';
+        subtitle = 'Tax due: ${fmtGbp.format(cgtTax)} · $assetType';
         icon = Icons.trending_up_rounded;
+      case 'rental_income':
+        final rentalTax = (results['tax'] as num?)?.toDouble() ?? 0;
+        final rentalIncome = (inputs['rentalIncome'] as num?)?.toDouble() ?? 0;
+        title = 'Rental Income — ${fmtGbp.format(rentalIncome)}';
+        subtitle = 'Tax: ${fmtGbp.format(rentalTax)}';
+        icon = Icons.home_work_rounded;
+      case 'savings_interest':
+        final savingsTax = (results['tax'] as num?)?.toDouble() ?? 0;
+        final interest = (inputs['interest'] as num?)?.toDouble() ?? 0;
+        title = 'Savings Interest — ${fmtGbp.format(interest)}';
+        subtitle = 'Tax: ${fmtGbp.format(savingsTax)}';
+        icon = Icons.savings_rounded;
       case 'salary_compare':
         final netA = (results['net_a'] as num?)?.toDouble() ?? 0;
         final netB = (results['net_b'] as num?)?.toDouble() ?? 0;

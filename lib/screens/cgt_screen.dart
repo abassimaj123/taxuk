@@ -146,6 +146,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       },
       l2: {
         'inputs': {
+          'type': 'cgt',
           'gains': r.totalGain,
           'grossIncome': _grossIncome,
           'assetType': _assetType.name,
@@ -181,6 +182,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       },
       l2: {
         'inputs': {
+          'type': 'cgt',
           'gains': r.totalGain,
           'grossIncome': _grossIncome,
           'assetType': _assetType.name,

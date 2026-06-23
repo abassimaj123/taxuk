@@ -97,6 +97,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       },
       l2: {
         'inputs': {
+          'type': 'savings_interest',
           'interest': r.grossInterest,
           'otherIncome': otherIncome,
         },
@@ -132,6 +133,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       },
       l2: {
         'inputs': {
+          'type': 'savings_interest',
           'interest': r.grossInterest,
           'otherIncome': otherIncome,
         },

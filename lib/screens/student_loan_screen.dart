@@ -93,6 +93,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       },
       l2: {
         'inputs': {
+          'type': 'student_loan',
           'salary': r.grossIncome,
           'plan': r.plan.shortLabel,
         },
@@ -126,6 +127,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       },
       l2: {
         'inputs': {
+          'type': 'student_loan',
           'salary': r.grossIncome,
           'plan': r.plan.shortLabel,
         },

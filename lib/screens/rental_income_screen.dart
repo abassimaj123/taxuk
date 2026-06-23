@@ -127,6 +127,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       },
       l2: {
         'inputs': {
+          'type': 'rental_income',
           'rentalIncome': r.grossRental,
           'otherIncome': otherIncome,
           'expenses': r.allowableExpenses,
@@ -162,6 +163,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       },
       l2: {
         'inputs': {
+          'type': 'rental_income',
           'rentalIncome': r.grossRental,
           'otherIncome': otherIncome,
           'expenses': r.allowableExpenses,

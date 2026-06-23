@@ -99,6 +99,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       },
       l2: {
         'inputs': {
+          'type': 'dividend',
           'dividendIncome': r.grossDividend,
           'grossIncome': salary,
         },
@@ -106,6 +107,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
           'allowanceUsed': r.allowance,
           'taxableDiv': r.taxableDividend,
           'dividendTax': r.taxDue,
+          'effectiveRate': r.effectiveRate,
         },
       },
       onSaved: () { if (mounted) HistoryScreen.refreshNotifier.value++; },
@@ -132,6 +134,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       },
       l2: {
         'inputs': {
+          'type': 'dividend',
           'dividendIncome': r.grossDividend,
           'grossIncome': salary,
         },
@@ -139,6 +142,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
           'allowanceUsed': r.allowance,
           'taxableDiv': r.taxableDividend,
           'dividendTax': r.taxDue,
+          'effectiveRate': r.effectiveRate,
         },
       },
       label: label,

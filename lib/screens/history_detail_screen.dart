@@ -106,14 +106,20 @@ class HistoryDetailScreen extends StatelessWidget {
         final gross = (inputs['gross'] as num?)?.toDouble() ?? 0;
         return 'Income Tax — ${fmt.format(gross)} gross';
       case 'dividend':
-        final div = (inputs['gross_dividend'] as num?)?.toDouble() ?? 0;
+        final div = (inputs['dividendIncome'] as num?)?.toDouble() ?? 0;
         return 'Dividend — ${fmt.format(div)}';
       case 'student_loan':
         final plan = inputs['plan'] as String? ?? '';
         return 'Student Loan — $plan';
       case 'cgt':
-        final gain = (inputs['gain'] as num?)?.toDouble() ?? 0;
+        final gain = (inputs['gains'] as num?)?.toDouble() ?? 0;
         return 'CGT — ${fmt.format(gain)} gain';
+      case 'rental_income':
+        final rentalIncome = (inputs['rentalIncome'] as num?)?.toDouble() ?? 0;
+        return 'Rental Income — ${fmt.format(rentalIncome)}';
+      case 'savings_interest':
+        final interest = (inputs['interest'] as num?)?.toDouble() ?? 0;
+        return 'Savings Interest — ${fmt.format(interest)}';
       case 'salary_compare':
         final a = inputs['name_a'] as String? ?? 'Job A';
         final b = inputs['name_b'] as String? ?? 'Job B';
@@ -137,13 +143,15 @@ class HistoryDetailScreen extends StatelessWidget {
           if (inputs['is_scotland'] == true) _Row('Region', 'Scotland'),
         ];
       case 'dividend':
+        final divTax = (results['dividendTax'] as num?)?.toDouble() ?? 0;
+        final divIncome = (inputs['dividendIncome'] as num?)?.toDouble() ?? 0;
         return [
-          _Row('Tax Due', fmt.format((results['tax_due'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
-          _Row('Net Dividend', fmt.format((results['net_dividend'] as num?)?.toDouble() ?? 0), isResult: true),
-          _Row('Effective Rate', '${((results['effective_rate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
-          _Row('Gross Dividend', fmt.format((inputs['gross_dividend'] as num?)?.toDouble() ?? 0)),
-          _Row('Other Income', fmt.format((inputs['other_income'] as num?)?.toDouble() ?? 0)),
-          _Row('Band', results['band'] as String? ?? ''),
+          _Row('Tax Due', fmt.format(divTax), isResult: true, isHighlight: true),
+          _Row('Net Dividend', fmt.format(divIncome - divTax), isResult: true),
+          _Row('Effective Rate', '${((results['effectiveRate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
+          _Row('Gross Dividend', fmt.format(divIncome)),
+          _Row('Other Income', fmt.format((inputs['grossIncome'] as num?)?.toDouble() ?? 0)),
+          _Row('Taxable Dividend', fmt.format((results['taxableDiv'] as num?)?.toDouble() ?? 0)),
         ];
       case 'student_loan':
         return [
@@ -155,11 +163,28 @@ class HistoryDetailScreen extends StatelessWidget {
         ];
       case 'cgt':
         return [
-          _Row('CGT Due', fmt.format((results['cgtTax'] as num?)?.toDouble() ?? (results['tax_due'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
-          _Row('Net Proceeds', fmt.format((results['net_proceeds'] as num?)?.toDouble() ?? 0), isResult: true),
-          _Row('Effective Rate', '${((results['effective_rate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
-          _Row('Total Gain', fmt.format((inputs['gain'] as num?)?.toDouble() ?? 0)),
-          _Row('Asset Type', inputs['asset_type'] as String? ?? ''),
+          _Row('CGT Due', fmt.format((results['cgtTax'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
+          _Row('Taxable Gain', fmt.format((results['taxableGain'] as num?)?.toDouble() ?? 0), isResult: true),
+          _Row('Effective Rate', '${((results['effectiveRate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
+          _Row('Total Gain', fmt.format((inputs['gains'] as num?)?.toDouble() ?? 0)),
+          _Row('Asset Type', inputs['assetType'] as String? ?? ''),
+          _Row('Annual Exemption', fmt.format((results['allowance'] as num?)?.toDouble() ?? 0)),
+        ];
+      case 'rental_income':
+        return [
+          _Row('Tax on Rental', fmt.format((results['tax'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
+          _Row('Taxable Profit', fmt.format((results['taxableProfit'] as num?)?.toDouble() ?? 0), isResult: true),
+          _Row('Rental Income', fmt.format((inputs['rentalIncome'] as num?)?.toDouble() ?? 0)),
+          _Row('Other Income', fmt.format((inputs['otherIncome'] as num?)?.toDouble() ?? 0)),
+          _Row('Allowable Expenses', fmt.format((inputs['expenses'] as num?)?.toDouble() ?? 0)),
+        ];
+      case 'savings_interest':
+        return [
+          _Row('Tax on Savings', fmt.format((results['tax'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
+          _Row('Net Interest', fmt.format((results['netInterest'] as num?)?.toDouble() ?? 0), isResult: true),
+          _Row('Personal Savings Allowance', fmt.format((results['psa'] as num?)?.toDouble() ?? 0), isResult: true),
+          _Row('Gross Interest', fmt.format((inputs['interest'] as num?)?.toDouble() ?? 0)),
+          _Row('Other Income', fmt.format((inputs['otherIncome'] as num?)?.toDouble() ?? 0)),
         ];
       case 'salary_compare':
         return [
