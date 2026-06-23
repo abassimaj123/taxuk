@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -162,6 +163,7 @@ class _SavingsInterestParams {
 // No BuildContext, no rootBundle, no Flutter services. Primitives only.
 
 Future<Uint8List> _buildIncomeTaxPdf(_IncomeTaxParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final pct = NumberFormat('##0.00', 'en_GB');
 
@@ -205,6 +207,7 @@ Future<Uint8List> _buildIncomeTaxPdf(_IncomeTaxParams p) async {
 }
 
 Future<Uint8List> _buildSalaryComparisonPdf(_SalaryComparisonParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final betterName = p.monthlyA >= p.monthlyB ? p.nameA : p.nameB;
   final diff = (p.monthlyA - p.monthlyB).abs();
@@ -240,6 +243,7 @@ Future<Uint8List> _buildSalaryComparisonPdf(_SalaryComparisonParams p) async {
 }
 
 Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final pct = NumberFormat('##0.00', 'en_GB');
 
@@ -278,6 +282,7 @@ Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
 }
 
 Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final pct = NumberFormat('##0.00', 'en_GB');
 
@@ -313,6 +318,7 @@ Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
 }
 
 Future<Uint8List> _buildVatPdf(_VatParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
 
   final pdf = pw.Document();
@@ -341,6 +347,7 @@ Future<Uint8List> _buildVatPdf(_VatParams p) async {
 }
 
 Future<Uint8List> _buildStudentLoanPdf(_StudentLoanParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
 
   final pdf = pw.Document();
@@ -378,6 +385,7 @@ Future<Uint8List> _buildStudentLoanPdf(_StudentLoanParams p) async {
 }
 
 Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final pct = NumberFormat('##0.00', 'en_GB');
 
@@ -415,6 +423,7 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
 }
 
 Future<Uint8List> _buildSavingsInterestPdf(_SavingsInterestParams p) async {
+  await initializeDateFormatting();
   final gbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
   final pct = NumberFormat('##0.00', 'en_GB');
 

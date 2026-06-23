@@ -483,6 +483,7 @@ class _HistoryCard extends StatelessWidget {
               builder: (_) => HistoryDetailScreen(row: row),
             ),
           );
+          if (!context.mounted) return;
           if (result == 'deleted') onDelete();
         },
         leading: Stack(
