@@ -8,6 +8,7 @@ import '../core/freemium/iap_service.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/strings_en.dart';
 import '../main.dart' show mainTabNotifier;
+import 'history_detail_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -462,6 +463,15 @@ class _HistoryCard extends StatelessWidget {
         border: cardBorder,
       ),
       child: ListTile(
+        onTap: () async {
+          final result = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HistoryDetailScreen(row: row),
+            ),
+          );
+          if (result == 'deleted') onDelete();
+        },
         leading: Stack(
           clipBehavior: Clip.none,
           children: [
