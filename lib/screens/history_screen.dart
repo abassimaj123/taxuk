@@ -110,6 +110,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
     );
+    controller.dispose();
     if (newLabel == null) return;
     await DatabaseService.instance
         .update(row['id'] as int, {'pin_label': newLabel.trim()});

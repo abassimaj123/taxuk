@@ -553,7 +553,7 @@ extension SelfEmployedNI on UKTaxEngine {
   // Accessed as static helpers below
 }
 
-/// Self-employed NI: Class 2 (£3.45/week if profits > SPT) + Class 4 (6%/2%)
+/// Self-employed NI: Class 2 (£3.50/week if profits > SPT) + Class 4 (6%/2%)
 double calculateSelfEmployedNI(double grossProfit) {
   const double class2Weekly = 3.50; // 2025-26
   const double spt = 12570.0; // Small Profits Threshold
