@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:calcwise_core/calcwise_core.dart' show PdfBrandHelper;
 import 'package:share_plus/share_plus.dart';
 
 // ── Brand colours ─────────────────────────────────────────────────────────────
@@ -171,7 +172,7 @@ Future<Uint8List> _buildIncomeTaxPdf(_IncomeTaxParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Income Tax Calculator', 'UK Income Tax Summary', p.dateStr),
@@ -199,7 +200,7 @@ Future<Uint8List> _buildIncomeTaxPdf(_IncomeTaxParams p) async {
           _isoRow('Weekly Take-Home', gbp.format(p.takeHome / 52)),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -216,7 +217,7 @@ Future<Uint8List> _buildSalaryComparisonPdf(_SalaryComparisonParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Salary Comparison', 'Side-by-side UK tax comparison', p.dateStr),
@@ -235,7 +236,7 @@ Future<Uint8List> _buildSalaryComparisonPdf(_SalaryComparisonParams p) async {
           ],
         ),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -251,7 +252,7 @@ Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Capital Gains Tax', 'UK CGT Summary 2025/26', p.dateStr),
@@ -274,7 +275,7 @@ Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
           _isoRow('Effective Rate on Gain', '${pct.format(p.effectiveRate * 100)}%'),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -290,7 +291,7 @@ Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Dividend Tax Calculator', 'UK Dividend Tax Summary 2025/26', p.dateStr),
@@ -310,7 +311,7 @@ Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
           _isoRow('Effective Rate on Dividend', '${pct.format(p.effectiveRate * 100)}%'),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -325,7 +326,7 @@ Future<Uint8List> _buildVatPdf(_VatParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('VAT Calculator', 'UK VAT Breakdown', p.dateStr),
@@ -339,7 +340,7 @@ Future<Uint8List> _buildVatPdf(_VatParams p) async {
           _isoRowHighlight('Gross Amount (inc-VAT)', gbp.format(p.grossAmount)),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -354,7 +355,7 @@ Future<Uint8List> _buildStudentLoanPdf(_StudentLoanParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Student Loan Repayment', 'UK Student Loan Calculator', p.dateStr),
@@ -377,7 +378,7 @@ Future<Uint8List> _buildStudentLoanPdf(_StudentLoanParams p) async {
           ),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -393,7 +394,7 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Rental Income Tax', 'UK Rental Income Tax Summary 2025/26', p.dateStr),
@@ -415,7 +416,7 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
           _isoRow('Effective Yield on Rental', '${pct.format(p.effectiveYield)}%'),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -431,7 +432,7 @@ Future<Uint8List> _buildSavingsInterestPdf(_SavingsInterestParams p) async {
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     margin: const pw.EdgeInsets.all(40),
-    build: (_) => pw.Column(
+    build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         _isoHeader('Savings Interest Tax', 'UK Savings Interest Tax Summary 2025/26', p.dateStr),
@@ -452,7 +453,7 @@ Future<Uint8List> _buildSavingsInterestPdf(_SavingsInterestParams p) async {
             _isoRow('Effective Rate', '${pct.format(p.effectiveRate * 100)}%'),
         ]),
         pw.Spacer(),
-        _isoFooter(),
+        PdfBrandHelper.footer(ctx, 'TaxUK'),
       ],
     ),
   ));
@@ -743,16 +744,6 @@ pw.Widget _isoRowHighlight(String label, String value) => pw.Padding(
           ],
         ),
       ),
-    );
-
-pw.Widget _isoFooter() => pw.Column(
-      children: [
-        pw.Divider(color: PdfColors.grey300),
-        pw.Text(
-          'Generated by TaxUK - UK Tax Calculator  ·  For informational purposes only. Consult a tax professional.',
-          style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
-        ),
-      ],
     );
 
 // ── Public service ────────────────────────────────────────────────────────────
