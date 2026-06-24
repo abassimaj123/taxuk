@@ -24,6 +24,7 @@ import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'l10n/strings_en.dart';
 import 'widgets/paywall_hard.dart';
+import 'widgets/paywall_soft.dart';
 
 final paywallSession = PaywallSessionService(
   appKey: 'taxuk',
@@ -113,6 +114,8 @@ Future<void> main() async {
     freemium: freemiumService,
     isSpanishNotifier: ValueNotifier<bool>(false),
   );
+  PaywallHard.setAnalytics(AnalyticsService.instance);
+  PaywallSoft.setAnalytics(AnalyticsService.instance);
   runApp(const TaxUKApp());
 }
 
