@@ -70,7 +70,7 @@ final adService = CalcwiseAdService(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting();
+  await initializeDateFormatting('en_GB', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   unawaited(CalcwiseRemoteConfig.initialize());
   await CalcwiseTax.init(remoteFetcher: calcwiseTaxRemoteFetch);
