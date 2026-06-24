@@ -23,7 +23,7 @@ class HistoryDetailScreen extends StatefulWidget {
     final pinLabel = row['pin_label'] as String?;
 
     final fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£', decimalDigits: 2);
-    final fmtDate = DateFormat('d MMM yyyy, HH:mm');
+    final fmtDate = DateFormat('d MMM yyyy, HH:mm', 'en');
     final dateStr = timestamp != null ? fmtDate.format(DateTime.parse(timestamp)) : '';
 
     final title = _titleFor(type, inputs, results, fmtGbp, pinLabel);
