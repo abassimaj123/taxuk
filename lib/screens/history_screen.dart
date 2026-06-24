@@ -76,11 +76,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _delete(int id) async {
     await DatabaseService.instance.delete(id);
+    if (!mounted) return;
     _load();
   }
 
   Future<void> _unpin(int id) async {
     await DatabaseService.instance.update(id, {'is_pinned': 0});
+    if (!mounted) return;
     _load();
   }
 
@@ -114,6 +116,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (newLabel == null) return;
     await DatabaseService.instance
         .update(row['id'] as int, {'pin_label': newLabel.trim()});
+    if (!mounted) return;
     _load();
   }
 
@@ -143,6 +146,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
     if (confirm == true) {
       await DatabaseService.instance.clearAll();
+      if (!mounted) return;
       _load();
     }
   }
