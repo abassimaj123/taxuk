@@ -92,7 +92,7 @@ Future<void> main() async {
     }
     if (AdConfig.adsEnabled) await adService.initialize();
   } catch (e) {
-    debugPrint('AdMob init error: $e');
+    if (kDebugMode) debugPrint('AdMob init error: $e');
   }
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
