@@ -175,6 +175,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
     }
     final salary =
         double.tryParse(_salaryCtrl.text.replaceAll(',', '.').trim()) ?? 0;
+    if (!mounted) return;
     await TaxUkPdfExportService.exportDividend(
       context: context,
       grossIncome: salary,

@@ -276,6 +276,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportSalaryComparison(
       context: context,
       nameA: rA.name,

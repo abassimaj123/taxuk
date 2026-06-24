@@ -222,6 +222,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportVat(
       context: context,
       netAmount: r.netAmount,

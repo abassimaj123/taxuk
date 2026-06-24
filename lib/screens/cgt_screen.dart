@@ -231,6 +231,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportCgt(
       context: context,
       totalGain: r.totalGain,

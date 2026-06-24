@@ -172,6 +172,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportSavingsInterest(
       context: context,
       grossInterest: r.grossInterest,

@@ -216,6 +216,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
           _mortgageInterestCtrl.text.replaceAll(',', '.').trim(),
         ) ??
         0;
+    if (!mounted) return;
     await TaxUkPdfExportService.exportRentalIncome(
       context: context,
       grossRental: r.grossRental,

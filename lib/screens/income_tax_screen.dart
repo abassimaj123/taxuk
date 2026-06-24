@@ -254,6 +254,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportIncomeTax(
       context: context,
       gross: r.grossIncome,

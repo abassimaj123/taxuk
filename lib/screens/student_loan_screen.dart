@@ -168,6 +168,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       );
       return;
     }
+    if (!mounted) return;
     await TaxUkPdfExportService.exportStudentLoan(
       context: context,
       salary: r.grossIncome,
