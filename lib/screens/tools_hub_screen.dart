@@ -7,9 +7,20 @@ import 'rental_income_screen.dart';
 import 'savings_interest_screen.dart';
 import 'salary_dividends_screen.dart';
 import '../main.dart' show grossIncomeNotifier;
+import '../core/analytics/analytics_service.dart';
 
-class ToolsHubScreen extends StatelessWidget {
+class ToolsHubScreen extends StatefulWidget {
   const ToolsHubScreen({super.key});
+  @override
+  State<ToolsHubScreen> createState() => _ToolsHubScreenState();
+}
+
+class _ToolsHubScreenState extends State<ToolsHubScreen> {
+  @override
+  void initState() {
+    super.initState();
+    analyticsService.logScreenView('tools_hub');
+  }
 
   @override
   Widget build(BuildContext context) {
