@@ -303,7 +303,6 @@ class _MainShellState extends State<MainShell> {
             ),
             onRewardAd: () => CalcwiseRewardAdSheet.show(context),
             onPremium: () {
-              analyticsService.logPaywallShown('hard');
               PaywallHard.show(context);
             },
           ),
@@ -335,10 +334,8 @@ class _MainShellState extends State<MainShell> {
             if (!mounted) return;
             if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
             if (trigger == PaywallTrigger.hard) {
-              analyticsService.logPaywallShown('hard');
               PaywallHard.show(context);
             } else if (trigger == PaywallTrigger.soft) {
-              analyticsService.logPaywallShown('soft');
               PaywallSoft.show(
                 context,
                 featureTitle: 'Unlimited History',
