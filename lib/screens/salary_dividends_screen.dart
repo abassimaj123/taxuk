@@ -287,7 +287,10 @@ class _SalaryDividendsScreenState extends State<SalaryDividendsScreen>
                 Row(children: [
                   Expanded(
                     child: FilledButton(
-                      onPressed: _runCalc,
+                      onPressed: () {
+                        HapticFeedback.mediumImpact();
+                        _runCalc();
+                      },
                       child: const Text('Calculate'),
                     ),
                   ),

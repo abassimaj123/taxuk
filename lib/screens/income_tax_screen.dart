@@ -549,7 +549,10 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
               Align(
                 alignment: Alignment.centerRight,
                 child: OutlinedButton(
-                  onPressed: _reset,
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    _reset();
+                  },
                   child: const Text('Reset'),
                 ),
               ),
@@ -1486,7 +1489,10 @@ class _ExportPdfButton extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         child: OutlinedButton.icon(
-          onPressed: onExport,
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            onExport();
+          },
           icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
           label: const Text('Export PDF'),
         ),

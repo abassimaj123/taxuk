@@ -123,13 +123,19 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
               Row(children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: _check,
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _check();
+                    },
                     child: const Text('Check Tax Code'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 OutlinedButton(
-                  onPressed: _reset,
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    _reset();
+                  },
                   child: const Text('Reset'),
                 ),
               ]),

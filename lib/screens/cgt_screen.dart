@@ -376,13 +376,19 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
               Row(children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: _calculate,
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _calculate();
+                    },
                     child: const Text('Calculate CGT'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 OutlinedButton(
-                  onPressed: _reset,
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    _reset();
+                  },
                   child: const Text('Reset'),
                 ),
               ]),
@@ -465,7 +471,10 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                           bottom: AppSpacing.sm,
                         ),
                         child: OutlinedButton.icon(
-                          onPressed: _exportPdf,
+                          onPressed: () {
+                            HapticFeedback.mediumImpact();
+                            _exportPdf();
+                          },
                           icon: const Icon(
                             Icons.picture_as_pdf_outlined,
                             size: 18,
