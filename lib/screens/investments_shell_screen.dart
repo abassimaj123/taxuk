@@ -3,9 +3,20 @@ import 'package:flutter/material.dart';
 import 'dividend_screen.dart';
 import 'cgt_screen.dart';
 import '../main.dart' show grossIncomeNotifier;
+import '../core/analytics/analytics_service.dart';
 
-class InvestmentsShellScreen extends StatelessWidget {
+class InvestmentsShellScreen extends StatefulWidget {
   const InvestmentsShellScreen({super.key});
+  @override
+  State<InvestmentsShellScreen> createState() => _InvestmentsShellScreenState();
+}
+
+class _InvestmentsShellScreenState extends State<InvestmentsShellScreen> {
+  @override
+  void initState() {
+    super.initState();
+    analyticsService.logScreenView('investments');
+  }
 
   @override
   Widget build(BuildContext context) {

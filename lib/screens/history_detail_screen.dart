@@ -2,16 +2,19 @@ import 'package:calcwise_core/calcwise_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../core/analytics/analytics_service.dart';
 import '../core/db/database_service.dart';
 import '../core/theme/app_theme.dart';
 
-class HistoryDetailScreen extends StatelessWidget {
+class HistoryDetailScreen extends StatefulWidget {
   final Map<String, dynamic> row;
 
   const HistoryDetailScreen({super.key, required this.row});
 
   @override
-  Widget build(BuildContext context) {
+  State<HistoryDetailScreen> createState() => _HistoryDetailScreenState();
+
+  Widget _build(BuildContext context) {
     final ct = CalcwiseTheme.of(context);
     final inputs = row['inputs'] as Map<String, dynamic>? ?? {};
     final results = row['results'] as Map<String, dynamic>? ?? {};
@@ -251,6 +254,17 @@ class HistoryDetailScreen extends StatelessWidget {
       if (context.mounted) Navigator.pop(context, 'deleted');
     }
   }
+}
+
+class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    analyticsService.logScreenView('history_detail');
+  }
+
+  @override
+  Widget build(BuildContext context) => widget._build(context);
 }
 
 class _Row {
