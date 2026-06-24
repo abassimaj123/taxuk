@@ -11,6 +11,7 @@ import '../l10n/strings_en.dart';
 import '../core/freemium/freemium_service.dart';
 import '../core/services/pdf_export_service.dart';
 import '../main.dart' show adService, analyticsService, grossIncomeNotifier, paywallSession, smartHistoryService;
+import '../widgets/paywall_hard.dart';
 import '../widgets/paywall_soft.dart';
 import '../widgets/save_scenario_button.dart';
 import 'salary_comparison_screen.dart';
@@ -225,7 +226,10 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
     try { analyticsService.logSave(); } catch (_) {}
     analyticsService.logResultSaved();
     adService.onSave();
-    paywallSession.recordAction().ignore();
+    final trigger = await paywallSession.recordAction();
+    if (!mounted) return;
+    if (trigger == PaywallTrigger.soft) PaywallSoft.show(context);
+    if (trigger == PaywallTrigger.hard) PaywallHard.show(context);
   }
 
   void _reset() {
