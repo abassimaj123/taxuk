@@ -266,7 +266,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                     selected: sel,
                     onSelected: (_) => setState(() {
                       _rateOption = opt;
-                      if (_result != null) _calculate();
+                      _calculate();
                     }),
                     selectedColor: AppTheme.primary.withValues(alpha: 0.15),
                     checkmarkColor: AppTheme.primary,
@@ -312,7 +312,7 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
                 isRight: _fromGross,
                 onChanged: (v) => setState(() {
                   _fromGross = v;
-                  if (_result != null) _calculate();
+                  _calculate();
                 }),
               ),
               const SizedBox(height: AppSpacing.md),

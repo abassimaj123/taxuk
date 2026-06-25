@@ -432,11 +432,11 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                 valueB: _selfEmployedB,
                 onChangedA: (v) {
                   setState(() => _selfEmployedA = v);
-                  if (_resultA != null) _calculate();
+                  _calculate();
                 },
                 onChangedB: (v) {
                   setState(() => _selfEmployedB = v);
-                  if (_resultB != null) _calculate();
+                  _calculate();
                 },
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -471,7 +471,7 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
                   onChanged: (v) {
                     setState(() => _isScotland = v);
                     analyticsService.logScotlandToggled(v);
-                    if (_resultA != null) _calculate();
+                    _calculate();
                   },
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,

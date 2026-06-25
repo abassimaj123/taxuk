@@ -282,7 +282,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                     selected: sel,
                     onSelected: (_) => setState(() {
                       _assetType = opt;
-                      if (_result != null) _calculate();
+                      _calculate();
                     }),
                     selectedColor: AppTheme.primary.withValues(alpha: 0.15),
                     checkmarkColor: AppTheme.primary,

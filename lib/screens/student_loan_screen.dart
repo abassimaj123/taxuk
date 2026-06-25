@@ -263,7 +263,7 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
                         onChanged: (p) {
                           if (p == null) return;
                           setState(() => _plan = p);
-                          if (_result != null) _calculate();
+                          _calculate();
                         },
                       ),
                     ),
