@@ -91,13 +91,13 @@ void main() {
     });
 
     test('£50,000 — 4 bands (gov.scot golden)', () {
-      // taxable = 37430:
-      //   Starter  2827 × 19% =  537.13
-      //   Basic   12094 × 20% = 2418.80
-      //   Interm  16171 × 21% = 3395.91
+      // taxable = 37430 (2026/27 Scottish bands):
+      //   Starter  3967 × 19% =  753.73
+      //   Basic   12989 × 20% = 2597.80
+      //   Interm  14136 × 21% = 2968.56
       //   Higher   6338 × 42% = 2661.96
-      //   Total = 9013.80
-      approx(UKTaxEngine.incomeTax(50000, isScotland: true), 9013.80);
+      //   Total = 8982.05
+      approx(UKTaxEngine.incomeTax(50000, isScotland: true), 8982.05);
     });
 
     test('Scotland higher than rUK at £50k', () {
@@ -288,11 +288,11 @@ void main() {
       expect(rows[4].rate, 0.42);
     });
 
-    test('£50,000 — Starter boundary at taxable £2,827 (gross £15,397)', () {
+    test('£50,000 — Starter boundary at taxable £3,967 (gross £16,537)', () {
       final rows = UKTaxEngine.taxBandBreakdown(50000, isScotland: true);
-      // PA row ends at 12570; Starter ends at 12570+2827=15397
-      expect(rows[1].rangeTo, closeTo(15397, 0.01));
-      expect(rows[1].amount, closeTo(537.13, 0.02)); // 2827 × 19%
+      // PA row ends at 12570; Starter ends at 12570+3967=16537 (2026/27)
+      expect(rows[1].rangeTo, closeTo(16537, 0.01));
+      expect(rows[1].amount, closeTo(753.73, 0.02)); // 3967 × 19%
     });
 
     test('£50,000 — Intermediate ends at taxable £31,092 (gross £43,662)', () {
@@ -300,7 +300,7 @@ void main() {
       expect(rows[3].rangeTo, closeTo(43662, 0.01)); // 12570 + 31092
     });
 
-    test('£50,000 — sum matches incomeTax (9013.80)', () {
+    test('£50,000 — sum matches incomeTax (8982.05)', () {
       final rows = UKTaxEngine.taxBandBreakdown(50000, isScotland: true);
       assertSumMatchesTax(rows, 50000);
     });
@@ -330,9 +330,9 @@ void main() {
       approx(UKTaxEngine.effectiveTaxRate(50000), 7486 / 50000, tol: 0.001);
     });
 
-    test('£50,000 Scotland → ~18.03% (9013.80/50000)', () {
+    test('£50,000 Scotland → ~17.96% (8982.05/50000)', () {
       approx(UKTaxEngine.effectiveTaxRate(50000, isScotland: true),
-          9013.80 / 50000, tol: 0.001);
+          8982.05 / 50000, tol: 0.001);
     });
   });
 

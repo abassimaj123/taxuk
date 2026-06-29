@@ -93,7 +93,7 @@ class UKTaxEngine {
   /// Effective personal allowance (tapered above £100k).
   /// Delegates to the registry so taper thresholds update with remote data.
   static double effectivePersonalAllowance(double grossIncome) =>
-      CalcwiseTax.registry.annual('uk', 2025)?.effectiveAllowance(grossIncome) ??
+      CalcwiseTax.registry.annual('uk', 2026)?.effectiveAllowance(grossIncome) ??
       (grossIncome <= paTaperStart
           ? personalAllowance
           : max(0, personalAllowance - (grossIncome - paTaperStart) / 2));
@@ -103,7 +103,7 @@ class UKTaxEngine {
   /// are remote-updatable without an app release.
   static double incomeTax(double grossIncome, {bool isScotland = false}) =>
       CalcwiseTax.registry
-          .incomeTax(isScotland ? 'uk_scotland' : 'uk', 2025, grossIncome) ??
+          .incomeTax(isScotland ? 'uk_scotland' : 'uk', 2026, grossIncome) ??
       0.0;
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -163,7 +163,7 @@ class UKTaxEngine {
 
   static void _addUKBands(double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
-    final set = CalcwiseTax.registry.annual('uk', 2025);
+    final set = CalcwiseTax.registry.annual('uk', 2026);
     if (set == null) return;
     const names = ['Basic Rate', 'Higher Rate', 'Additional Rate'];
     double prev = 0;
@@ -188,7 +188,7 @@ class UKTaxEngine {
   static void _addScottishBands(
       double taxable, double pa, List<TaxBandRow> rows) {
     if (taxable <= 0) return;
-    final set = CalcwiseTax.registry.annual('uk_scotland', 2025);
+    final set = CalcwiseTax.registry.annual('uk_scotland', 2026);
     if (set == null) return;
     const names = [
       'Starter Rate',
