@@ -41,14 +41,17 @@ extension _AssetTypeLabel on _AssetType {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class CGTScreen extends StatefulWidget {
-  const CGTScreen({super.key});
+  /// Optional pre-filled gross income from the income tax tab.
+  final double? initialGrossIncome;
+
+  const CGTScreen({super.key, this.initialGrossIncome});
 
   @override
   State<CGTScreen> createState() => _CGTScreenState();
 }
 
 class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
-  final _grossCtrl = TextEditingController(text: '35000');
+  late final TextEditingController _grossCtrl;
   final _salePriceCtrl = TextEditingController(text: '200000');
   final _purchasePriceCtrl = TextEditingController(text: '150000');
   final _costsCtrl = TextEditingController(text: '0');
@@ -67,6 +70,10 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
   void initState() {
     super.initState();
     analyticsService.logScreenView('cgt');
+    final initial = widget.initialGrossIncome;
+    _grossCtrl = TextEditingController(
+      text: initial != null ? initial.round().toString() : '35000',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });

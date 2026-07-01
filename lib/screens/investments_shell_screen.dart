@@ -60,7 +60,7 @@ class _InvestmentsShellScreenState extends State<InvestmentsShellScreen> {
               child: TabBarView(
                 children: [
                   DividendScreen(initialGrossIncome: grossIncome),
-                  const CGTScreen(),
+                  CGTScreen(initialGrossIncome: grossIncome),
                 ],
               ),
             ),
