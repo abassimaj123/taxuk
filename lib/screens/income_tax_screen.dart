@@ -718,15 +718,23 @@ class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
       centerBottom = 'Take-Home';
     }
 
+    final chartLabel = 'Salary breakdown: ${entries.map((e) {
+      final pct = (e.value / total * 100).toStringAsFixed(1);
+      return '${e.label} ${widget.fmtGbp.format(e.value)} ($pct%)';
+    }).join(', ')}';
+
     return SectionCard(
       title: 'Salary Breakdown',
       children: [
-        SizedBox(
-          height: 200,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              PieChart(
+        Semantics(
+          label: chartLabel,
+          excludeSemantics: true,
+          child: SizedBox(
+            height: 200,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                PieChart(
                 PieChartData(
                   sectionsSpace: 2,
                   centerSpaceRadius: CalcwiseChartTokens.donutCenterR,
@@ -772,6 +780,7 @@ class _TaxBreakdownDonutState extends State<_TaxBreakdownDonut> {
                 ],
               ),
             ],
+          ),
           ),
         ),
         const SizedBox(height: AppSpacing.md),
