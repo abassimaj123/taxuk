@@ -553,14 +553,14 @@ extension SelfEmployedNI on UKTaxEngine {
   // Accessed as static helpers below
 }
 
-/// Self-employed NI: Class 2 (£3.50/week if profits > SPT) + Class 4 (6%/2%)
+/// Self-employed NI: Class 2 (abolished 2024, now £0) + Class 4 (6%/2%)
 double calculateSelfEmployedNI(double grossProfit) {
-  const double class2Weekly = 3.50; // 2025-26
-  const double spt = 12570.0; // Small Profits Threshold
+  const double class2Weekly = 0.0; // ABOLISHED April 2024 — was £3.50/week pre-2024
+  const double spt = 12570.0; // Small Profits Threshold (Class 2 threshold, no longer used)
   const double lpl = 12570.0; // Lower Profits Limit
   const double upl = 50270.0; // Upper Profits Limit
   double ni = 0;
-  if (grossProfit > spt) ni += class2Weekly * 52;
+  if (grossProfit > spt) ni += class2Weekly * 52; // now always 0
   if (grossProfit > lpl) {
     ni += (min(grossProfit, upl) - lpl) * 0.06;
   }
@@ -572,13 +572,14 @@ double calculateSelfEmployedNI(double grossProfit) {
 
 /// Returns Class 2 + Class 4 as separate amounts for detailed display.
 /// Use alongside [calculateSelfEmployedNI] for self-employed scenarios.
+/// Note: Class 2 is now £0 (abolished April 2024); historical comment kept for reference.
 ({double class2, double class4}) calculateSelfEmployedNIBreakdown(
     double grossProfit) {
-  const double class2Weekly = 3.50; // 2025-26
+  const double class2Weekly = 0.0; // ABOLISHED April 2024 — was £3.50/week (£182/yr)
   const double spt = 12570.0;
   const double lpl = 12570.0;
   const double upl = 50270.0;
-  final class2 = grossProfit > spt ? class2Weekly * 52 : 0.0; // £179.40/yr
+  final class2 = grossProfit > spt ? class2Weekly * 52 : 0.0; // now always 0
   double class4 = 0;
   if (grossProfit > lpl) {
     class4 += (min(grossProfit, upl) - lpl) * 0.06; // 6% on £12,570-£50,270

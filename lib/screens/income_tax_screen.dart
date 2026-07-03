@@ -493,7 +493,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       ),
                       subtitle: Text(
                         _isSelfEmployed
-                            ? 'NI: £3.45/wk (Class 2) + 6%/2% on profits (Class 4)'
+                            ? 'NI: Class 2 abolished 2024 (£0) + 6%/2% Class 4 on profits'
                             : 'PAYE: Class 1 NI (8% / 2%)',
                         style: TextStyle(
                           fontSize: AppTextSize.sm,
@@ -1121,7 +1121,7 @@ class _SummaryCard extends StatelessWidget {
               ct,
               highlight: true,
             ),
-            _IndentRow(' ↳ Class 2 (£3.45/wk)', result.class2NI, fmtGbp, ct),
+            _IndentRow(' ↳ Class 2 (£0 - abolished 2024)', result.class2NI, fmtGbp, ct),
             _IndentRow(' ↳ Class 4 (6%/2%)', result.class4NI, fmtGbp, ct),
           ] else
             _Row(
@@ -1257,7 +1257,7 @@ class _NiBreakdown extends StatelessWidget {
         title: title,
         children: [
           if (class2NI > 0)
-            _SubRow('Class 2 (£3.45/week)', class2NI, fmtGbp, ct),
+            _SubRow('Class 2 (abolished 2024, £0)', class2NI, fmtGbp, ct),
           if (class4band1 > 0)
             _SubRow('Class 4 @ 6% (£12,570–£50,270)', class4band1, fmtGbp, ct),
           if (class4band2 > 0)
