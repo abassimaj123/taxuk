@@ -472,9 +472,9 @@ extension StudentLoanPlanLabel on StudentLoanPlan {
       case StudentLoanPlan.plan1:
         return 26065.0;
       case StudentLoanPlan.plan2:
-        return 27295.0;
+        return 28470.0;
       case StudentLoanPlan.plan4:
-        return 31395.0;
+        return 32745.0;
       case StudentLoanPlan.plan5:
         return 25000.0;
       case StudentLoanPlan.postgraduate:
@@ -697,8 +697,8 @@ class CGTResult {
 
   bool get hasGain => totalGain > 0;
   bool get hasTax => totalTax > 0;
-  double get basicRate => isResidentialProperty ? 0.18 : 0.10;
-  double get higherRate => isResidentialProperty ? 0.24 : 0.20;
+  double get basicRate => 0.18;
+  double get higherRate => 0.24;
 }
 
 CGTResult calculateCGT({
@@ -733,8 +733,8 @@ CGTResult calculateCGT({
   final gainInBasic = min(taxableGain, remainingBasic);
   final gainInHigher = taxableGain - gainInBasic;
 
-  final basicRate = isResidentialProperty ? 0.18 : 0.10;
-  final higherRate = isResidentialProperty ? 0.24 : 0.20;
+  final basicRate = 0.18;
+  final higherRate = 0.24;
 
   final taxBasic = gainInBasic * basicRate;
   final taxHigher = gainInHigher * higherRate;

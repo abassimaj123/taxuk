@@ -620,6 +620,7 @@ class _RatesReferenceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Each entry: (rowLabel, basicRateStr, higherRateStr, assetType)
+    // All asset classes use the same 18%/24% rates since 30 Oct 2024.
     const rows = [
       (
         'Residential Property',
@@ -629,8 +630,8 @@ class _RatesReferenceCard extends StatelessWidget {
       ),
       (
         'Other Assets (Shares, Crypto…)',
-        '10%',
-        '20%',
+        '18%',
+        '24%',
         _AssetType.other,
       ),
     ];
