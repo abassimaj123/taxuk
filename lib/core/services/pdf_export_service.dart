@@ -37,10 +37,14 @@ class _IncomeTaxParams {
     required this.pension,
     required this.isSelfEmployed,
     required this.dateStr,
+    this.hasMarriageAllowance = false,
+    this.marriageAllowanceCredit = 0,
   });
   final double gross, tax, ni, takeHome, effectiveTaxRate, marginalTaxRate, pension;
   final String region, dateStr;
   final bool isSelfEmployed;
+  final bool hasMarriageAllowance;
+  final double marriageAllowanceCredit;
 }
 
 class _SalaryComparisonParams {
@@ -137,10 +141,12 @@ class _RentalIncomeParams {
     required this.mortgageInterestCredit,
     required this.otherIncome,
     required this.dateStr,
+    this.isScotland = false,
   });
   final double grossRental, allowableExpenses, taxableProfit, taxAfterCredit;
   final double netProfit, effectiveYield, mortgageInterestCredit, otherIncome;
   final String dateStr;
+  final bool isScotland;
 }
 
 class _SavingsInterestParams {
@@ -184,9 +190,12 @@ Future<Uint8List> _buildIncomeTaxPdf(_IncomeTaxParams p) async {
           if (p.pension > 0) _isoRow('Pension Contribution', gbp.format(p.pension)),
           _isoRow('Tax Region', p.region),
           _isoRow('Employment Type', p.isSelfEmployed ? 'Self-Employed' : 'PAYE'),
+          _isoRow('Marriage Allowance', p.hasMarriageAllowance ? 'Applied' : 'Not applied'),
         ]),
         pw.SizedBox(height: 12),
         _isoSection('TAX BREAKDOWN', [
+          if (p.hasMarriageAllowance && p.marriageAllowanceCredit > 0)
+            _isoRow('Marriage Allowance Credit', '− ${gbp.format(p.marriageAllowanceCredit)}'),
           _isoRow('Income Tax', gbp.format(p.tax)),
           _isoRow('National Insurance', gbp.format(p.ni)),
           _isoRow('Total Deductions', gbp.format(p.tax + p.ni)),
@@ -397,7 +406,13 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
     build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _isoHeader('Rental Income Tax', 'UK Rental Income Tax Summary 2025/26', p.dateStr),
+        _isoHeader(
+          'Rental Income Tax',
+          p.isScotland
+              ? 'UK Rental Income Tax Summary 2025/26 (Scotland rates)'
+              : 'UK Rental Income Tax Summary 2025/26',
+          p.dateStr,
+        ),
         pw.SizedBox(height: 16),
         _isoHeroBox('NET PROFIT AFTER TAX', gbp.format(p.netProfit)),
         pw.SizedBox(height: 16),
@@ -406,6 +421,7 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
           _isoRow('Allowable Expenses', gbp.format(p.allowableExpenses)),
           _isoRow('Taxable Profit', gbp.format(p.taxableProfit)),
           if (p.otherIncome > 0) _isoRow('Other Income', gbp.format(p.otherIncome)),
+          _isoRow('Tax Region', p.isScotland ? 'Scotland' : 'England / Wales / NI'),
         ]),
         pw.SizedBox(height: 12),
         _isoSection('TAX CALCULATION', [
@@ -764,6 +780,8 @@ class TaxUkPdfExportService {
     required String region,
     double pension = 0,
     bool isSelfEmployed = false,
+    bool hasMarriageAllowance = false,
+    double marriageAllowanceCredit = 0,
   }) async {
     final params = _IncomeTaxParams(
       gross: gross,
@@ -775,6 +793,8 @@ class TaxUkPdfExportService {
       region: region,
       pension: pension,
       isSelfEmployed: isSelfEmployed,
+      hasMarriageAllowance: hasMarriageAllowance,
+      marriageAllowanceCredit: marriageAllowanceCredit,
       dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildIncomeTaxPdf(params));
@@ -933,6 +953,7 @@ class TaxUkPdfExportService {
     required double effectiveYield,
     double mortgageInterestCredit = 0,
     double otherIncome = 0,
+    bool isScotland = false,
   }) async {
     final params = _RentalIncomeParams(
       grossRental: grossRental,
@@ -943,6 +964,7 @@ class TaxUkPdfExportService {
       effectiveYield: effectiveYield,
       mortgageInterestCredit: mortgageInterestCredit,
       otherIncome: otherIncome,
+      isScotland: isScotland,
       dateStr: DateFormat('dd MMM yyyy', 'en').format(DateTime.now()),
     );
     final bytes = await Isolate.run(() => _buildRentalIncomePdf(params));

@@ -165,6 +165,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       'gross': _roundTo(r.grossIncome, 1000),
       'is_scotland': _isScotland ? 1 : 0,
       'is_self_employed': _isSelfEmployed ? 1 : 0,
+      'has_marriage_allowance': _hasMarriageAllowance ? 1 : 0,
       'pension': _roundTo(r.pensionContribution, 100),
     });
     smartHistoryService.scheduleAutoSave(
@@ -184,6 +185,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
         'ni_contributions': r.nationalInsurance,
         'net_income': r.netIncome,
         'effective_rate': r.effectiveTaxRate,
+        'has_marriage_allowance': r.hasMarriageAllowance,
       };
 
   Map<String, dynamic> _buildL2(IncomeTaxResult r) => {
@@ -191,7 +193,9 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
           'type': 'income_tax',
           'gross': r.grossIncome,
           'is_scotland': r.isScotland,
+          'region': _region.name,
           'is_self_employed': r.isSelfEmployed,
+          'has_marriage_allowance': r.hasMarriageAllowance,
           'pension': r.pensionContribution,
         },
         'results': {
@@ -212,6 +216,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       'gross': _roundTo(r.grossIncome, 1000),
       'is_scotland': _isScotland ? 1 : 0,
       'is_self_employed': _isSelfEmployed ? 1 : 0,
+      'has_marriage_allowance': _hasMarriageAllowance ? 1 : 0,
       'pension': _roundTo(r.pensionContribution, 100),
     });
     await smartHistoryService.saveScenario(
@@ -270,6 +275,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
       region: _region.label,
       pension: r.pensionContribution,
       isSelfEmployed: r.isSelfEmployed,
+      hasMarriageAllowance: r.hasMarriageAllowance,
+      marriageAllowanceCredit: r.marriageAllowanceCreditApplied,
     );
     analyticsService.logCalculationCompleted(
       params: {'type': 'income_tax_pdf_exported'},

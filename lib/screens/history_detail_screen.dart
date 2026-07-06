@@ -144,6 +144,8 @@ class HistoryDetailScreen extends StatefulWidget {
           _Row('Gross Salary', fmt.format((inputs['gross'] as num?)?.toDouble() ?? 0)),
           _Row('Tax Code', inputs['tax_code'] as String? ?? 'Standard'),
           if (inputs['is_scotland'] == true) _Row('Region', 'Scotland'),
+          if (inputs['has_marriage_allowance'] == true)
+            _Row('Marriage Allowance', 'Applied'),
         ];
       case 'dividend':
         final divTax = (results['dividendTax'] as num?)?.toDouble() ?? 0;

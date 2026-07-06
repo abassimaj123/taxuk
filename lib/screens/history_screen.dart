@@ -406,12 +406,14 @@ class _HistoryCard extends StatelessWidget {
         final taxAmt = (results['income_tax'] as num?)?.toDouble() ?? 0;
         final niAmt = (results['ni'] as num?)?.toDouble() ?? 0;
         final isScotland = inputs['is_scotland'] as bool? ?? false;
+        final hasMA = inputs['has_marriage_allowance'] as bool? ?? false;
         title = pinLabel?.isNotEmpty == true
             ? pinLabel!
             : 'Income Tax — ${fmtGbp.format(inputs['gross'] ?? 0)} gross';
         subtitle =
             'Take-home: ${fmtGbp.format(takeHome)} · Tax: ${fmtGbp.format(taxAmt)}'
-            ' · NI: ${fmtGbp.format(niAmt)}${isScotland ? ' (Scotland)' : ''}';
+            ' · NI: ${fmtGbp.format(niAmt)}${isScotland ? ' (Scotland)' : ''}'
+            '${hasMA ? ' · Marriage Allowance' : ''}';
         icon = Icons.account_balance_rounded;
       case 'dividend':
         final divTax = (results['dividendTax'] as num?)?.toDouble() ?? 0;

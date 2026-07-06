@@ -132,7 +132,8 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
           'rentalIncome': r.grossRental,
           'otherIncome': otherIncome,
           'expenses': r.allowableExpenses,
-          'propertyAllowance': _parse(_mortgageInterestCtrl),
+          'mortgageInterest': _parse(_mortgageInterestCtrl),
+          'isScotland': _isScotland,
         },
         'results': {
           'taxableProfit': r.taxableProfit,
@@ -168,7 +169,8 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
           'rentalIncome': r.grossRental,
           'otherIncome': otherIncome,
           'expenses': r.allowableExpenses,
-          'propertyAllowance': _parse(_mortgageInterestCtrl),
+          'mortgageInterest': _parse(_mortgageInterestCtrl),
+          'isScotland': _isScotland,
         },
         'results': {
           'taxableProfit': r.taxableProfit,
@@ -233,6 +235,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
           ? r.mortgageInterestCredit
           : 0,
       otherIncome: otherIncome,
+      isScotland: _isScotland,
     );
   }
 
