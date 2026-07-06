@@ -336,12 +336,16 @@ class _DataRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.md),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: highlight ? AppTextSize.body : AppTextSize.sm,
-              fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
-              color: highlight ? AppTheme.primary : ct.textPrimary,
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: highlight ? AppTextSize.body : AppTextSize.sm,
+                fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
+                color: highlight ? AppTheme.primary : ct.textPrimary,
+              ),
             ),
           ),
         ],
