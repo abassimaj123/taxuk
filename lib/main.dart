@@ -72,6 +72,9 @@ final adService = CalcwiseAdService(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Android 15+ (API 35) forces edge-to-edge; draw under transparent system
+  // bars ourselves instead of painting them opaque (deprecated pattern).
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await initializeDateFormatting('en_GB', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   unawaited(CalcwiseRemoteConfig.initialize());
@@ -239,8 +242,10 @@ class _MainShellState extends State<MainShell> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      systemNavigationBarColor:
-          isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+      // Transparent — the app draws under the system nav bar
+      // (edge-to-edge) instead of painting it opaque, per Android 15's
+      // forced behavior.
+      systemNavigationBarColor: Colors.transparent,
       systemNavigationBarIconBrightness:
           isDark ? Brightness.light : Brightness.dark,
     ));
