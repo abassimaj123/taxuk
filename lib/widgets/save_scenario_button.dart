@@ -47,35 +47,11 @@ class _SaveScenarioButtonState extends State<SaveScenarioButton> {
     }
   }
 
-  Future<String?> _showNameDialog() async {
-    final controller = TextEditingController();
-    final result = await showDialog<String>(
+  Future<String?> _showNameDialog() {
+    return showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Save Scenario'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            hintText: 'Scenario name (optional)',
-          ),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (_) => const _SaveScenarioNameDialog(),
     );
-    controller.dispose();
-    return result;
   }
 
   @override
@@ -96,6 +72,56 @@ class _SaveScenarioButtonState extends State<SaveScenarioButton> {
           minimumSize: const Size.fromHeight(48),
         ),
       ),
+    );
+  }
+}
+
+class _SaveScenarioNameDialog extends StatefulWidget {
+  const _SaveScenarioNameDialog();
+
+  @override
+  State<_SaveScenarioNameDialog> createState() =>
+      _SaveScenarioNameDialogState();
+}
+
+class _SaveScenarioNameDialogState extends State<_SaveScenarioNameDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Save Scenario'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        decoration: const InputDecoration(
+          hintText: 'Scenario name (optional)',
+        ),
+        onSubmitted: (v) => Navigator.pop(context, v),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: const Text('Save'),
+        ),
+      ],
     );
   }
 }
