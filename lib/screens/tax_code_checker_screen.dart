@@ -393,7 +393,7 @@ class _DisclaimerCard extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(top: AppSpacing.xs),
         child: Text(
-          'This is a guide based on HMRC 2025/26 tax codes. Always check your '
+          'This is a guide based on HMRC 2026/27 tax codes. Always check your '
           'official tax code with HMRC or your employer.',
           style: TextStyle(
             fontSize: AppTextSize.xs,

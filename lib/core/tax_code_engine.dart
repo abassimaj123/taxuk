@@ -1,11 +1,11 @@
-/// UK Tax Code Checker — 2025/26 rules (HMRC).
+/// UK Tax Code Checker — 2026/27 rules (HMRC).
 ///
 /// Parses a PAYE tax code (e.g. "1257L", "BR", "D0", "K475", "1257L W1/M1")
 /// and explains what it means: the personal allowance it implies, the meaning
 /// of its suffix/letter, the region (England/NI, Scotland, Wales) and whether
 /// it is an emergency (non-cumulative) code.
 ///
-/// Reference values 2025/26:
+/// Reference values 2026/27:
 ///   - Standard Personal Allowance: £12,570  → numeric code 1257L
 ///   - The number × 10 ≈ the tax-free allowance for the year.
 ///   - BR = all income taxed at basic rate (20%)
@@ -172,7 +172,7 @@ class TaxCodeEngine {
           letterMeaning =
               'You are entitled to the standard tax-free Personal Allowance. '
               'The most common tax code — 1257L matches the full £12,570 '
-              'allowance for 2025/26.';
+              'allowance for 2026/27.';
           break;
         case 'M':
           letterMeaning =

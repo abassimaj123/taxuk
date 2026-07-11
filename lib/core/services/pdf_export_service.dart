@@ -264,7 +264,7 @@ Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
     build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _isoHeader('Capital Gains Tax', 'UK CGT Summary 2025/26', p.dateStr),
+        _isoHeader('Capital Gains Tax', 'UK CGT Summary 2026/27', p.dateStr),
         pw.SizedBox(height: 16),
         _isoHeroBox('CGT DUE', gbp.format(p.totalTax)),
         pw.SizedBox(height: 16),
@@ -278,7 +278,7 @@ Future<Uint8List> _buildCgtPdf(_CgtParams p) async {
         pw.SizedBox(height: 12),
         _isoSection('GAIN CALCULATION', [
           _isoRow('Total Gain', gbp.format(p.totalGain)),
-          _isoRow('Annual Exemption (2025/26)', gbp.format(p.annualExemption)),
+          _isoRow('Annual Exemption (2026/27)', gbp.format(p.annualExemption)),
           _isoRow('Taxable Gain', gbp.format(p.taxableGain)),
           _isoRowHighlight('Capital Gains Tax Due', gbp.format(p.totalTax)),
           _isoRow('Effective Rate on Gain', '${pct.format(p.effectiveRate * 100)}%'),
@@ -303,7 +303,7 @@ Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
     build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _isoHeader('Dividend Tax Calculator', 'UK Dividend Tax Summary 2025/26', p.dateStr),
+        _isoHeader('Dividend Tax Calculator', 'UK Dividend Tax Summary 2026/27', p.dateStr),
         pw.SizedBox(height: 16),
         _isoHeroBox('DIVIDEND TAX DUE', gbp.format(p.taxDue)),
         pw.SizedBox(height: 16),
@@ -314,7 +314,7 @@ Future<Uint8List> _buildDividendPdf(_DividendParams p) async {
         ]),
         pw.SizedBox(height: 12),
         _isoSection('DIVIDEND TAX CALCULATION', [
-          _isoRow('Dividend Allowance (2025/26)', gbp.format(p.allowance)),
+          _isoRow('Dividend Allowance (2026/27)', gbp.format(p.allowance)),
           _isoRow('Taxable Dividend', gbp.format(p.taxableDividend)),
           _isoRowHighlight('Tax Due', gbp.format(p.taxDue)),
           _isoRow('Effective Rate on Dividend', '${pct.format(p.effectiveRate * 100)}%'),
@@ -409,8 +409,8 @@ Future<Uint8List> _buildRentalIncomePdf(_RentalIncomeParams p) async {
         _isoHeader(
           'Rental Income Tax',
           p.isScotland
-              ? 'UK Rental Income Tax Summary 2025/26 (Scotland rates)'
-              : 'UK Rental Income Tax Summary 2025/26',
+              ? 'UK Rental Income Tax Summary 2026/27 (Scotland rates)'
+              : 'UK Rental Income Tax Summary 2026/27',
           p.dateStr,
         ),
         pw.SizedBox(height: 16),
@@ -451,7 +451,7 @@ Future<Uint8List> _buildSavingsInterestPdf(_SavingsInterestParams p) async {
     build: (pw.Context ctx) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _isoHeader('Savings Interest Tax', 'UK Savings Interest Tax Summary 2025/26', p.dateStr),
+        _isoHeader('Savings Interest Tax', 'UK Savings Interest Tax Summary 2026/27', p.dateStr),
         pw.SizedBox(height: 16),
         _isoHeroBox('TAX DUE ON INTEREST', gbp.format(p.taxDue)),
         pw.SizedBox(height: 16),

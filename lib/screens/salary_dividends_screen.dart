@@ -11,7 +11,7 @@ import '../core/theme/app_theme.dart';
 import '../main.dart' show adService, analyticsService;
 import '../widgets/paywall_soft.dart';
 
-// ── Corporation Tax (2025/26) ─────────────────────────────────────────────────
+// ── Corporation Tax (2026/27) ─────────────────────────────────────────────────
 
 const double _corpTaxSmall = 0.19;
 const double _corpTaxMain = 0.25;
@@ -34,8 +34,10 @@ double _corpTaxEffectiveRate(double profit) =>
 
 // ── Employer NI ───────────────────────────────────────────────────────────────
 
-const double _employerNiThreshold = 9100.0;
-const double _employerNiRate = 0.138;
+// Secondary Threshold cut to £5,000 and rate raised to 15% from 6 April 2025
+// (Autumn Budget 2024); unchanged for 2026/27.
+const double _employerNiThreshold = 5000.0;
+const double _employerNiRate = 0.15;
 
 double _employerNI(double salary) =>
     salary > _employerNiThreshold ? (salary - _employerNiThreshold) * _employerNiRate : 0;
@@ -778,7 +780,7 @@ class _EmployerNiCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
             child: Text(
-              'Employers pay 13.8% NI on salary above £9,100. '
+              'Employers pay 15% NI on salary above £5,000. '
               'Dividends are exempt from employer NI — a key advantage of the dividend route.',
               style: TextStyle(
                 fontSize: AppTextSize.sm,
@@ -992,14 +994,14 @@ class _CorpTaxNoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionCard(
-        title: '2025/26 Rates Used',
+        title: '2026/27 Rates Used',
         children: [
           for (final row in const [
             ('Corp Tax (small)', '19% (profits ≤ £50k)'),
             ('Corp Tax (marginal)', '19–25% (£50k–£250k)'),
             ('Corp Tax (main)', '25% (profits > £250k)'),
             ('Dividend Allowance', '£500'),
-            ('Employer NI rate', '13.8% above £9,100'),
+            ('Employer NI rate', '15% above £5,000'),
             ('Employee NI', '8% (£12,570–£50,270)'),
           ])
             Padding(

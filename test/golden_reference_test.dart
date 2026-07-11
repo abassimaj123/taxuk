@@ -82,21 +82,21 @@ void main() {
     });
   });
 
-  // ── Scotland marginal rates 2025/26 ──────────────────────────────────────
+  // ── Scotland marginal rates 2026/27 ──────────────────────────────────────
 
-  group('UKTaxEngine.marginalTaxRate — Scotland 2025/26', () {
-    test('TUK-G13: Scotland starter rate 19% → 0.19 (taxable ≤ £2,827)', () {
-      // Gross £14,000 → taxable = 14000-12570 = 1430 ≤ 2827 → 19%
+  group('UKTaxEngine.marginalTaxRate — Scotland 2026/27', () {
+    test('TUK-G13: Scotland starter rate 19% → 0.19 (taxable ≤ £3,967)', () {
+      // Gross £14,000 → taxable = 14000-12570 = 1430 ≤ 3967 → 19%
       expect(UKTaxEngine.marginalTaxRate(14000, isScotland: true), closeTo(0.19, 0.001));
     });
 
-    test('TUK-G14: Scotland basic rate 20% (taxable £2,828–£14,921)', () {
-      // Gross £20,000 → taxable = 7430 > 2827 and ≤ 14921 → 20%
+    test('TUK-G14: Scotland basic rate 20% (taxable £3,968–£16,956)', () {
+      // Gross £20,000 → taxable = 7430 > 3967 and ≤ 16956 → 20%
       expect(UKTaxEngine.marginalTaxRate(20000, isScotland: true), closeTo(0.20, 0.001));
     });
 
-    test('TUK-G15: Scotland intermediate rate 21% (taxable £14,922–£31,092)', () {
-      // Gross £35,000 → taxable = 22430 > 14921 and ≤ 31092 → 21%
+    test('TUK-G15: Scotland intermediate rate 21% (taxable £16,957–£31,092)', () {
+      // Gross £35,000 → taxable = 22430 > 16956 and ≤ 31092 → 21%
       expect(UKTaxEngine.marginalTaxRate(35000, isScotland: true), closeTo(0.21, 0.001));
     });
 

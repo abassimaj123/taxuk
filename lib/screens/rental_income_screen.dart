@@ -342,7 +342,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: Text(
-                  'Mortgage interest is not deductible from profit. A 20% tax credit applies instead (2025/26 rules).',
+                  'Mortgage interest is not deductible from profit. A 20% tax credit applies instead (2026/27 rules).',
                   style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary),
                 ),
               ),
@@ -380,7 +380,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
                         label: 'TAX DUE',
                         value: _fmtGbp.format(r.taxAfterCredit),
                         secondary:
-                            '2025/26 rates · Rental Income',
+                            '2026/27 rates · Rental Income',
                         rawValue: r.taxAfterCredit,
                         valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         stats: [
@@ -573,7 +573,7 @@ class _RentalRulesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionCard(
-        title: '2025/26 Rental Income Rules',
+        title: '2026/27 Rental Income Rules',
         children: [
           for (final entry in const [
             (

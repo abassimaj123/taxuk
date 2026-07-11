@@ -289,7 +289,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                       child: CalcwiseHeroCard(
                         label: 'DIVIDEND TAX DUE',
                         value: _fmtGbp.format(r.taxDue),
-                        secondary: '2025/26 rates · ${r.band} Rate taxpayer',
+                        secondary: '2026/27 rates · ${r.band} Rate taxpayer',
                         rawValue: r.taxDue,
                         valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         rawStats: [
@@ -381,9 +381,9 @@ class _DividendInsightCard extends StatelessWidget {
   String get _rateStr {
     switch (result.band) {
       case 'Basic':
-        return '8.75%';
+        return '10.75%';
       case 'Higher':
-        return '33.75%';
+        return '35.75%';
       default:
         return '39.35%';
     }
@@ -473,11 +473,11 @@ class _DividendRatesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionCard(
-        title: '2025/26 Dividend Tax Rates',
+        title: '2026/27 Dividend Tax Rates',
         children: [
           for (final entry in const [
-            ('Basic Rate (up to £50,270)', '8.75%', 'Basic'),
-            ('Higher Rate (£50,270–£125,140)', '33.75%', 'Higher'),
+            ('Basic Rate (up to £50,270)', '10.75%', 'Basic'),
+            ('Higher Rate (£50,270–£125,140)', '35.75%', 'Higher'),
             ('Additional Rate (above £125,140)', '39.35%', 'Additional'),
           ]) ...[
             Padding(
@@ -526,7 +526,7 @@ class _DividendRatesCard extends StatelessWidget {
           ],
           Divider(color: ct.cardBorder, height: AppSpacing.xl, thickness: 1),
           Text(
-            'Dividend allowance: £500 (2025/26). '
+            'Dividend allowance: £500 (2026/27). '
             'Dividends are not subject to Scottish income tax — same rates apply throughout the UK.',
             style:
                 TextStyle(fontSize: AppTextSize.xs, color: ct.textSecondary, height: 1.5),

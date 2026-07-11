@@ -16,7 +16,7 @@ class OnboardingScreen extends StatelessWidget {
             title: 'Know Your\nTake-Home Pay',
             subtitle:
                 'Enter your salary and instantly see how much you keep after '
-                'Income Tax and National Insurance — with 2025/26 rates for '
+                'Income Tax and National Insurance — with 2026/27 rates for '
                 'England, Wales, NI and Scotland.',
             pills: [
               'England & Wales',
@@ -33,7 +33,7 @@ class OnboardingScreen extends StatelessWidget {
                 'and property, UK dividend tax, student loan repayments, '
                 'VAT, and compare two job offers side by side.',
             pills: [
-              'CGT 2025/26',
+              'CGT 2026/27',
               'Dividends',
               'Student Loan',
               'Salary Compare',

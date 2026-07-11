@@ -302,7 +302,7 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
                         label: 'TAX DUE ON SAVINGS',
                         value: _fmtGbp.format(r.taxDue),
                         secondary:
-                            '2025/26 rates · ${r.band} taxpayer',
+                            '2026/27 rates · ${r.band} taxpayer',
                         rawValue: r.taxDue,
                         valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         stats: [
@@ -493,7 +493,7 @@ class _SavingsRatesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionCard(
-        title: '2025/26 Personal Savings Allowance',
+        title: '2026/27 Personal Savings Allowance',
         children: [
           for (final entry in const [
             ('Basic Rate (up to £50,270)', '£1,000 PSA', 'Basic Rate'),

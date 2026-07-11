@@ -360,7 +360,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                       child: CalcwiseHeroCard(
                         label: 'ANNUAL TAKE-HOME',
                         value: _fmtGbp.format(r.netIncome),
-                        secondary: '${_region.label} rates 2025/26',
+                        secondary: '${_region.label} rates 2026/27',
                         rawValue: r.netIncome,
                         valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         rawStats: [

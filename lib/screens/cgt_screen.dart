@@ -416,7 +416,7 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
                         label: 'CAPITAL GAINS TAX DUE',
                         value: _fmtGbp.format(r.totalTax),
                         secondary:
-                            '${_assetType.shortLabel} · 2025/26 rates',
+                            '${_assetType.shortLabel} · 2026/27 rates',
                         rawValue: r.totalTax,
                         valueFormatter: (v) => AmountFormatter.ui(v, 'GBP'),
                         rawStats: [
@@ -637,7 +637,7 @@ class _RatesReferenceCard extends StatelessWidget {
     ];
 
     return SectionCard(
-      title: '2025/26 CGT Rates',
+      title: '2026/27 CGT Rates',
       children: [
         // Header row
         Padding(
@@ -677,7 +677,7 @@ class _RatesReferenceCard extends StatelessWidget {
         Divider(color: ct.cardBorder, height: AppSpacing.sm, thickness: 1),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          'Annual CGT exemption: £3,000 (2025/26). '
+          'Annual CGT exemption: £3,000 (2026/27). '
           'Basic rate applies to gains within your remaining Income Tax basic rate band.',
           style: TextStyle(
             fontSize: AppTextSize.xs,

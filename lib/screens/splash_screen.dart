@@ -10,7 +10,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) => CalcwiseSplash(
         appName: 'Tax',
         appSuffix: 'UK',
-        tagline: 'UK Tax Calculator 2025/26',
+        tagline: 'UK Tax Calculator 2026/27',
         chips: const [
           'Income Tax',
           'Scottish Rates',

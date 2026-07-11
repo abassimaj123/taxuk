@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:calcwise_core/calcwise_core.dart';
 
-/// UK income-tax region. Only Scotland has its own rates/bands for 2025/26.
+/// UK income-tax region. Only Scotland has its own rates/bands for 2026/27.
 ///
 /// Wales has the Welsh Rate of Income Tax (WRIT): the UK rates are reduced by
 /// 10p in each band and the Welsh Government adds back 10p, so the effective
@@ -57,7 +57,7 @@ extension IncomeTaxRegionInfo on IncomeTaxRegion {
   }
 }
 
-/// UK Tax Engine — 2025/26 rates
+/// UK Tax Engine — 2026/27 rates
 /// Covers Income Tax (England/Wales/NI + Scotland), National Insurance (Class 1),
 /// and VAT (Standard 20%, Reduced 5%, Zero 0%, Custom).
 class UKTaxEngine {
@@ -70,8 +70,8 @@ class UKTaxEngine {
   // UK band fallback limits (used only by marginalTaxRate — main calc uses registry)
   static const double ukBasicLimit = 37700.0;
   static const double ukHigherLimit = 125140.0;
-  static const double scotStarterLimit = 2827.0;
-  static const double scotBasicLimit = 14921.0;
+  static const double scotStarterLimit = 3967.0;
+  static const double scotBasicLimit = 16956.0;
   static const double scotIntermediateLimit = 31092.0;
   static const double scotHigherLimit = 62430.0;
 
@@ -333,21 +333,22 @@ class IncomeTaxResult {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// Dividend Tax (2024/25 — same rates for 2025/26)
+// Dividend Tax (2024/25 — same rates for 2026/27)
 // ══════════════════════════════════════════════════════════════════════════
 
 extension DividendTax on UKTaxEngine {
   // All static — accessed via UKTaxEngine.calculateDividend(...)
 }
 
-/// 2025/26 UK dividend tax constants (inchangés depuis 2024/25)
+/// 2026/27 UK dividend tax constants. Basic/higher rates rose 2pp from
+/// 6 April 2026 (Autumn Budget 2025); additional rate is unchanged.
 class DividendTaxConstants {
   DividendTaxConstants._();
   static const double allowance = 500.0;
   static const double basicRateThreshold = 50270.0; // total income
   static const double higherRateThreshold = 125140.0;
-  static const double basicRate = 0.0875;
-  static const double higherRate = 0.3375;
+  static const double basicRate = 0.1075;
+  static const double higherRate = 0.3575;
   static const double additionalRate = 0.3935;
 }
 
@@ -470,11 +471,11 @@ extension StudentLoanPlanLabel on StudentLoanPlan {
   double get threshold {
     switch (this) {
       case StudentLoanPlan.plan1:
-        return 26065.0;
+        return 26900.0;
       case StudentLoanPlan.plan2:
-        return 28470.0;
+        return 29385.0;
       case StudentLoanPlan.plan4:
-        return 32745.0;
+        return 33795.0;
       case StudentLoanPlan.plan5:
         return 25000.0;
       case StudentLoanPlan.postgraduate:
@@ -546,7 +547,7 @@ StudentLoanResult calculateStudentLoan({
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// Self-Employed National Insurance (Class 2 + Class 4) 2025/26
+// Self-Employed National Insurance (Class 2 + Class 4) 2026/27
 // ══════════════════════════════════════════════════════════════════════════
 
 extension SelfEmployedNI on UKTaxEngine {
@@ -599,7 +600,7 @@ double grossAfterPension(double gross, double pensionContrib) =>
     max(0.0, gross - pensionContrib);
 
 // ══════════════════════════════════════════════════════════════════════════
-// Marriage Allowance (2025/26)
+// Marriage Allowance (2026/27)
 // ══════════════════════════════════════════════════════════════════════════
 
 /// Marriage Allowance tax credit for recipient (£1,260 @ 20% = £252/year)
@@ -667,7 +668,7 @@ double reverseCalculateGross({
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// Capital Gains Tax (CGT) 2025/26
+// Capital Gains Tax (CGT) 2026/27
 // ══════════════════════════════════════════════════════════════════════════
 
 class CGTResult {
@@ -755,10 +756,10 @@ CGTResult calculateCGT({
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// Rental Income Tax (2025/26)
+// Rental Income Tax (2026/27)
 // ══════════════════════════════════════════════════════════════════════════
 
-/// Result model for UK rental income tax calculation (2025/26 rules).
+/// Result model for UK rental income tax calculation (2026/27 rules).
 class RentalIncomeResult {
   final double grossRental;
   final double allowableExpenses;
@@ -781,7 +782,7 @@ class RentalIncomeResult {
   });
 }
 
-/// Calculate UK rental income tax (2025/26 rules).
+/// Calculate UK rental income tax (2026/27 rules).
 /// Mortgage interest is NOT deducted from profit — instead a 20% tax credit applies.
 RentalIncomeResult calculateRentalIncomeTax({
   required double grossRental,
@@ -829,10 +830,10 @@ RentalIncomeResult calculateRentalIncomeTax({
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// Savings Interest Tax (2025/26)
+// Savings Interest Tax (2026/27)
 // ══════════════════════════════════════════════════════════════════════════
 
-/// Personal Savings Allowance 2025/26.
+/// Personal Savings Allowance 2026/27.
 /// Scottish higher rate starts at £43,662 (vs £50,270 for rest of UK).
 double personalSavingsAllowance(double grossIncome, {bool isScotland = false}) {
   final higherThreshold = isScotland ? 43662.0 : 50270.0;
@@ -871,7 +872,7 @@ class SavingsInterestResult {
   });
 }
 
-/// Calculate UK savings interest tax (2025/26).
+/// Calculate UK savings interest tax (2026/27).
 SavingsInterestResult calculateSavingsInterestTax({
   required double grossInterest,
   required double otherIncome, // employment/self-emp income
