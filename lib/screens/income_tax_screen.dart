@@ -366,7 +366,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> with CalcwiseAutoCalc
                         rawStats: [
                           (label: 'Income Tax', value: r.incomeTax, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
                           (label: r.isSelfEmployed ? 'NI (Class 2+4)' : 'NI', value: r.nationalInsurance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                          (label: 'Effective Rate', value: r.effectiveOverallRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                          (label: 'Effective Rate', value: r.effectiveOverallRate, formatter: (v) => '${(v * 100).toStringAsFixed(1)}%'),
                         ],
                         stats: [
                           (

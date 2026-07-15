@@ -153,7 +153,7 @@ class HistoryDetailScreen extends StatefulWidget {
         return [
           _Row('Tax Due', fmt.format(divTax), isResult: true, isHighlight: true),
           _Row('Net Dividend', fmt.format(divIncome - divTax), isResult: true),
-          _Row('Effective Rate', '${((results['effectiveRate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
+          _Row('Effective Rate', '${(((results['effectiveRate'] as num?)?.toDouble() ?? 0) * 100).toStringAsFixed(1)}%', isResult: true),
           _Row('Gross Dividend', fmt.format(divIncome)),
           _Row('Other Income', fmt.format((inputs['grossIncome'] as num?)?.toDouble() ?? 0)),
           _Row('Taxable Dividend', fmt.format((results['taxableDiv'] as num?)?.toDouble() ?? 0)),
@@ -170,7 +170,7 @@ class HistoryDetailScreen extends StatefulWidget {
         return [
           _Row('CGT Due', fmt.format((results['cgtTax'] as num?)?.toDouble() ?? 0), isResult: true, isHighlight: true),
           _Row('Taxable Gain', fmt.format((results['taxableGain'] as num?)?.toDouble() ?? 0), isResult: true),
-          _Row('Effective Rate', '${((results['effectiveRate'] as num?)?.toDouble() ?? 0).toStringAsFixed(1)}%', isResult: true),
+          _Row('Effective Rate', '${(((results['effectiveRate'] as num?)?.toDouble() ?? 0) * 100).toStringAsFixed(1)}%', isResult: true),
           _Row('Total Gain', fmt.format((inputs['gains'] as num?)?.toDouble() ?? 0)),
           _Row('Asset Type', inputs['assetType'] as String? ?? ''),
           _Row('Annual Exemption', fmt.format((results['allowance'] as num?)?.toDouble() ?? 0)),

@@ -295,7 +295,7 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
                         rawStats: [
                           (label: 'Taxable Dividend', value: r.taxableDividend, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
                           (label: 'Allowance Used', value: r.allowance, formatter: (v) => AmountFormatter.ui(v, 'GBP')),
-                          (label: 'Effective Rate', value: r.effectiveRate, formatter: (v) => '${v.toStringAsFixed(1)}%'),
+                          (label: 'Effective Rate', value: r.effectiveRate, formatter: (v) => '${(v * 100).toStringAsFixed(1)}%'),
                         ],
                         stats: [
                           (
