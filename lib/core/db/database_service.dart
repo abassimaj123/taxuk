@@ -17,7 +17,7 @@ class DatabaseService {
     final path = join(await getDatabasesPath(), 'taxuk_history.db');
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, v) => db.execute('''
         CREATE TABLE history (
           id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +28,8 @@ class DatabaseService {
           input_hash TEXT,
           pin_label  TEXT,
           pin_order  INTEGER NOT NULL DEFAULT 0,
-          l1_json    TEXT
+          l1_json    TEXT,
+          screen_id  TEXT    NOT NULL DEFAULT 'income_tax'
         )
       '''),
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -40,6 +41,15 @@ class DatabaseService {
           await db.execute(
               'ALTER TABLE history ADD COLUMN pin_order INTEGER NOT NULL DEFAULT 0');
           await db.execute('ALTER TABLE history ADD COLUMN l1_json TEXT');
+        }
+        if (oldVersion < 3) {
+          // Scope history rows by screen so hash-based dedup/lookup never
+          // merges saves from two different calculators that happen to hash
+          // to the same rounded inputs. Existing rows predate multi-screen
+          // SmartHistory usage and default to 'income_tax' (the only screen
+          // originally wired through this table).
+          await db.execute(
+              "ALTER TABLE history ADD COLUMN screen_id TEXT NOT NULL DEFAULT 'income_tax'");
         }
       },
     );
@@ -82,10 +92,13 @@ class DatabaseService {
     return rows.map(_decodeRow).toList();
   }
 
-  Future<Map<String, dynamic>?> getHistoryByHash(String hash) async {
+  Future<Map<String, dynamic>?> getHistoryByHash(
+      String hash, String screenId) async {
     final database = await db;
     final rows = await database.query('history',
-        where: 'input_hash = ?', whereArgs: [hash], limit: 1);
+        where: 'input_hash = ? AND screen_id = ?',
+        whereArgs: [hash, screenId],
+        limit: 1);
     if (rows.isEmpty) return null;
     return _decodeRow(rows.first);
   }
@@ -168,5 +181,6 @@ class DatabaseService {
         'pin_label': r['pin_label'],
         'pin_order': r['pin_order'] ?? 0,
         'l1_json': r['l1_json'],
+        'screen_id': r['screen_id'] ?? 'income_tax',
       };
 }
