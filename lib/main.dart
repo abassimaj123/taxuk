@@ -311,17 +311,22 @@ class _MainShellState extends State<MainShell> {
           ),
         ],
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: List.generate(
-          _screens.length,
-          (i) => IgnorePointer(
-            ignoring: _index != i,
-            child: CalcwiseTabReveal(active: _index == i, child: _screens[i]),
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          fit: StackFit.expand,
+          children: List.generate(
+            _screens.length,
+            (i) => IgnorePointer(
+              ignoring: _index != i,
+              child: CalcwiseTabReveal(active: _index == i, child: _screens[i]),
+            ),
           ),
         ),
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
         decoration: BoxDecoration(
           color: ct.surface,
           border: Border(top: BorderSide(color: ct.cardBorder)),
@@ -373,6 +378,7 @@ class _MainShellState extends State<MainShell> {
               label: 'History',
             ),
           ],
+        ),
         ),
       ),
     );
