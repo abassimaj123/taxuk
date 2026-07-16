@@ -8,7 +8,8 @@ class AdConfig {
   static const bool adsEnabled = true;
 
   // ── Google official TEST ad unit IDs (debug + release fallback) ──────────
-  static const _testBannerAndroid = 'ca-app-pub-3940256099942544/6300978111';
+  // Adaptive banner test unit — fixed 320x50 unit letterboxes when requested at an adaptive size.
+  static const _testBannerAndroid = 'ca-app-pub-3940256099942544/9214589741';
   static const _testInterstitialAndroid = 'ca-app-pub-3940256099942544/1033173712';
   static const _testRewardedAndroid = 'ca-app-pub-3940256099942544/5224354917';
   static const _testBannerIOS = 'ca-app-pub-3940256099942544/2934735716';
