@@ -188,9 +188,9 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Student Loan')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(

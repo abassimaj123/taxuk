@@ -61,9 +61,9 @@ class _TaxCodeCheckerScreenState extends State<TaxCodeCheckerScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tax Code Checker')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(

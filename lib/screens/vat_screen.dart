@@ -241,9 +241,9 @@ class _VatScreenState extends State<VatScreen> with CalcwiseAutoCalcMixin {
   Widget build(BuildContext context) {
     final ct = CalcwiseTheme.of(context);
     final r = _result;
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('VAT Calculator')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(

@@ -198,9 +198,9 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Savings Interest')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(

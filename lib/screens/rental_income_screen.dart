@@ -244,9 +244,9 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
     final ct = CalcwiseTheme.of(context);
     final r = _result;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Rental Income')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(

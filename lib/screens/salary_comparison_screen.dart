@@ -305,9 +305,9 @@ class _SalaryComparisonScreenState extends State<SalaryComparisonScreen> with Ca
     final rA = _resultA;
     final rB = _resultB;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Salary Comparison')),
+      body: Column(
       children: [
         Expanded(
           child: ListView(
