@@ -15,7 +15,10 @@ import '../widgets/save_scenario_button.dart';
 import 'history_screen.dart';
 
 class SavingsInterestScreen extends StatefulWidget {
-  const SavingsInterestScreen({super.key});
+  /// Optional pre-filled other income from the income tax tab.
+  final double? initialGrossIncome;
+
+  const SavingsInterestScreen({super.key, this.initialGrossIncome});
 
   @override
   State<SavingsInterestScreen> createState() => _SavingsInterestScreenState();
@@ -24,7 +27,7 @@ class SavingsInterestScreen extends StatefulWidget {
 class _SavingsInterestScreenState extends State<SavingsInterestScreen>
     with CalcwiseAutoCalcMixin {
   final _grossInterestCtrl = TextEditingController(text: '2000');
-  final _otherIncomeCtrl = TextEditingController(text: '35000');
+  late final TextEditingController _otherIncomeCtrl;
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
 
   SavingsInterestResult? _result;
@@ -34,6 +37,10 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
   void initState() {
     super.initState();
     analyticsService.logScreenView('savings_interest');
+    final initial = widget.initialGrossIncome;
+    _otherIncomeCtrl = TextEditingController(
+      text: initial != null ? initial.round().toString() : '35000',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });
@@ -202,6 +209,11 @@ class _SavingsInterestScreenState extends State<SavingsInterestScreen>
       appBar: AppBar(title: const Text('Savings Interest')),
       body: Column(
       children: [
+        if (widget.initialGrossIncome != null)
+          CalcSourceBanner(
+            label: 'From your Income Tax calculator:',
+            summary: '${_fmtGbp.format(widget.initialGrossIncome!)} other income',
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(

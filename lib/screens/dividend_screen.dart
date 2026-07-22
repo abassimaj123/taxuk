@@ -201,6 +201,11 @@ class _DividendScreenState extends State<DividendScreen> with CalcwiseAutoCalcMi
       type: MaterialType.transparency,
       child: Column(
       children: [
+        if (widget.initialGrossIncome != null)
+          CalcSourceBanner(
+            label: 'From your Income Tax calculator:',
+            summary: '${_fmtGbp.format(widget.initialGrossIncome!)} gross salary',
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(

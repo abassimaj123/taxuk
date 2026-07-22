@@ -15,7 +15,10 @@ import '../widgets/save_scenario_button.dart';
 import 'history_screen.dart';
 
 class RentalIncomeScreen extends StatefulWidget {
-  const RentalIncomeScreen({super.key});
+  /// Optional pre-filled other income from the income tax tab.
+  final double? initialGrossIncome;
+
+  const RentalIncomeScreen({super.key, this.initialGrossIncome});
 
   @override
   State<RentalIncomeScreen> createState() => _RentalIncomeScreenState();
@@ -31,7 +34,7 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
   final _utilitiesCtrl = TextEditingController(text: '0');
   final _otherExpensesCtrl = TextEditingController(text: '0');
   final _mortgageInterestCtrl = TextEditingController(text: '0');
-  final _otherIncomeCtrl = TextEditingController(text: '35000');
+  late final TextEditingController _otherIncomeCtrl;
 
   final _fmtGbp = NumberFormat.currency(locale: 'en_GB', symbol: '£');
   final _fmtPct = NumberFormat('##0.00', 'en_GB');
@@ -43,6 +46,10 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
   void initState() {
     super.initState();
     analyticsService.logScreenView('rental_income');
+    final initial = widget.initialGrossIncome;
+    _otherIncomeCtrl = TextEditingController(
+      text: initial != null ? initial.round().toString() : '35000',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _calculate();
     });
@@ -248,6 +255,11 @@ class _RentalIncomeScreenState extends State<RentalIncomeScreen>
       appBar: AppBar(title: const Text('Rental Income')),
       body: Column(
       children: [
+        if (widget.initialGrossIncome != null)
+          CalcSourceBanner(
+            label: 'From your Income Tax calculator:',
+            summary: '${_fmtGbp.format(widget.initialGrossIncome!)} other income',
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(

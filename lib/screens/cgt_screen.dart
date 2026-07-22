@@ -267,6 +267,11 @@ class _CGTScreenState extends State<CGTScreen> with CalcwiseAutoCalcMixin {
       type: MaterialType.transparency,
       child: Column(
       children: [
+        if (widget.initialGrossIncome != null)
+          CalcSourceBanner(
+            label: 'From your Income Tax calculator:',
+            summary: '${_fmtGbp.format(widget.initialGrossIncome!)} gross income',
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(

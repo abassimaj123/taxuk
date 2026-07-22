@@ -50,13 +50,17 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
         icon: Icons.home_work_rounded,
         label: 'Rental Income',
         subtitle: 'Rental profit & tax estimate',
-        screen: const RentalIncomeScreen(),
+        screenBuilder: () => RentalIncomeScreen(
+          initialGrossIncome: grossIncomeNotifier.value,
+        ),
       ),
       _ToolEntry(
         icon: Icons.savings_rounded,
         label: 'Savings Interest',
         subtitle: 'PSA & ISA tax on savings',
-        screen: const SavingsInterestScreen(),
+        screenBuilder: () => SavingsInterestScreen(
+          initialGrossIncome: grossIncomeNotifier.value,
+        ),
       ),
       _ToolEntry(
         icon: Icons.balance_rounded,
@@ -71,10 +75,24 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       body: SafeArea(
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: tools.length,
+          itemCount: tools.length + 1,
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, i) {
-            final t = tools[i];
+            if (i == 0) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '6 secondary calculators — VAT, tax code, student loan, rental '
+                  'income, savings interest and salary vs dividends.',
+                  style: TextStyle(
+                    fontSize: AppTextSize.sm,
+                    color: ct.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              );
+            }
+            final t = tools[i - 1];
             return _ToolTile(entry: t, ct: ct);
           },
         ),

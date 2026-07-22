@@ -192,6 +192,11 @@ class _StudentLoanScreenState extends State<StudentLoanScreen> with CalcwiseAuto
       appBar: AppBar(title: const Text('Student Loan')),
       body: Column(
       children: [
+        if (widget.initialGrossIncome != null)
+          CalcSourceBanner(
+            label: 'From your Income Tax calculator:',
+            summary: '${_fmtGbp.format(widget.initialGrossIncome!)} gross income',
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(

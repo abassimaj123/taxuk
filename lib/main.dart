@@ -180,6 +180,17 @@ class _MainShellState extends State<MainShell> {
     HistoryScreen(),
   ];
 
+  /// Bottom-nav tab labels, in the same order as [_screens], used to make
+  /// the shell's AppBar title reflect the active tab instead of staying
+  /// frozen on the app name.
+  static const List<String> _tabLabels = [
+    'Income Tax',
+    'Compare',
+    'Investments',
+    'More Calculators',
+    'History',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -268,28 +279,38 @@ class _MainShellState extends State<MainShell> {
                 color: Colors.white, size: 18),
           ),
           const SizedBox(width: AppSpacing.smPlus),
-          RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                text: 'Tax',
-                style: TextStyle(
-                  color: ct.textPrimary,
-                  fontSize: AppTextSize.subtitleSm,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.4,
+          _index == 0
+              ? RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                      text: 'Tax',
+                      style: TextStyle(
+                        color: ct.textPrimary,
+                        fontSize: AppTextSize.subtitleSm,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' UK',
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: AppTextSize.subtitleSm,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                  ]),
+                )
+              : Text(
+                  _tabLabels[_index],
+                  style: TextStyle(
+                    color: ct.textPrimary,
+                    fontSize: AppTextSize.subtitleSm,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.4,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: ' UK',
-                style: const TextStyle(
-                  color: AppTheme.primary,
-                  fontSize: AppTextSize.subtitleSm,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.4,
-                ),
-              ),
-            ]),
-          ),
         ]),
         actions: [
           CalcwiseAppBarActions(
@@ -370,7 +391,7 @@ class _MainShellState extends State<MainShell> {
             NavigationDestination(
               icon: Icon(Icons.grid_view_outlined),
               selectedIcon: Icon(Icons.grid_view_rounded),
-              label: 'Tools',
+              label: 'More Calculators',
             ),
             NavigationDestination(
               icon: Icon(Icons.history_outlined),
