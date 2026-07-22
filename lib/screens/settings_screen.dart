@@ -197,6 +197,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () =>
                 _launch('mailto:hello@calqwise.com?subject=TaxUK%20Support'),
           ),
+
+          const Divider(),
+
+          // ── Discover ─────────────────────────────────────────────────────
+          _SectionHeader('Discover'),
+          ListTile(
+            leading: const Icon(Icons.apps_rounded, color: AppTheme.primary),
+            title: Text('CalqWise', style: TextStyle(color: ct.textPrimary)),
+            subtitle: Text('Our other financial calculators',
+                style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary)),
+            trailing:
+                Icon(Icons.open_in_new_rounded, color: ct.textSecondary, size: 16),
+            onTap: () => _launch('https://calqwise.com'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.grid_view_rounded, color: AppTheme.primary),
+            title: Text('More apps by CalqWise',
+                style: TextStyle(color: ct.textPrimary)),
+            subtitle: Text('See all our calculators',
+                style: TextStyle(fontSize: AppTextSize.sm, color: ct.textSecondary)),
+            trailing:
+                Icon(Icons.open_in_new_rounded, color: ct.textSecondary, size: 16),
+            onTap: () => _launch(
+                'https://play.google.com/store/apps/developer?id=Dailywave+Apps'),
+          ),
           const SizedBox(height: AppSpacing.xxxl),
         ],
       ),
